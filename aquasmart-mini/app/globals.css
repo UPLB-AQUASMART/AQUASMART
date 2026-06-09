@@ -1,26 +1,181 @@
-@import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --navy: #0b2545;
+  --aqua: #09a9d5;
+  --sky: #46c5df;
+  --pale: #f1f8fc;
+  --line: #d7e4ed;
+  --muted: #5f7592;
+  --green: #25a66b;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; color: var(--navy); background: #fff; font-family: Inter, Arial, sans-serif; }
+button, input { font: inherit; }
+button { color: inherit; }
+
+.site-header {
+  height: 94px; padding: 0 max(6vw, 28px); display: flex; align-items: center;
+  justify-content: space-between; background: #f5fbfe; border-bottom: 1px solid var(--line);
+}
+.brand { display: flex; align-items: baseline; font-size: 27px; font-weight: 700; letter-spacing: .02em; white-space: nowrap; }
+.brand-mark { width: 46px; height: 46px; display: grid; place-items: center; margin-right: 8px; border-radius: 50%; color: #25b7d6; background: var(--navy); }
+.brand-aqua { color: var(--sky); }
+.brand-navy { color: #17618e; }
+.brand small { margin-left: 4px; font-size: 11px; color: #07569a; letter-spacing: 0; }
+nav { display: flex; align-items: center; gap: 28px; }
+nav button { padding: 8px 0; border: 0; background: transparent; font-size: 15px; cursor: pointer; }
+nav button:hover, nav button.active { color: var(--aqua); }
+
+.page-intro { padding: 23px max(6vw, 28px) 36px; }
+.page-intro h1 { margin: 0 0 4px; font-size: 26px; letter-spacing: 0; color: #080b0e; }
+.page-intro p { max-width: 1260px; margin: 0; color: var(--navy); font-size: 13px; line-height: 1.55; }
+
+.simulation-map {
+  position: relative; width: min(1280px, 88vw); height: 980px; margin: 0 auto 42px;
+  overflow: hidden; border-radius: 12px; background:
+    linear-gradient(rgba(18, 77, 22, .12), rgba(18, 77, 22, .12)),
+    url("/farm-map.png") center/cover;
+}
+.simulation-panel {
+  position: absolute; z-index: 4; top: 80px; bottom: 30px; left: 28px; width: 50%;
+  max-width: 632px; min-width: 430px; border-radius: 0 17px 17px 17px;
+  background: rgba(229, 241, 242, .73); backdrop-filter: blur(5px);
+  box-shadow: 0 2px 8px rgba(11, 37, 69, .06);
+}
+.tabs { position: absolute; bottom: 100%; left: 0; display: flex; height: 52px; }
+.tabs button {
+  min-width: 144px; padding: 0 28px; border: 0; color: #686868;
+  background: rgba(237, 243, 246, .96); cursor: pointer; font-size: 20px;
+}
+.tabs button:first-child { min-width: 230px; border-radius: 16px 24px 0 0; }
+.tabs button:last-child { border-radius: 24px 24px 0 0; }
+.tabs button.selected { color: #38a8d2; background: rgba(239, 251, 255, .98); font-weight: 600; }
+.panel-heading { display: flex; align-items: center; justify-content: space-between; padding: 40px 28px 20px; }
+.panel-heading h2 { max-width: 465px; margin: 0; font-size: 31px; font-weight: 700; line-height: 1.15; letter-spacing: 0; }
+.icon-button {
+  width: 56px; height: 56px; flex: 0 0 56px; display: grid; place-items: center;
+  border: 0; border-radius: 50%; color: #6b6f72; background: rgba(246, 249, 250, .92); cursor: pointer;
+}
+.well-list { padding: 0 28px 28px; display: grid; gap: 16px; max-height: 590px; overflow-y: auto; }
+.well-control, .add-well { border: 0; border-radius: 15px; background: rgba(255,255,255,.87); box-shadow: 0 1px 5px rgba(18,45,63,.08); }
+.well-control { min-height: 155px; padding: 28px 30px 18px; }
+.well-row { display: grid; grid-template-columns: 1fr auto auto; gap: 12px; align-items: center; font-size: 21px; }
+.well-row span { min-width: 0; display: flex; align-items: center; gap: 19px; font-weight: 700; }
+.well-row strong { color: #39a8d2; font-size: 20px; white-space: nowrap; }
+.delete-well { padding: 2px; border: 0; color: #8c9cab; background: transparent; cursor: pointer; }
+input[type="range"] { width: 100%; height: 5px; margin: 26px 0 13px; accent-color: #39a8d2; cursor: pointer; }
+.range-labels { display: flex; justify-content: space-between; color: #616365; font-size: 20px; }
+.add-well {
+  height: 108px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  color: #3fa9d3; background: rgba(235, 249, 255, .91); font-size: 23px; font-weight: 700; cursor: pointer;
+}
+.statistics { display: grid; gap: 16px; padding: 0 28px; }
+.statistics div { padding: 24px 28px; display: flex; justify-content: space-between; border-radius: 15px; background: rgba(255,255,255,.87); }
+.statistics span { color: var(--muted); font-size: 18px; }
+.statistics strong { font-size: 19px; }
+.well-marker { position: absolute; z-index: 2; width: 44px; height: 44px; transform: translate(-50%,-50%); display: grid; place-items: center; }
+.well-marker i { position: absolute; width: 160px; height: 160px; border-radius: 50%; background: rgba(77,190,210,.19); }
+.well-marker i:nth-child(2) { width: 92px; height: 92px; background: rgba(77,190,210,.24); }
+.well-marker span { z-index: 2; width: 45px; height: 45px; display: grid; place-items: center; border: 4px solid #c8bda8; border-radius: 50%; color: #0d7c9a; background: #ded8cb; box-shadow: 0 5px 10px rgba(0,0,0,.25); }
+
+.readings-section { padding: 52px max(6vw, 28px) 70px; background: #e4f0f7; }
+.section-inner { max-width: 1220px; margin: auto; }
+.readings-section h2 { margin: 0 0 26px; color: var(--aqua); font-size: 16px; text-transform: uppercase; }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; background: rgba(255,255,255,.35); }
+th, td { padding: 15px; text-align: left; border-bottom: 1px solid rgba(95,117,146,.18); font-size: 14px; }
+th { color: var(--muted); font-weight: 600; }
+
+.forecast-band { padding: 10px max(6vw, 28px); background: var(--pale); }
+.forecast-grid { max-width: 1280px; margin: auto; display: grid; grid-template-columns: 585px 338px; gap: 10px; }
+.forecast-card, .forecast-summary { min-height: 378px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,.18); }
+.forecast-card { padding: 14px; }
+.current-weather { display: grid; grid-template-columns: 162px 1fr; gap: 20px; }
+.weather-symbol { height: 242px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; border: 1px solid var(--line); border-radius: 12px; }
+.weather-symbol strong { color: #07090b; font-size: 25px; }
+.weather-facts { display: grid; gap: 12px; padding: 10px 10px 10px 0; }
+.weather-facts > div { min-height: 65px; display: flex; align-items: center; gap: 36px; padding: 12px 30px; border: 1px solid var(--line); color: #07090b; }
+.weather-facts strong, .weather-facts b { font-size: 25px; }
+.weather-facts .excellent { color: var(--green); }
+.forecast-selector { margin-top: 26px; display: grid; grid-template-columns: 34px 1fr 34px; align-items: center; }
+.forecast-days { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.forecast-days button { min-height: 112px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; border: 1px solid var(--line); background: rgba(255,255,255,.18); cursor: pointer; }
+.forecast-days button.selected-day { border-color: var(--aqua); background: #fff; box-shadow: 0 0 0 2px rgba(9,169,213,.1); }
+.forecast-days span { font-size: 12px; font-weight: 600; }
+.forecast-days strong { color: #07090b; font-size: 18px; }
+.arrow-button { display: grid; place-items: center; border: 0; background: transparent; cursor: pointer; }
+.forecast-summary { padding: 26px; overflow: hidden; }
+.forecast-summary > span { color: var(--aqua); font-size: 12px; font-weight: 700; text-transform: uppercase; }
+.forecast-summary h2 { max-width: 270px; margin: 9px 0 36px; font-size: 22px; line-height: 1.25; color: #0b1828; }
+.rain-bars { height: 210px; display: flex; align-items: flex-end; gap: 18px; }
+.rain-bars div { height: 100%; flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 7px; }
+.rain-bars i { width: 100%; min-height: 12px; border-radius: 5px 5px 0 0; background: linear-gradient(#48c6df, #1487b8); }
+.rain-bars small { color: var(--muted); }
+
+.aquifer-section { padding: 36px max(6vw, 28px) 70px; overflow: hidden; }
+.aquifer-visual { position: relative; max-width: 1280px; height: 390px; margin: auto; overflow: hidden; background: #fff; }
+.land { position: absolute; top: 105px; left: -3%; width: 106%; height: 75px; border-radius: 48% 60% 0 0; background: #78944b; transform: rotate(.8deg); }
+.soil { position: absolute; left: -2%; width: 104%; }
+.soil-one { top: 155px; height: 105px; background: #a27b45; clip-path: polygon(0 10%, 19% 3%, 42% 12%, 62% 0, 80% 13%, 100% 5%, 100% 100%, 0 100%); }
+.soil-two { top: 245px; height: 150px; background: #cfad70; }
+.water-table { position: absolute; left: 0; right: 0; top: 278px; height: 65px; background: rgba(40,161,201,.46); border-top: 4px solid #149bc4; }
+.aquifer-well { position: absolute; z-index: 4; top: 6px; text-align: center; color: #111; }
+.aquifer-well strong, .aquifer-well span { display: block; font-size: 15px; }
+.aquifer-well span { color: #111; }
+.aquifer-well i { width: 4px; height: 235px; display: block; margin: 8px auto 0; background: #5f6264; border: 1px solid #222; }
+.well-1 { left: 16%; color: #1c36ef; } .well-2 { left: 34%; } .well-3 { left: 56%; color: #1c36ef; } .well-4 { left: 75%; }
+.north-arrow { position: absolute; z-index: 5; right: 4%; top: 0; font-size: 25px; font-weight: 700; transform: rotate(8deg); }
+.north-arrow span { display: block; font-size: 62px; transform: rotate(-42deg); }
+
+@media (max-width: 1050px) {
+  .site-header { height: auto; padding-block: 18px; flex-direction: column; gap: 16px; }
+  nav { max-width: 100%; gap: 20px; overflow-x: auto; }
+  .forecast-grid { grid-template-columns: 1fr; }
+  .forecast-summary { min-height: 300px; }
+  .simulation-panel { width: 56%; min-width: 400px; }
+  .tabs button { min-width: 125px; padding-inline: 20px; font-size: 17px; }
+  .tabs button:first-child { min-width: 195px; }
+  .panel-heading h2 { font-size: 25px; }
+  .well-control { min-height: 135px; padding: 23px 24px 15px; }
+  .well-row { font-size: 18px; }
+  .well-row strong, .range-labels { font-size: 16px; }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@media (max-width: 700px) {
+  .brand { font-size: 22px; }
+  .brand-mark { width: 40px; height: 40px; }
+  nav { justify-content: flex-start; width: 100%; }
+  nav button { white-space: nowrap; font-size: 13px; }
+  .page-intro { padding-top: 28px; }
+  .simulation-map { width: calc(100% - 28px); height: 700px; }
+  .simulation-panel {
+    top: 52px; left: 12px; right: 12px; width: auto; min-width: 0;
+    bottom: auto; height: 520px; max-height: 520px;
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  .tabs { height: 42px; }
+  .tabs button { min-width: 110px; padding-inline: 14px; font-size: 15px; }
+  .tabs button:first-child { min-width: 160px; }
+  .panel-heading { padding: 25px 16px 13px; }
+  .panel-heading h2 { font-size: 20px; }
+  .icon-button { width: 42px; height: 42px; flex-basis: 42px; }
+  .well-list { padding: 0 16px 16px; }
+  .well-control { min-height: 118px; padding: 20px 16px 12px; }
+  .add-well { height: 82px; font-size: 19px; }
+  .well-marker { top: 76% !important; }
+  .current-weather { grid-template-columns: 1fr; }
+  .weather-symbol { height: 180px; }
+  .weather-facts { padding: 0; }
+  .weather-facts > div { padding: 12px 16px; gap: 18px; }
+  .weather-facts strong, .weather-facts b { font-size: 18px; }
+  .well-row { gap: 5px; font-size: 14px; }
+  .well-row span { gap: 8px; }
+  .well-row strong { font-size: 12px; }
+  .range-labels { font-size: 14px; }
+  .forecast-days { overflow-x: auto; grid-template-columns: repeat(4, 110px); }
+  .forecast-grid { display: block; }
+  .forecast-summary { margin-top: 14px; }
+  .aquifer-visual { min-width: 720px; }
 }
