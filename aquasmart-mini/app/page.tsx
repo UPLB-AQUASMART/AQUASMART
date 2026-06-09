@@ -7,9 +7,10 @@ import {
   Droplet,
   Plus,
   RefreshCw,
+  TrendingUp,
   Trash2,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type PointerEvent as ReactPointerEvent } from "react";
 
 type View = "simulation" | "forecast";
 type Tab = "discharge" | "statistics";
@@ -69,8 +70,7 @@ function PageIntro({ title }: { title: string }) {
     <section className="page-intro">
       <h1>{title}</h1>
       <p>
-        Plan irrigation with field data, groundwater conditions, and local weather
-        insights. Explore scenarios before applying changes to your farm.
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
       </p>
     </section>
   );
@@ -80,6 +80,7 @@ function Simulation() {
   const initialWells: Well[] = [{ id: 1, name: "Option 1", discharge: 138, x: 45, y: 36 }];
   const [wells, setWells] = useState(initialWells);
   const [tab, setTab] = useState<Tab>("discharge");
+  const [draggingWell, setDraggingWell] = useState<number | null>(null);
   const totalDischarge = useMemo(() => wells.reduce((sum, well) => sum + well.discharge, 0), [wells]);
 
   function addWell() {
@@ -100,6 +101,32 @@ function Simulation() {
     setWells((current) => current.map((well) => well.id === id ? { ...well, discharge } : well));
   }
 
+  function startWellDrag(event: ReactPointerEvent<HTMLDivElement>, id: number) {
+    event.preventDefault();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    setDraggingWell(id);
+  }
+
+  function moveWell(event: ReactPointerEvent<HTMLDivElement>, id: number) {
+    if (draggingWell !== id) return;
+
+    const map = event.currentTarget.parentElement;
+    if (!map) return;
+
+    const bounds = map.getBoundingClientRect();
+    const x = Math.min(96, Math.max(4, ((event.clientX - bounds.left) / bounds.width) * 100));
+    const y = Math.min(92, Math.max(8, ((event.clientY - bounds.top) / bounds.height) * 100));
+
+    setWells((current) => current.map((well) => well.id === id ? { ...well, x, y } : well));
+  }
+
+  function stopWellDrag(event: ReactPointerEvent<HTMLDivElement>) {
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    setDraggingWell(null);
+  }
+
   return (
     <>
       <PageIntro title="Groundwater Simulation" />
@@ -109,17 +136,24 @@ function Simulation() {
             <button className={tab === "discharge" ? "selected" : ""} onClick={() => setTab("discharge")}>Water Discharge</button>
             <button className={tab === "statistics" ? "selected" : ""} onClick={() => setTab("statistics")}>Statistics</button>
           </div>
-          <div className="panel-heading">
-            <h2>MODFLOW/FLOPY Groundwater Simulation</h2>
-            <button className="icon-button" onClick={() => setWells(initialWells)} title="Reset simulation"><RefreshCw size={30} strokeWidth={2.4} /></button>
-          </div>
+          {tab === "discharge" ? (
+            <div className="panel-heading">
+              <h2>MODFLOW/FLOPY Groundwater Simulation</h2>
+              <button className="icon-button" onClick={() => setWells(initialWells)} title="Reset simulation"><RefreshCw size={20} strokeWidth={2.4} /></button>
+            </div>
+          ) : (
+            <div className="statistics-heading">
+              <h2><TrendingUp size={21} strokeWidth={2.4} /> Model Statistics</h2>
+              <p>Current scenario performance metrics</p>
+            </div>
+          )}
 
           {tab === "discharge" ? (
             <div className="well-list">
               {wells.map((well) => (
                 <div className="well-control" key={well.id}>
                   <div className="well-row">
-                    <span><Droplet size={27} strokeWidth={2.2} />{well.name}</span>
+                    <span><Droplet size={17} strokeWidth={2.2} />{well.name}</span>
                     <strong>{well.discharge} m³/day</strong>
                     {wells.length > 1 && (
                       <button className="delete-well" title={`Remove ${well.name}`} onClick={() => setWells((current) => current.filter((item) => item.id !== well.id))}>
@@ -131,20 +165,41 @@ function Simulation() {
                   <div className="range-labels"><span>0</span><span>500</span></div>
                 </div>
               ))}
-              <button className="add-well" onClick={addWell}>Add Well <Plus size={30} strokeWidth={2} /></button>
+              <button className="add-well" onClick={addWell}>Add Well <Plus size={18} strokeWidth={2} /></button>
             </div>
           ) : (
             <div className="statistics">
-              <div><span>Active wells</span><strong>{wells.length}</strong></div>
-              <div><span>Total discharge</span><strong>{totalDischarge} m³/day</strong></div>
-              <div><span>Estimated drawdown</span><strong>{(totalDischarge / 115).toFixed(1)} m</strong></div>
+              <div className="statistics-card">
+                <div className="stat-row"><span>Total Pumping Discharge</span><strong>{totalDischarge} m³/day</strong></div>
+                <div className="stat-row"><span>Safe Yield Capacity</span><strong>1000 m³/day</strong></div>
+                <div className="stat-row utilization-row"><span>Capacity Utilization</span><strong>93.2%</strong></div>
+                <div className="utilization-track" aria-label="Capacity utilization: 93.2 percent"><i /></div>
+                <div className="stat-row"><span>Average Drawdown</span><strong>1.9 m</strong></div>
+                <div className="stat-row"><span>Critical Wells</span><strong>0</strong></div>
+                <div className="stat-row"><span>Sustainability Status</span><strong className="sustainable-pill">Sustainable</strong></div>
+                <div className="stat-row"><span>Est. Recovery Time</span><strong>94 days</strong></div>
+              </div>
             </div>
           )}
         </div>
 
         {wells.map((well) => (
-          <div className="well-marker" key={well.id} style={{ left: `${well.x}%`, top: `${well.y}%` }}>
-            <i /><i /><span><Droplet size={21} fill="currentColor" /></span>
+          <div
+            className={`well-marker${draggingWell === well.id ? " dragging" : ""}`}
+            key={well.id}
+            style={{ left: `${well.x}%`, top: `${well.y}%` }}
+            onPointerDown={(event) => startWellDrag(event, well.id)}
+            onPointerMove={(event) => moveWell(event, well.id)}
+            onPointerUp={stopWellDrag}
+            onPointerCancel={stopWellDrag}
+            title={`Drag ${well.name} across the map`}
+          >
+            <i className="influence-ring ring-outer" />
+            <i className="influence-ring ring-middle" />
+            <i className="influence-ring ring-inner" />
+            <i className="well-ripple ripple-one" />
+            <i className="well-ripple ripple-two" />
+            <img className="well-image" src="/well-cropped.png" alt="" aria-hidden="true" />
           </div>
         ))}
       </section>
