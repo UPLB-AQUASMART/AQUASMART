@@ -21,11 +21,11 @@ Completed locally:
 - Supabase PostGIS, tables, RLS policies, and v1 storage buckets created.
 - Frontend lint/build verified.
 - Backend import and `/health` verified.
+- Render backend service configured and deployed from `main`.
 
 Still requires account-side action:
 
 - Vercel deployment. The local Vercel CLI requested device login, so deployment cannot finish until the Vercel account is authenticated.
-- Render deployment. No Render CLI or Render deployment connector is available in this workspace, so this must be created from the Render dashboard or from Render after connecting the Git repository.
 - Render `SUPABASE_SERVICE_ROLE_KEY`. Supabase service role keys are secret dashboard credentials and are not exposed by the available Supabase connector.
 
 Supabase project used:
@@ -35,6 +35,17 @@ Name: AQUASMART
 Project ref: erjcmensjjhdpwwqnisq
 URL: https://erjcmensjjhdpwwqnisq.supabase.co
 Region: ap-southeast-1
+```
+
+Render backend:
+
+```text
+Service URL: https://aquasmart-zf44.onrender.com
+Health URL: https://aquasmart-zf44.onrender.com/health
+Root Directory: api
+Build Command: pip install -r requirements.txt
+Start Command: uvicorn main:app --host 0.0.0.0 --port $PORT
+Health Check Path: /health
 ```
 
 ## Project Structure
@@ -159,7 +170,7 @@ Keep v1 files small:
 
 The repo includes `render.yaml`, so you can deploy through a Render Blueprint or create the service manually.
 
-This step still needs to be completed in your Render account because this workspace does not have an authenticated Render CLI or Render deployment connector.
+The current Render service has already been configured from the Render dashboard.
 
 Recommended manual settings:
 
@@ -190,8 +201,10 @@ For this project:
 PYTHON_VERSION=3.12.8
 SUPABASE_URL=https://erjcmensjjhdpwwqnisq.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=copy_from_supabase_dashboard
-FRONTEND_ORIGIN=https://your-vercel-app.vercel.app
+FRONTEND_ORIGIN=http://localhost:3000
 ```
+
+After Vercel is deployed, update `FRONTEND_ORIGIN` to the production Vercel URL.
 
 Where to get the service role key:
 
