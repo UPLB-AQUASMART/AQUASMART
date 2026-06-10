@@ -1,0 +1,794 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AQUASMART Groundwater 3D Viewer</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #02040a;
+        color: #f8fafc;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        overflow: hidden;
+        background: #02040a;
+      }
+
+      #scene {
+        position: fixed;
+        inset: 0;
+      }
+
+      .panel {
+        position: fixed;
+        left: 16px;
+        top: 16px;
+        width: min(360px, calc(100vw - 32px));
+        border: 1px solid rgba(226, 232, 240, 0.16);
+        border-radius: 8px;
+        background: rgba(3, 7, 18, 0.88);
+        box-shadow: 0 18px 42px rgba(0, 0, 0, 0.42);
+        padding: 14px;
+        backdrop-filter: blur(10px);
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: 0;
+      }
+
+      p {
+        margin: 0;
+        color: #cbd5e1;
+        font-size: 13px;
+        line-height: 1.45;
+      }
+
+      .status {
+        margin-top: 12px;
+        display: grid;
+        gap: 6px;
+        color: #e5edf7;
+        font-size: 12px;
+      }
+
+      .legend {
+        margin-top: 12px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 7px 10px;
+        font-size: 12px;
+        color: #e5edf7;
+      }
+
+      .legend-item {
+        display: flex;
+        min-width: 0;
+        align-items: center;
+        gap: 7px;
+      }
+
+      .swatch {
+        width: 14px;
+        height: 14px;
+        flex: 0 0 14px;
+        border-radius: 3px;
+        border: 1px solid rgba(255, 255, 255, 0.24);
+      }
+
+      .controls {
+        margin-top: 12px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      button {
+        border: 1px solid rgba(226, 232, 240, 0.16);
+        border-radius: 7px;
+        background: rgba(15, 23, 42, 0.88);
+        color: #f8fafc;
+        cursor: pointer;
+        font: inherit;
+        font-size: 12px;
+        padding: 7px 9px;
+      }
+
+      button:hover {
+        background: rgba(51, 65, 85, 0.92);
+      }
+
+      .error {
+        color: #b91c1c;
+      }
+
+      .compass {
+        position: fixed;
+        right: 34px;
+        top: 26px;
+        width: 86px;
+        height: 86px;
+        color: #f8fafc;
+        font-weight: 800;
+        pointer-events: none;
+      }
+
+      .compass::before {
+        content: "";
+        position: absolute;
+        left: 34px;
+        top: 22px;
+        width: 13px;
+        height: 56px;
+        background: #f8fafc;
+        clip-path: polygon(50% 0, 100% 36%, 64% 36%, 64% 100%, 36% 100%, 36% 36%, 0 36%);
+        transform: rotate(34deg);
+        transform-origin: 50% 50%;
+      }
+
+      .compass span {
+        position: absolute;
+        right: 7px;
+        top: 0;
+        font-size: 28px;
+      }
+
+      .head-legend {
+        position: fixed;
+        right: 28px;
+        bottom: 24px;
+        width: 150px;
+        border: 1px solid rgba(226, 232, 240, 0.16);
+        border-radius: 8px;
+        background: rgba(3, 7, 18, 0.88);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.34);
+        padding: 12px;
+        color: #f8fafc;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .colorbar {
+        height: 112px;
+        width: 34px;
+        margin: 9px auto 7px;
+        border: 1px solid rgba(226, 232, 240, 0.18);
+        background: linear-gradient(
+          to top,
+          #2366f5 0%,
+          #31cdd6 22%,
+          #80e54f 43%,
+          #ffda28 62%,
+          #ff8419 80%,
+          #d92a26 100%
+        );
+      }
+
+      .head-scale {
+        display: flex;
+        justify-content: space-between;
+        color: #cbd5e1;
+        font-weight: 600;
+      }
+    </style>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.184.0/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three@0.184.0/examples/jsm/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <main id="scene" aria-label="3D groundwater model viewer"></main>
+    <div class="compass" aria-hidden="true"><span>N</span></div>
+    <aside class="head-legend" aria-label="Hydraulic head legend">
+      <div>Hydraulic Head</div>
+      <div class="colorbar"></div>
+      <div class="head-scale"><span>low</span><span>high</span></div>
+    </aside>
+    <aside class="panel">
+      <h1>AQUASMART 3D Groundwater Sample</h1>
+      <p>
+        Drag to orbit, scroll to zoom, right-drag to pan. Red-orange zones show higher/deeper
+        downward-flow emphasis; lighter/cooler zones are closer to the surface.
+      </p>
+      <div class="status" id="status">Loading scene JSON...</div>
+      <div class="legend" id="legend"></div>
+      <div class="controls">
+        <button id="toggle-heads" type="button">Toggle heads</button>
+        <button id="toggle-arrows" type="button">Toggle arrows</button>
+        <button id="toggle-wells" type="button">Toggle wells</button>
+        <button id="reset-camera" type="button">Reset view</button>
+      </div>
+    </aside>
+
+    <script type="module">
+      import * as THREE from "three";
+      import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+      const sceneRoot = document.querySelector("#scene");
+      const statusEl = document.querySelector("#status");
+      const legendEl = document.querySelector("#legend");
+      const xScale = 1 / 1000;
+      const yScale = 1 / 1000;
+      const zScale = 11 / 1000;
+      const domain = { lx_m: 60000, ly_m: 25000 };
+      const centerX = domain.lx_m / 2;
+      const centerY = domain.ly_m / 2;
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setClearColor(0x02040a, 1);
+      sceneRoot.appendChild(renderer.domElement);
+
+      const scene = new THREE.Scene();
+      scene.fog = new THREE.Fog(0x02040a, 95, 165);
+
+      const perspectiveCamera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 400);
+      const orthoSize = 36;
+      const orthoCamera = new THREE.OrthographicCamera(-orthoSize, orthoSize, orthoSize, -orthoSize, 0.1, 400);
+      let activeCamera = perspectiveCamera;
+      const controls = new OrbitControls(activeCamera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.08;
+      controls.target.set(0, 0, 0);
+      const raycaster = new THREE.Raycaster();
+      const pointer = new THREE.Vector2();
+      let cameraTween = null;
+
+      const headsGroup = new THREE.Group();
+      const arrowsGroup = new THREE.Group();
+      const wellsGroup = new THREE.Group();
+      const frameGroup = new THREE.Group();
+      scene.add(headsGroup, arrowsGroup, wellsGroup, frameGroup);
+
+      scene.add(new THREE.HemisphereLight(0xffffff, 0x162033, 2.35));
+      const sun = new THREE.DirectionalLight(0xffffff, 3.0);
+      sun.position.set(-18, 30, 24);
+      scene.add(sun);
+
+      function toScenePoint(point) {
+        return new THREE.Vector3(
+          (point[0] - centerX) * xScale,
+          (point[2] || 0) * zScale,
+          (point[1] - centerY) * yScale
+        );
+      }
+
+      function colorArray(hexColors) {
+        const values = [];
+        const color = new THREE.Color();
+        for (const hex of hexColors) {
+          color.set(hex);
+          values.push(color.r, color.g, color.b);
+        }
+        return new Float32Array(values);
+      }
+
+      function makeTerrainColors(vertices) {
+        const values = [];
+        const color = new THREE.Color();
+        for (const [x, y, z] of vertices) {
+          const x01 = x / domain.lx_m;
+          const y01 = y / domain.ly_m;
+          const riverA = Math.abs(y01 - (0.22 + 0.08 * Math.sin(x01 * 10)));
+          const riverB = Math.abs(y01 - (0.68 - 0.05 * Math.cos(x01 * 13)));
+          if (riverA < 0.015 || riverB < 0.012) {
+            color.set("#2f83d8");
+          } else if (z > 354) {
+            color.set("#557c35");
+          } else if ((x01 > 0.58 && y01 > 0.48) || z < 300) {
+            color.set("#c7b783");
+          } else {
+            color.set("#78a953");
+          }
+          values.push(color.r, color.g, color.b);
+        }
+        return new Float32Array(values);
+      }
+
+      function makeSurface(surface, options = {}) {
+        const geometry = new THREE.BufferGeometry();
+        const positions = [];
+        for (const vertex of surface.vertices) {
+          const p = toScenePoint(vertex);
+          positions.push(p.x, p.y, p.z);
+        }
+
+        geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+        geometry.setIndex(surface.faces.flat());
+        geometry.computeVertexNormals();
+
+        const materialOptions = {
+          transparent: options.solid ? false : true,
+          opacity: options.opacity ?? 0.74,
+          roughness: 0.9,
+          metalness: 0,
+          side: THREE.DoubleSide,
+        };
+
+        if (options.terrainColors) {
+          geometry.setAttribute("color", new THREE.BufferAttribute(makeTerrainColors(surface.vertices), 3));
+          materialOptions.vertexColors = true;
+        } else if (surface.vertexColors) {
+          geometry.setAttribute("color", new THREE.BufferAttribute(colorArray(surface.vertexColors), 3));
+          materialOptions.vertexColors = true;
+        } else {
+          materialOptions.color = surface.color || options.color || "#9ca3af";
+        }
+
+        const Material = options.unlit ? THREE.MeshBasicMaterial : THREE.MeshStandardMaterial;
+        const mesh = new THREE.Mesh(geometry, new Material(materialOptions));
+        mesh.name = surface.name;
+        if (options.renderOrder !== undefined) {
+          mesh.renderOrder = options.renderOrder;
+        }
+        return mesh;
+      }
+
+      function addEdges(mesh, color = 0x02040a, opacity = 0.46) {
+        const edges = new THREE.EdgesGeometry(mesh.geometry, 18);
+        const lines = new THREE.LineSegments(
+          edges,
+          new THREE.LineBasicMaterial({ color, transparent: true, opacity })
+        );
+        mesh.add(lines);
+        return mesh;
+      }
+
+      function addOutline(mesh, color = 0x02040a, opacity = 0.5) {
+        const edges = new THREE.EdgesGeometry(mesh.geometry, 42);
+        const lines = new THREE.LineSegments(
+          edges,
+          new THREE.LineBasicMaterial({ color, transparent: true, opacity })
+        );
+        lines.renderOrder = 15;
+        mesh.add(lines);
+        return mesh;
+      }
+
+      function makeTextSprite(text, color = "#f8fafc", background = "rgba(2,4,10,0.74)") {
+        const canvas = document.createElement("canvas");
+        const context = canvas.getContext("2d");
+        const scale = 3;
+        canvas.width = 360 * scale;
+        canvas.height = 84 * scale;
+        context.scale(scale, scale);
+        context.font = "700 24px Inter, system-ui, sans-serif";
+        context.textAlign = "center";
+        context.textBaseline = "middle";
+        const metrics = context.measureText(text);
+        const width = Math.min(336, metrics.width + 34);
+        const x = (360 - width) / 2;
+        context.fillStyle = background;
+        context.strokeStyle = "rgba(255,255,255,0.28)";
+        context.lineWidth = 1;
+        context.beginPath();
+        context.roundRect(x, 12, width, 60, 10);
+        context.fill();
+        context.stroke();
+        context.fillStyle = color;
+        context.fillText(text, 180, 42);
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        const material = new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false });
+        const sprite = new THREE.Sprite(material);
+        sprite.scale.set(7.2, 1.68, 1);
+        sprite.renderOrder = 20;
+        return sprite;
+      }
+
+      function inferGrid(surface) {
+        const firstY = surface.vertices[0][1];
+        let cols = 0;
+        while (cols < surface.vertices.length && surface.vertices[cols][1] === firstY) {
+          cols += 1;
+        }
+        return { rows: surface.vertices.length / cols, cols };
+      }
+
+      function makeLayerSides(topSurface, bottomSurface, color) {
+        const { rows, cols } = inferGrid(topSurface);
+        const vertices = [];
+        const faces = [];
+
+        function pushQuad(topA, topB, bottomA, bottomB) {
+          const base = vertices.length;
+          for (const source of [topA, bottomA, topB, bottomB]) {
+            const p = toScenePoint(source);
+            vertices.push(p.x, p.y, p.z);
+          }
+          faces.push(base, base + 1, base + 2, base + 2, base + 1, base + 3);
+        }
+
+        for (let col = 0; col < cols - 1; col += 1) {
+          const a = col;
+          const b = col + 1;
+          const c = (rows - 1) * cols + col;
+          const d = c + 1;
+          pushQuad(topSurface.vertices[a], topSurface.vertices[b], bottomSurface.vertices[a], bottomSurface.vertices[b]);
+          pushQuad(topSurface.vertices[c], topSurface.vertices[d], bottomSurface.vertices[c], bottomSurface.vertices[d]);
+        }
+
+        for (let row = 0; row < rows - 1; row += 1) {
+          const leftA = row * cols;
+          const leftB = (row + 1) * cols;
+          const rightA = row * cols + cols - 1;
+          const rightB = (row + 1) * cols + cols - 1;
+          pushQuad(
+            topSurface.vertices[leftA],
+            topSurface.vertices[leftB],
+            bottomSurface.vertices[leftA],
+            bottomSurface.vertices[leftB]
+          );
+          pushQuad(
+            topSurface.vertices[rightA],
+            topSurface.vertices[rightB],
+            bottomSurface.vertices[rightA],
+            bottomSurface.vertices[rightB]
+          );
+        }
+
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
+        geometry.setIndex(faces);
+        geometry.computeVertexNormals();
+        const mesh = new THREE.Mesh(
+          geometry,
+          new THREE.MeshStandardMaterial({
+            color,
+            transparent: false,
+            opacity: 1,
+            roughness: 0.86,
+            side: THREE.DoubleSide,
+            polygonOffset: true,
+            polygonOffsetFactor: 1,
+            polygonOffsetUnits: 1,
+          })
+        );
+        mesh.renderOrder = 4;
+        return addEdges(mesh, 0x02040a, 0.62);
+      }
+
+      function makeBoundaryLines(surface) {
+        const { rows, cols } = inferGrid(surface);
+        const material = new THREE.LineBasicMaterial({
+          color: 0x02040a,
+          transparent: true,
+          opacity: 0.95,
+          depthTest: false,
+        });
+        const group = new THREE.Group();
+        const edges = [
+          Array.from({ length: cols }, (_, col) => col),
+          Array.from({ length: cols }, (_, col) => (rows - 1) * cols + col),
+          Array.from({ length: rows }, (_, row) => row * cols),
+          Array.from({ length: rows }, (_, row) => row * cols + cols - 1),
+        ];
+
+        for (const edge of edges) {
+          const points = edge.map((index) => {
+            const point = toScenePoint(surface.vertices[index]);
+            point.y += 0.018;
+            return point;
+          });
+          const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints(points), material.clone());
+          line.renderOrder = 30;
+          group.add(line);
+        }
+        return group;
+      }
+
+      function makeWireBox(sceneData) {
+        const lx = sceneData.domain.lx_m * xScale;
+        const ly = sceneData.domain.ly_m * yScale;
+        const lz = (sceneData.domain.top_m - sceneData.domain.bottom_m) * zScale;
+        const box = new THREE.BoxGeometry(lx, lz, ly);
+        const edges = new THREE.EdgesGeometry(box);
+        const lines = new THREE.LineSegments(
+          edges,
+          new THREE.LineBasicMaterial({ color: 0xe2e8f0, transparent: true, opacity: 0.34 })
+        );
+        lines.position.y = ((sceneData.domain.top_m + sceneData.domain.bottom_m) / 2) * zScale;
+        return lines;
+      }
+
+      function makeWell(well) {
+        const top = toScenePoint([well.x_m, well.y_m, well.screen_top_m]);
+        const bottom = toScenePoint([well.x_m, well.y_m, well.screen_bottom_m]);
+        const height = top.distanceTo(bottom);
+        const mid = top.clone().add(bottom).multiplyScalar(0.5);
+        const casing = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.11, 0.11, height, 16),
+          new THREE.MeshStandardMaterial({
+            color: 0xf8fafc,
+            metalness: 0.1,
+            roughness: 0.36,
+          })
+        );
+        casing.position.copy(mid);
+        const marker = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.16, 0.16, 0.38, 16),
+          new THREE.MeshStandardMaterial({ color: well.role === "Pumping" ? 0x0057ff : 0xf8fafc })
+        );
+        marker.position.copy(top);
+        marker.position.y += 0.18;
+        const screen = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.13, 0.13, Math.max(height * 0.34, 0.5), 16),
+          new THREE.MeshStandardMaterial({ color: well.role === "Pumping" ? 0x00a3ff : 0x38d6d1 })
+        );
+        screen.position.copy(bottom.clone().lerp(top, 0.22));
+        const label = makeTextSprite(`${well.id} (${well.role})`, well.role === "Pumping" ? "#65a8ff" : "#f8fafc");
+        label.position.copy(top);
+        label.position.y += 2.2;
+        const group = new THREE.Group();
+        group.userData.well = well;
+        group.add(casing, screen, marker, label);
+        group.traverse((child) => {
+          child.userData.well = well;
+          child.userData.selectableWell = true;
+        });
+        return group;
+      }
+
+      function makeFlowArrow(flow) {
+        const origin = toScenePoint(flow.start);
+        const direction = new THREE.Vector3(flow.direction[0], flow.direction[2] * 3, flow.direction[1]).normalize();
+        const arrow = new THREE.ArrowHelper(direction, origin, flow.length_m * xScale * 1.45, 0xffffff, 0.74, 0.3);
+        arrow.traverse((child) => {
+          if (child.material) {
+            child.material.depthTest = false;
+            child.material.transparent = true;
+            child.material.opacity = 0.92;
+          }
+          child.renderOrder = 10;
+        });
+        return arrow;
+      }
+
+      function makeFlowTraces() {
+        const group = new THREE.Group();
+        const material = new THREE.LineBasicMaterial({
+          color: 0xffffff,
+          transparent: true,
+          opacity: 0.9,
+          depthTest: false,
+        });
+        const frontY = -centerY * yScale - 0.18;
+        const levels = [1.2, 0.35, -0.65, -1.55, -2.45, -3.3];
+        for (let row = 0; row < levels.length; row += 1) {
+          for (let band = 0; band < 2; band += 1) {
+            const points = [];
+            const start = -27 + band * 3.8;
+            const end = 25 - band * 2.8;
+            for (let i = 0; i <= 52; i += 1) {
+              const t = i / 52;
+              const x = start + (end - start) * t;
+              const dip = Math.sin(t * Math.PI * 1.7 + row * 0.55) * 0.22;
+              const pumpSag = -0.52 * Math.exp(-Math.pow((t - 0.62) / 0.18, 2));
+              const y = levels[row] + dip + pumpSag;
+              points.push(new THREE.Vector3(x, y, frontY - row * 0.018));
+            }
+            const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints(points), material.clone());
+            line.renderOrder = 12;
+            group.add(line);
+
+            const arrowPoint = points[Math.floor(points.length * 0.72)];
+            const cone = new THREE.Mesh(
+              new THREE.ConeGeometry(0.16, 0.42, 18),
+              new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.92, depthTest: false })
+            );
+            cone.position.copy(arrowPoint);
+            cone.rotation.z = -Math.PI / 2.8;
+            cone.rotation.x = Math.PI / 2;
+            cone.renderOrder = 13;
+            group.add(cone);
+          }
+        }
+        return group;
+      }
+
+      function resetCamera() {
+        activeCamera = perspectiveCamera;
+        controls.object = activeCamera;
+        perspectiveCamera.position.set(44, 9, 34);
+        controls.target.set(0, -1.35, 0);
+        perspectiveCamera.updateProjectionMatrix();
+        controls.update();
+      }
+
+      function updateOrthoCamera() {
+        const aspect = window.innerWidth / window.innerHeight;
+        orthoCamera.left = (-orthoSize * aspect) / 2;
+        orthoCamera.right = (orthoSize * aspect) / 2;
+        orthoCamera.top = orthoSize / 2;
+        orthoCamera.bottom = -orthoSize / 2;
+        orthoCamera.updateProjectionMatrix();
+      }
+
+      function animateCameraTo(targetCamera, targetPosition, targetLookAt, duration = 850) {
+        const sourceCamera = activeCamera;
+        const startPosition = sourceCamera.position.clone();
+        const startTarget = controls.target.clone();
+        const startTime = performance.now();
+        cameraTween = { targetCamera, startPosition, startTarget, targetPosition, targetLookAt, duration, startTime };
+      }
+
+      function transitionToWell(well) {
+        updateOrthoCamera();
+        const target = toScenePoint([well.x_m, well.y_m, (well.screen_top_m + well.screen_bottom_m) / 2]);
+        target.y = 0.35;
+        const targetPosition = target.clone().add(new THREE.Vector3(36, 18, 29));
+        orthoCamera.position.copy(activeCamera.position);
+        orthoCamera.rotation.copy(activeCamera.rotation);
+        activeCamera = orthoCamera;
+        controls.object = activeCamera;
+        animateCameraTo(orthoCamera, targetPosition, target, 950);
+        statusEl.textContent = `Selected ${well.id}: isometric well section view.`;
+      }
+
+      function updateCameraTween() {
+        if (!cameraTween) {
+          return;
+        }
+        const elapsed = performance.now() - cameraTween.startTime;
+        const t = Math.min(elapsed / cameraTween.duration, 1);
+        const eased = 1 - Math.pow(1 - t, 3);
+        activeCamera.position.lerpVectors(cameraTween.startPosition, cameraTween.targetPosition, eased);
+        controls.target.lerpVectors(cameraTween.startTarget, cameraTween.targetLookAt, eased);
+        activeCamera.lookAt(controls.target);
+        activeCamera.updateProjectionMatrix();
+        if (t >= 1) {
+          cameraTween = null;
+        }
+      }
+
+      function findWellObject(object) {
+        let current = object;
+        while (current) {
+          if (current.userData?.well) {
+            return current.userData.well;
+          }
+          current = current.parent;
+        }
+        return null;
+      }
+
+      function addLegend(layerColors) {
+        legendEl.replaceChildren();
+        for (const [label, color] of Object.entries(layerColors)) {
+          const item = document.createElement("div");
+          item.className = "legend-item";
+          item.innerHTML = `<span class="swatch" style="background:${color}"></span><span>${label}</span>`;
+          legendEl.appendChild(item);
+        }
+      }
+
+      async function loadScene() {
+        try {
+          const response = await fetch(`../generated/demo_groundwater_scene.json?v=${Date.now()}`, {
+            cache: "no-store",
+          });
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+
+          const data = await response.json();
+          domain.lx_m = data.domain.lx_m;
+          domain.ly_m = data.domain.ly_m;
+
+          updateOrthoCamera();
+          frameGroup.add(makeSurface(data.terrain, { opacity: 1, terrainColors: true }));
+          if (data.base) {
+            frameGroup.add(makeSurface(data.base, { opacity: 1, solid: true, unlit: true, renderOrder: 1 }));
+          }
+          if (!data.cutawayFaces?.length) {
+            frameGroup.add(addEdges(makeSurface(data.bedrock, { opacity: 0.94 }), 0x02040a, 0.56));
+          }
+
+          if (data.cutawayFaces?.length) {
+            for (const face of data.cutawayFaces) {
+              headsGroup.add(makeSurface(face, { opacity: 1, solid: true, renderOrder: 5 }));
+            }
+          } else {
+            for (let i = 0; i < data.layers.length - 1; i += 1) {
+              const layer = data.layers[i];
+              const nextLayer = data.layers[i + 1];
+              headsGroup.add(
+                makeLayerSides(
+                  layer.topSurface,
+                  nextLayer.topSurface,
+                  layer.sideColor || data.legend.layerColors[layer.type] || "#9ca3af"
+                )
+              );
+            }
+
+            const deepestLayer = data.layers[data.layers.length - 1];
+            headsGroup.add(
+              makeLayerSides(
+                deepestLayer.topSurface,
+                data.bedrock,
+                deepestLayer.sideColor || data.legend.layerColors[deepestLayer.type] || "#9ca3af"
+              )
+            );
+          }
+
+          for (const flow of data.flowArrows) {
+            if (arrowsGroup.children.length % 2 === 0) {
+              arrowsGroup.add(makeFlowArrow(flow));
+            }
+          }
+          arrowsGroup.add(makeFlowTraces());
+
+          for (const well of data.wells) {
+            wellsGroup.add(makeWell(well));
+          }
+
+          addLegend(data.legend.layerColors);
+          statusEl.textContent = `${data.layers.length} layers, ${data.flowArrows.length} arrows, ${data.wells.length} wells loaded.`;
+          resetCamera();
+        } catch (error) {
+          statusEl.className = "status error";
+          statusEl.textContent =
+            "Could not load JSON. Start the viewer with: python3 -m http.server 8765 -d api";
+          console.error(error);
+        }
+      }
+
+      document.querySelector("#toggle-heads").addEventListener("click", () => {
+        headsGroup.visible = !headsGroup.visible;
+      });
+      document.querySelector("#toggle-arrows").addEventListener("click", () => {
+        arrowsGroup.visible = !arrowsGroup.visible;
+      });
+      document.querySelector("#toggle-wells").addEventListener("click", () => {
+        wellsGroup.visible = !wellsGroup.visible;
+      });
+      document.querySelector("#reset-camera").addEventListener("click", resetCamera);
+
+      renderer.domElement.addEventListener("pointerdown", (event) => {
+        const rect = renderer.domElement.getBoundingClientRect();
+        pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+        raycaster.setFromCamera(pointer, activeCamera);
+        const hits = raycaster.intersectObjects(wellsGroup.children, true);
+        const selectedWell = hits.map((hit) => findWellObject(hit.object)).find(Boolean);
+        if (selectedWell) {
+          transitionToWell(selectedWell);
+        }
+      });
+
+      window.addEventListener("resize", () => {
+        perspectiveCamera.aspect = window.innerWidth / window.innerHeight;
+        perspectiveCamera.updateProjectionMatrix();
+        updateOrthoCamera();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      function animate() {
+        updateCameraTween();
+        controls.update();
+        renderer.render(scene, activeCamera);
+        requestAnimationFrame(animate);
+      }
+
+      loadScene();
+      animate();
+    </script>
+  </body>
+</html>
