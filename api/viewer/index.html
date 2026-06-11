@@ -40,6 +40,30 @@
         box-shadow: 0 18px 42px rgba(0, 0, 0, 0.42);
         padding: 14px;
         backdrop-filter: blur(10px);
+        z-index: 40;
+        transition:
+          opacity 220ms ease,
+          transform 220ms ease,
+          visibility 220ms ease;
+      }
+
+      .panel.is-hidden {
+        opacity: 0;
+        pointer-events: none;
+        transform: translateX(-18px);
+        visibility: hidden;
+      }
+
+      .panel-toggle {
+        position: fixed;
+        left: 16px;
+        top: 16px;
+        z-index: 43;
+        display: none;
+      }
+
+      .panel-toggle.is-visible {
+        display: inline-flex;
       }
 
       h1 {
@@ -95,6 +119,13 @@
         gap: 8px;
       }
 
+      .well-picker {
+        margin-top: 12px;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+
       button {
         border: 1px solid rgba(226, 232, 240, 0.16);
         border-radius: 7px;
@@ -114,42 +145,11 @@
         color: #b91c1c;
       }
 
-      .compass {
-        position: fixed;
-        right: 34px;
-        top: 26px;
-        width: 86px;
-        height: 86px;
-        color: #f8fafc;
-        font-weight: 800;
-        pointer-events: none;
-      }
-
-      .compass::before {
-        content: "";
-        position: absolute;
-        left: 34px;
-        top: 22px;
-        width: 13px;
-        height: 56px;
-        background: #f8fafc;
-        clip-path: polygon(50% 0, 100% 36%, 64% 36%, 64% 100%, 36% 100%, 36% 36%, 0 36%);
-        transform: rotate(34deg);
-        transform-origin: 50% 50%;
-      }
-
-      .compass span {
-        position: absolute;
-        right: 7px;
-        top: 0;
-        font-size: 28px;
-      }
-
       .head-legend {
         position: fixed;
         right: 28px;
         bottom: 24px;
-        width: 150px;
+        width: 178px;
         border: 1px solid rgba(226, 232, 240, 0.16);
         border-radius: 8px;
         background: rgba(3, 7, 18, 0.88);
@@ -158,12 +158,13 @@
         color: #f8fafc;
         font-size: 12px;
         font-weight: 700;
+        z-index: 40;
       }
 
       .colorbar {
         height: 112px;
         width: 34px;
-        margin: 9px auto 7px;
+        margin: 0;
         border: 1px solid rgba(226, 232, 240, 0.18);
         background: linear-gradient(
           to top,
@@ -177,9 +178,176 @@
       }
 
       .head-scale {
+        margin-top: 10px;
+        display: grid;
+        grid-template-columns: 42px 1fr;
+        align-items: center;
+        gap: 10px;
+        color: #cbd5e1;
+        font-weight: 600;
+      }
+
+      .head-labels {
+        align-self: stretch;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        font-size: 11px;
+        line-height: 1.25;
+      }
+
+      .head-label {
+        display: grid;
+        gap: 2px;
+      }
+
+      .head-label strong {
+        color: #f8fafc;
+        font-size: 12px;
+      }
+
+      .head-label span {
+        color: #94a3b8;
+        font-weight: 500;
+      }
+
+      .section-view {
+        position: fixed;
+        inset: 0;
+        z-index: 10;
+        opacity: 0;
+        pointer-events: none;
+        background: #02040a;
+        transition: opacity 520ms ease;
+      }
+
+      .section-view.is-open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      #section-canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+        cursor: grab;
+      }
+
+      #section-canvas:active {
+        cursor: grabbing;
+      }
+
+      .section-toolbar {
+        position: fixed;
+        left: min(392px, calc(100vw - 320px));
+        right: 16px;
+        top: 16px;
+        z-index: 42;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        pointer-events: none;
+      }
+
+      .section-toolbar > * {
+        pointer-events: auto;
+      }
+
+      .section-title {
+        border: 1px solid rgba(226, 232, 240, 0.16);
+        border-radius: 8px;
+        background: rgba(3, 7, 18, 0.88);
+        padding: 10px 12px;
+        color: #f8fafc;
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .section-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .section-discharge {
+        min-width: 260px;
+        border: 1px solid rgba(226, 232, 240, 0.16);
+        border-radius: 8px;
+        background: rgba(3, 7, 18, 0.88);
+        padding: 9px 10px;
+        color: #e5edf7;
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .section-discharge label {
         display: flex;
         justify-content: space-between;
-        color: #cbd5e1;
+        gap: 12px;
+        margin-bottom: 6px;
+      }
+
+      .section-discharge span {
+        color: #93c5fd;
+        white-space: nowrap;
+      }
+
+      .section-discharge input {
+        display: block;
+        width: 100%;
+        accent-color: #38bdf8;
+      }
+
+      .sensor-specs {
+        position: fixed;
+        right: 28px;
+        top: 92px;
+        z-index: 42;
+        width: 238px;
+        border: 1px solid rgba(125, 211, 252, 0.38);
+        border-radius: 8px;
+        background: rgba(3, 7, 18, 0.92);
+        box-shadow: 0 18px 42px rgba(0, 0, 0, 0.36);
+        padding: 12px;
+        color: #e5edf7;
+        font-size: 12px;
+        pointer-events: auto;
+      }
+
+      .sensor-specs[hidden] {
+        display: none;
+      }
+
+      .sensor-specs header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 8px;
+      }
+
+      .sensor-specs h2 {
+        margin: 0;
+        color: #f8fafc;
+        font-size: 13px;
+      }
+
+      .sensor-specs dl {
+        display: grid;
+        grid-template-columns: 88px 1fr;
+        gap: 6px 10px;
+        margin: 0;
+      }
+
+      .sensor-specs dt {
+        color: #94a3b8;
+        font-weight: 700;
+      }
+
+      .sensor-specs dd {
+        margin: 0;
+        color: #f8fafc;
         font-weight: 600;
       }
     </style>
@@ -194,13 +362,18 @@
   </head>
   <body>
     <main id="scene" aria-label="3D groundwater model viewer"></main>
-    <div class="compass" aria-hidden="true"><span>N</span></div>
+    <button class="panel-toggle" id="show-panel" type="button">Show menu</button>
     <aside class="head-legend" aria-label="Hydraulic head legend">
       <div>Hydraulic Head</div>
-      <div class="colorbar"></div>
-      <div class="head-scale"><span>low</span><span>high</span></div>
+      <div class="head-scale">
+        <div class="colorbar"></div>
+        <div class="head-labels">
+          <div class="head-label"><strong>High head</strong><span>red / deeper zones</span></div>
+          <div class="head-label"><strong>Low head</strong><span>blue / shallower zones</span></div>
+        </div>
+      </div>
     </aside>
-    <aside class="panel">
+    <aside class="panel" id="menu-panel">
       <h1>AQUASMART 3D Groundwater Sample</h1>
       <p>
         Drag to orbit, scroll to zoom, right-drag to pan. Red-orange zones show higher/deeper
@@ -208,13 +381,40 @@
       </p>
       <div class="status" id="status">Loading scene JSON...</div>
       <div class="legend" id="legend"></div>
+      <div class="well-picker" id="well-picker"></div>
       <div class="controls">
         <button id="toggle-heads" type="button">Toggle heads</button>
         <button id="toggle-arrows" type="button">Toggle arrows</button>
         <button id="toggle-wells" type="button">Toggle wells</button>
         <button id="reset-camera" type="button">Reset view</button>
+        <button id="hide-panel" type="button">Hide menu</button>
       </div>
     </aside>
+    <section class="section-view" id="section-view" aria-label="2D well section view">
+      <canvas id="section-canvas"></canvas>
+      <div class="section-toolbar">
+        <div class="section-title" id="section-title">2D Well Section</div>
+        <div class="section-actions">
+          <div class="section-discharge">
+            <label for="section-discharge">
+              Discharge
+              <span id="section-discharge-value">0 m3/day</span>
+            </label>
+            <input id="section-discharge" type="range" min="0" max="8000" step="100" value="0" />
+          </div>
+          <button id="section-zoom-out" type="button">Zoom out</button>
+          <button id="section-zoom-in" type="button">Zoom in</button>
+          <button id="section-exit" type="button">Exit 2D view</button>
+        </div>
+      </div>
+      <aside class="sensor-specs" id="sensor-specs" hidden>
+        <header>
+          <h2 id="sensor-specs-title">Sensor specs</h2>
+          <button id="sensor-specs-close" type="button">Close</button>
+        </header>
+        <dl id="sensor-specs-list"></dl>
+      </aside>
+    </section>
 
     <script type="module">
       import * as THREE from "three";
@@ -223,6 +423,18 @@
       const sceneRoot = document.querySelector("#scene");
       const statusEl = document.querySelector("#status");
       const legendEl = document.querySelector("#legend");
+      const wellPickerEl = document.querySelector("#well-picker");
+      const menuPanelEl = document.querySelector("#menu-panel");
+      const showPanelButton = document.querySelector("#show-panel");
+      const sectionViewEl = document.querySelector("#section-view");
+      const sectionCanvas = document.querySelector("#section-canvas");
+      const sectionTitleEl = document.querySelector("#section-title");
+      const sectionDischargeInput = document.querySelector("#section-discharge");
+      const sectionDischargeValueEl = document.querySelector("#section-discharge-value");
+      const sensorSpecsEl = document.querySelector("#sensor-specs");
+      const sensorSpecsTitleEl = document.querySelector("#sensor-specs-title");
+      const sensorSpecsListEl = document.querySelector("#sensor-specs-list");
+      const sectionContext = sectionCanvas.getContext("2d");
       const xScale = 1 / 1000;
       const yScale = 1 / 1000;
       const zScale = 11 / 1000;
@@ -250,6 +462,18 @@
       const raycaster = new THREE.Raycaster();
       const pointer = new THREE.Vector2();
       let cameraTween = null;
+      let sceneData = null;
+      let activeSectionWell = null;
+      let sectionZoom = 1;
+      let sectionMode = false;
+      let sectionPanX = 0;
+      let sectionPanY = 0;
+      let sectionDischarge = 0;
+      let isSectionDragging = false;
+      let lastSectionPointer = { x: 0, y: 0 };
+      let lastSectionCursor = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+      let sensorHitBox = null;
+      let sensorSpecsVisible = false;
 
       const headsGroup = new THREE.Group();
       const arrowsGroup = new THREE.Group();
@@ -400,6 +624,31 @@
           cols += 1;
         }
         return { rows: surface.vertices.length / cols, cols };
+      }
+
+      function surfaceRow(surface, rowIndex) {
+        const { rows, cols } = inferGrid(surface);
+        const row = rowIndex === -1 ? rows - 1 : rowIndex;
+        return surface.vertices.slice(row * cols, row * cols + cols);
+      }
+
+      function surfaceRowAtY(surface, yValue) {
+        const { rows, cols } = inferGrid(surface);
+        let bestRow = 0;
+        let bestDistance = Number.POSITIVE_INFINITY;
+        for (let row = 0; row < rows; row += 1) {
+          const rowY = surface.vertices[row * cols][1];
+          const distance = Math.abs(rowY - yValue);
+          if (distance < bestDistance) {
+            bestDistance = distance;
+            bestRow = row;
+          }
+        }
+        return surface.vertices.slice(bestRow * cols, bestRow * cols + cols);
+      }
+
+      function xzPath(points, project) {
+        return points.map((point) => project(point[0], point[2]));
       }
 
       function makeLayerSides(topSurface, bottomSurface, color) {
@@ -630,16 +879,7 @@
       }
 
       function transitionToWell(well) {
-        updateOrthoCamera();
-        const target = toScenePoint([well.x_m, well.y_m, (well.screen_top_m + well.screen_bottom_m) / 2]);
-        target.y = 0.35;
-        const targetPosition = target.clone().add(new THREE.Vector3(36, 18, 29));
-        orthoCamera.position.copy(activeCamera.position);
-        orthoCamera.rotation.copy(activeCamera.rotation);
-        activeCamera = orthoCamera;
-        controls.object = activeCamera;
-        animateCameraTo(orthoCamera, targetPosition, target, 950);
-        statusEl.textContent = `Selected ${well.id}: isometric well section view.`;
+        openSectionView(well);
       }
 
       function updateCameraTween() {
@@ -669,6 +909,430 @@
         return null;
       }
 
+      function drawCalloutText(context, text, x, y, options = {}) {
+        const font = options.font || "800 13px Inter, system-ui, sans-serif";
+        const paddingX = options.paddingX || 8;
+        const paddingY = options.paddingY || 5;
+        context.save();
+        context.font = font;
+        context.textAlign = options.align || "left";
+        context.textBaseline = "middle";
+        const metrics = context.measureText(text);
+        const width = metrics.width + paddingX * 2;
+        const height = (options.height || 23);
+        const boxX = context.textAlign === "center" ? x - width / 2 : x;
+        context.fillStyle = options.background || "rgba(2, 6, 23, 0.74)";
+        context.strokeStyle = options.border || "rgba(226, 232, 240, 0.22)";
+        context.lineWidth = 1;
+        context.beginPath();
+        context.roundRect(boxX, y - height / 2, width, height, 6);
+        context.fill();
+        context.stroke();
+        context.fillStyle = options.color || "#f8fafc";
+        context.fillText(text, context.textAlign === "center" ? x : x + paddingX, y + (options.baselineOffset || 0));
+        context.restore();
+      }
+
+      function drawSectionView() {
+        if (!sceneData || !activeSectionWell) {
+          return;
+        }
+        const ratio = Math.min(window.devicePixelRatio, 2);
+        const width = sectionCanvas.clientWidth;
+        const height = sectionCanvas.clientHeight;
+        sectionCanvas.width = Math.max(1, Math.floor(width * ratio));
+        sectionCanvas.height = Math.max(1, Math.floor(height * ratio));
+        sensorHitBox = null;
+        sectionContext.setTransform(ratio, 0, 0, ratio, 0, 0);
+        sectionContext.clearRect(0, 0, width, height);
+        sectionContext.fillStyle = "#02040a";
+        sectionContext.fillRect(0, 0, width, height);
+        const backgroundGradient = sectionContext.createRadialGradient(
+          width * 0.54,
+          height * 0.48,
+          80,
+          width * 0.54,
+          height * 0.48,
+          Math.max(width, height) * 0.78
+        );
+        backgroundGradient.addColorStop(0, "#07111f");
+        backgroundGradient.addColorStop(1, "#02040a");
+        sectionContext.fillStyle = backgroundGradient;
+        sectionContext.fillRect(0, 0, width, height);
+
+        const marginX = Math.min(410, Math.max(92, width * 0.2));
+        const marginTop = 116;
+        const marginBottom = 76;
+        const plotWidth = width - marginX - 220;
+        const plotHeight = height - marginTop - marginBottom;
+        const xFactor = (plotWidth * sectionZoom) / sceneData.domain.lx_m;
+        const zMin = sceneData.domain.bottom_m;
+        const zMax = sceneData.domain.top_m;
+        const zFactor = (plotHeight * sectionZoom) / (zMax - zMin);
+        const originX = marginX - ((sectionZoom - 1) * plotWidth) / 2 + sectionPanX;
+        const originY = marginTop + ((sectionZoom - 1) * plotHeight) / 2 + sectionPanY;
+        const skewX = 130;
+        const skewY = -74;
+
+        function project(x, z) {
+          return {
+            x: originX + x * xFactor,
+            y: originY + (zMax - z) * zFactor,
+          };
+        }
+
+        function projectSide(z, x = sceneData.domain.lx_m) {
+          const front = project(x, z);
+          return { x: front.x + skewX, y: front.y + skewY };
+        }
+
+        const layerColors = sceneData.legend.layerColors;
+        const sectionY = activeSectionWell.y_m;
+        const topRows = sceneData.layers.map((layer) => surfaceRowAtY(layer.topSurface, sectionY));
+        const bedrockRow = surfaceRowAtY(sceneData.bedrock, sectionY);
+        const baseRow = surfaceRowAtY(sceneData.base, sectionY);
+        const layerBottomRows = sceneData.layers.map((_, index) =>
+          index < sceneData.layers.length - 1 ? topRows[index + 1] : bedrockRow
+        );
+        const discharge01 = sectionDischarge / Number(sectionDischargeInput.max);
+        const influenceRadius = 4500 + discharge01 * 12000;
+        const maxDrawdown = discharge01 * 130;
+        const wellX = activeSectionWell.x_m;
+        const wellBottomZ = activeSectionWell.screen_bottom_m;
+        const originalHeadZ = wellBottomZ;
+
+        function drawdownAtX(x) {
+          const distance = Math.abs(x - wellX);
+          return maxDrawdown * Math.exp(-(distance * distance) / (2 * influenceRadius * influenceRadius));
+        }
+
+        function drawdownHeadZ(x) {
+          return originalHeadZ - drawdownAtX(x);
+        }
+
+        sectionContext.lineJoin = "round";
+        sectionContext.lineCap = "round";
+
+        for (let i = 0; i < sceneData.layers.length; i += 1) {
+          const layer = sceneData.layers[i];
+          const top = xzPath(topRows[i], project);
+          const bottom = xzPath(layerBottomRows[i], project).reverse();
+          sectionContext.beginPath();
+          for (const [idx, point] of [...top, ...bottom].entries()) {
+            if (idx === 0) sectionContext.moveTo(point.x, point.y);
+            else sectionContext.lineTo(point.x, point.y);
+          }
+          sectionContext.closePath();
+          const fill = layer.type === "Confining Layer" ? layerColors[layer.type] : layer.sideColor;
+          sectionContext.fillStyle = fill || layerColors[layer.type] || "#9ca3af";
+          sectionContext.fill();
+          sectionContext.strokeStyle = "rgba(2, 4, 10, 0.78)";
+          sectionContext.lineWidth = 1.25;
+          sectionContext.stroke();
+        }
+
+        const bedrockTop = xzPath(bedrockRow, project);
+        const baseBottom = xzPath(baseRow, project).reverse();
+        sectionContext.beginPath();
+        for (const [idx, point] of [...bedrockTop, ...baseBottom].entries()) {
+          if (idx === 0) sectionContext.moveTo(point.x, point.y);
+          else sectionContext.lineTo(point.x, point.y);
+        }
+        sectionContext.closePath();
+        sectionContext.fillStyle = layerColors.Bedrock || "#686868";
+        sectionContext.fill();
+        sectionContext.strokeStyle = "rgba(2, 4, 10, 0.78)";
+        sectionContext.stroke();
+
+        const rightX = sceneData.domain.lx_m;
+        for (let i = 0; i < sceneData.layers.length; i += 1) {
+          const layer = sceneData.layers[i];
+          const topFront = project(rightX, topRows[i].at(-1)[2]);
+          const bottomFront = project(rightX, layerBottomRows[i].at(-1)[2]);
+          const topBack = projectSide(topRows[i].at(-1)[2]);
+          const bottomBack = projectSide(layerBottomRows[i].at(-1)[2]);
+          sectionContext.beginPath();
+          sectionContext.moveTo(topFront.x, topFront.y);
+          sectionContext.lineTo(topBack.x, topBack.y);
+          sectionContext.lineTo(bottomBack.x, bottomBack.y);
+          sectionContext.lineTo(bottomFront.x, bottomFront.y);
+          sectionContext.closePath();
+          sectionContext.fillStyle = layer.type === "Confining Layer" ? layerColors[layer.type] : layer.sideColor;
+          sectionContext.fill();
+          sectionContext.strokeStyle = "rgba(2, 4, 10, 0.72)";
+          sectionContext.stroke();
+        }
+
+        const terrain = xzPath(surfaceRowAtY(sceneData.terrain, sectionY), project);
+        const terrainBack = surfaceRow(sceneData.terrain, -1).map((point) => projectSide(point[2], point[0]));
+        sectionContext.beginPath();
+        for (const [idx, point] of [...terrain, ...terrainBack.reverse()].entries()) {
+          if (idx === 0) sectionContext.moveTo(point.x, point.y);
+          else sectionContext.lineTo(point.x, point.y);
+        }
+        sectionContext.closePath();
+        sectionContext.fillStyle = "#83aa5a";
+        sectionContext.fill();
+        sectionContext.strokeStyle = "rgba(2, 4, 10, 0.72)";
+        sectionContext.stroke();
+
+        const originalWater = topRows[0].map((point) => project(point[0], originalHeadZ));
+        const drawdownWater = topRows[0].map((point) => project(point[0], drawdownHeadZ(point[0])));
+        if (sectionDischarge > 0) {
+          sectionContext.beginPath();
+          for (const [idx, point] of originalWater.entries()) {
+            if (idx === 0) sectionContext.moveTo(point.x, point.y);
+            else sectionContext.lineTo(point.x, point.y);
+          }
+          for (const point of [...drawdownWater].reverse()) {
+            sectionContext.lineTo(point.x, point.y);
+          }
+          sectionContext.closePath();
+          sectionContext.fillStyle = "rgba(248, 113, 113, 0.26)";
+          sectionContext.fill();
+        }
+
+        sectionContext.beginPath();
+        for (const [idx, point] of drawdownWater.entries()) {
+          if (idx === 0) sectionContext.moveTo(point.x, point.y);
+          else sectionContext.lineTo(point.x, point.y);
+        }
+        sectionContext.strokeStyle = sectionDischarge > 0 ? "#f97316" : "rgba(56, 189, 248, 0.78)";
+        sectionContext.lineWidth = 2.2;
+        sectionContext.stroke();
+
+        const coneLabel = project(Math.max(2400, wellX - influenceRadius * 0.46), drawdownHeadZ(wellX) + 22);
+        drawCalloutText(sectionContext, "drawdown at screen", coneLabel.x, coneLabel.y, {
+          font: "800 12px Inter, system-ui, sans-serif",
+          color: "#fed7aa",
+          background: "rgba(67, 20, 7, 0.76)",
+          border: "rgba(251, 146, 60, 0.48)",
+        });
+
+        if (sectionDischarge > 0) {
+          const leftInfluence = project(Math.max(0, wellX - influenceRadius), originalHeadZ + 22);
+          const rightInfluence = project(Math.min(sceneData.domain.lx_m, wellX + influenceRadius), originalHeadZ + 22);
+          sectionContext.strokeStyle = "rgba(250, 204, 21, 0.94)";
+          sectionContext.lineWidth = 2.4;
+          sectionContext.setLineDash([10, 7]);
+          sectionContext.beginPath();
+          sectionContext.moveTo(leftInfluence.x, leftInfluence.y);
+          sectionContext.lineTo(rightInfluence.x, rightInfluence.y);
+          sectionContext.stroke();
+          sectionContext.setLineDash([]);
+          sectionContext.strokeStyle = "rgba(254, 240, 138, 0.96)";
+          sectionContext.lineWidth = 2;
+          sectionContext.beginPath();
+          sectionContext.moveTo(leftInfluence.x, leftInfluence.y - 5);
+          sectionContext.lineTo(leftInfluence.x, leftInfluence.y + 5);
+          sectionContext.moveTo(rightInfluence.x, rightInfluence.y - 5);
+          sectionContext.lineTo(rightInfluence.x, rightInfluence.y + 5);
+          sectionContext.stroke();
+          drawCalloutText(sectionContext, "area of influence", (leftInfluence.x + rightInfluence.x) / 2, leftInfluence.y - 17, {
+            align: "center",
+            font: "900 12px Inter, system-ui, sans-serif",
+            color: "#fef9c3",
+            background: "rgba(66, 32, 6, 0.82)",
+            border: "rgba(250, 204, 21, 0.55)",
+          });
+        }
+
+        const top = project(activeSectionWell.x_m, activeSectionWell.screen_top_m);
+        const bottom = project(activeSectionWell.x_m, activeSectionWell.screen_bottom_m);
+        const sensorY = bottom.y - 5;
+        const pipeWidth = 16;
+        const pipeX = top.x - pipeWidth / 2;
+        const pipeTopY = top.y - 42;
+        const screenTopY = Math.max(pipeTopY + 84, bottom.y - 104);
+        const casingGradient = sectionContext.createLinearGradient(pipeX, 0, pipeX + pipeWidth, 0);
+        casingGradient.addColorStop(0, "#6b7280");
+        casingGradient.addColorStop(0.28, "#f8fafc");
+        casingGradient.addColorStop(0.55, "#cbd5e1");
+        casingGradient.addColorStop(1, "#475569");
+        sectionContext.fillStyle = casingGradient;
+        sectionContext.strokeStyle = "#111827";
+        sectionContext.lineWidth = 1.4;
+        sectionContext.beginPath();
+        sectionContext.roundRect(pipeX, pipeTopY, pipeWidth, screenTopY - pipeTopY + 2, 5);
+        sectionContext.fill();
+        sectionContext.stroke();
+
+        sectionContext.fillStyle = "#e5e7eb";
+        sectionContext.strokeStyle = "#111827";
+        sectionContext.lineWidth = 1.2;
+        sectionContext.beginPath();
+        sectionContext.ellipse(top.x, pipeTopY, pipeWidth * 0.72, 4.8, 0, 0, Math.PI * 2);
+        sectionContext.fill();
+        sectionContext.stroke();
+
+        const screenGradient = sectionContext.createLinearGradient(pipeX, 0, pipeX + pipeWidth, 0);
+        screenGradient.addColorStop(0, "#075985");
+        screenGradient.addColorStop(0.35, "#38bdf8");
+        screenGradient.addColorStop(0.65, "#0ea5e9");
+        screenGradient.addColorStop(1, "#075985");
+        sectionContext.fillStyle = screenGradient;
+        sectionContext.strokeStyle = "#082f49";
+        sectionContext.lineWidth = 1.4;
+        sectionContext.beginPath();
+        sectionContext.roundRect(pipeX - 1, screenTopY, pipeWidth + 2, bottom.y - screenTopY + 4, 5);
+        sectionContext.fill();
+        sectionContext.stroke();
+
+        sectionContext.fillStyle = "rgba(14, 165, 233, 0.42)";
+        sectionContext.beginPath();
+        sectionContext.roundRect(pipeX + 3, screenTopY + 5, pipeWidth - 6, Math.max(12, bottom.y - screenTopY - 8), 4);
+        sectionContext.fill();
+
+        sectionContext.strokeStyle = "rgba(186, 230, 253, 0.95)";
+        sectionContext.fillStyle = "rgba(8, 47, 73, 0.86)";
+        sectionContext.lineWidth = 1.5;
+        for (let holeY = screenTopY + 12; holeY < bottom.y - 8; holeY += 15) {
+          for (const side of [-1, 1]) {
+            const holeX = top.x + side * 5.1;
+            sectionContext.strokeStyle = "rgba(186, 230, 253, 0.95)";
+            sectionContext.fillStyle = "rgba(8, 47, 73, 0.86)";
+            sectionContext.lineWidth = 1.5;
+            sectionContext.beginPath();
+            sectionContext.ellipse(holeX, holeY, 2.1, 3.2, 0, 0, Math.PI * 2);
+            sectionContext.fill();
+            sectionContext.stroke();
+            sectionContext.beginPath();
+            sectionContext.moveTo(top.x + side * 24, holeY - 5);
+            sectionContext.quadraticCurveTo(top.x + side * 15, holeY - 2, holeX + side * 1.5, holeY);
+            sectionContext.strokeStyle = "rgba(125, 211, 252, 0.72)";
+            sectionContext.lineWidth = 1.4;
+            sectionContext.stroke();
+          }
+        }
+
+        sectionContext.fillStyle = activeSectionWell.role === "Pumping" ? "#65a8ff" : "#f8fafc";
+        sectionContext.font = "800 16px Inter, system-ui, sans-serif";
+        sectionContext.textAlign = "center";
+        sectionContext.fillText(activeSectionWell.id, top.x, top.y - 66);
+        sectionContext.font = "600 12px Inter, system-ui, sans-serif";
+        sectionContext.fillText(`(${activeSectionWell.role})`, top.x, top.y - 49);
+        sensorHitBox = {
+          x: bottom.x - 18,
+          y: sensorY - 18,
+          width: 102,
+          height: 36,
+        };
+        sectionContext.fillStyle = "#22d3ee";
+        sectionContext.strokeStyle = "#e0f2fe";
+        sectionContext.lineWidth = 2;
+        sectionContext.beginPath();
+        sectionContext.roundRect(sensorHitBox.x + 3, sensorHitBox.y + 4, 24, 20, 6);
+        sectionContext.fill();
+        sectionContext.stroke();
+        drawCalloutText(sectionContext, "sensor", bottom.x + 20, sensorY, {
+          font: "900 12px Inter, system-ui, sans-serif",
+          color: "#ecfeff",
+          background: "rgba(8, 47, 73, 0.86)",
+          border: "rgba(125, 211, 252, 0.62)",
+        });
+
+      }
+
+      function openSectionView(well) {
+        activeSectionWell = well;
+        sectionMode = true;
+        sectionZoom = 1;
+        sectionPanX = 0;
+        sectionPanY = 0;
+        lastSectionCursor = { x: sectionCanvas.clientWidth / 2, y: sectionCanvas.clientHeight / 2 };
+        sectionDischarge = Math.abs(well.pumping_m3_day || 0);
+        sectionDischargeInput.value = String(Math.min(Number(sectionDischargeInput.max), sectionDischarge));
+        sectionDischarge = Number(sectionDischargeInput.value);
+        updateDischargeLabel();
+        controls.enabled = false;
+        sectionTitleEl.textContent = `${well.id} ${well.role} - 2D Section View`;
+        statusEl.textContent = `Selected ${well.id}: 2D section view.`;
+        drawSectionView();
+        requestAnimationFrame(() => sectionViewEl.classList.add("is-open"));
+      }
+
+      function closeSectionView() {
+        sectionMode = false;
+        activeSectionWell = null;
+        hideSensorSpecs();
+        controls.enabled = true;
+        sectionViewEl.classList.remove("is-open");
+        statusEl.textContent = sceneData
+          ? `${sceneData.layers.length} layers, ${sceneData.flowArrows.length} arrows, ${sceneData.wells.length} wells loaded.`
+          : "3D view restored.";
+      }
+
+      function setSectionZoom(nextZoom) {
+        sectionZoom = Math.min(2.4, Math.max(0.65, nextZoom));
+        drawSectionView();
+      }
+
+      function getSectionLayout() {
+        const width = sectionCanvas.clientWidth;
+        const height = sectionCanvas.clientHeight;
+        const marginX = Math.min(410, Math.max(92, width * 0.2));
+        const marginTop = 116;
+        const marginBottom = 76;
+        const plotWidth = width - marginX - 220;
+        const plotHeight = height - marginTop - marginBottom;
+        return { marginX, marginTop, plotWidth, plotHeight };
+      }
+
+      function zoomSectionAt(nextZoom, anchorX, anchorY) {
+        const previousZoom = sectionZoom;
+        const clampedZoom = Math.min(2.4, Math.max(0.65, nextZoom));
+        if (clampedZoom === previousZoom) {
+          return;
+        }
+        const zoomRatio = clampedZoom / previousZoom;
+        const { marginX, marginTop, plotWidth, plotHeight } = getSectionLayout();
+        const xAnchorBase = marginX + sectionPanX + plotWidth / 2;
+        const yAnchorBase = marginTop + sectionPanY - plotHeight / 2;
+        sectionPanX = anchorX - marginX - plotWidth / 2 - (anchorX - xAnchorBase) * zoomRatio;
+        sectionPanY = anchorY - marginTop + plotHeight / 2 - (anchorY - yAnchorBase) * zoomRatio;
+        sectionZoom = clampedZoom;
+        drawSectionView();
+      }
+
+      function updateDischargeLabel() {
+        sectionDischargeValueEl.textContent = `${Math.round(sectionDischarge).toLocaleString()} m3/day`;
+      }
+
+      function getSensorSpecs(well) {
+        return {
+          "Sensor ID": `${well.id}-PT-01`,
+          Type: "Dummy pressure transducer",
+          Depth: `${Math.round(Math.abs(well.screen_bottom_m)).toLocaleString()} m`,
+          Range: "0-300 m H2O",
+          Accuracy: "+/- 0.05% FS",
+          Reading: `${Math.round(sectionDischarge * 0.018 + 42)} m head`,
+          Status: "Online",
+        };
+      }
+
+      function showSensorSpecs() {
+        if (!activeSectionWell) {
+          return;
+        }
+        const specs = getSensorSpecs(activeSectionWell);
+        sensorSpecsTitleEl.textContent = `${activeSectionWell.id} sensor specs`;
+        sensorSpecsListEl.replaceChildren();
+        for (const [label, value] of Object.entries(specs)) {
+          const term = document.createElement("dt");
+          term.textContent = label;
+          const description = document.createElement("dd");
+          description.textContent = value;
+          sensorSpecsListEl.append(term, description);
+        }
+        sensorSpecsVisible = true;
+        sensorSpecsEl.hidden = false;
+      }
+
+      function hideSensorSpecs() {
+        sensorSpecsVisible = false;
+        sensorSpecsEl.hidden = true;
+      }
+
       function addLegend(layerColors) {
         legendEl.replaceChildren();
         for (const [label, color] of Object.entries(layerColors)) {
@@ -676,6 +1340,17 @@
           item.className = "legend-item";
           item.innerHTML = `<span class="swatch" style="background:${color}"></span><span>${label}</span>`;
           legendEl.appendChild(item);
+        }
+      }
+
+      function addWellPicker(wells) {
+        wellPickerEl.replaceChildren();
+        for (const well of wells) {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.textContent = `${well.id} ${well.role}`;
+          button.addEventListener("click", () => openSectionView(well));
+          wellPickerEl.appendChild(button);
         }
       }
 
@@ -689,6 +1364,7 @@
           }
 
           const data = await response.json();
+          sceneData = data;
           domain.lx_m = data.domain.lx_m;
           domain.ly_m = data.domain.ly_m;
 
@@ -740,6 +1416,7 @@
           }
 
           addLegend(data.legend.layerColors);
+          addWellPicker(data.wells);
           statusEl.textContent = `${data.layers.length} layers, ${data.flowArrows.length} arrows, ${data.wells.length} wells loaded.`;
           resetCamera();
         } catch (error) {
@@ -760,8 +1437,100 @@
         wellsGroup.visible = !wellsGroup.visible;
       });
       document.querySelector("#reset-camera").addEventListener("click", resetCamera);
+      document.querySelector("#hide-panel").addEventListener("click", () => {
+        menuPanelEl.classList.add("is-hidden");
+        showPanelButton.classList.add("is-visible");
+      });
+      showPanelButton.addEventListener("click", () => {
+        menuPanelEl.classList.remove("is-hidden");
+        showPanelButton.classList.remove("is-visible");
+      });
+      document.querySelector("#section-exit").addEventListener("click", closeSectionView);
+      document.querySelector("#sensor-specs-close").addEventListener("click", hideSensorSpecs);
+      document.querySelector("#section-zoom-out").addEventListener("click", () => {
+        zoomSectionAt(sectionZoom - 0.12, lastSectionCursor.x, lastSectionCursor.y);
+      });
+      document.querySelector("#section-zoom-in").addEventListener("click", () => {
+        zoomSectionAt(sectionZoom + 0.12, lastSectionCursor.x, lastSectionCursor.y);
+      });
+      sectionDischargeInput.addEventListener("input", () => {
+        sectionDischarge = Number(sectionDischargeInput.value);
+        updateDischargeLabel();
+        drawSectionView();
+        if (sensorSpecsVisible) {
+          showSensorSpecs();
+        }
+      });
+
+      sectionCanvas.addEventListener("pointerdown", (event) => {
+        if (!sectionMode) {
+          return;
+        }
+        const rect = sectionCanvas.getBoundingClientRect();
+        lastSectionCursor = { x: event.clientX - rect.left, y: event.clientY - rect.top };
+        if (
+          sensorHitBox &&
+          lastSectionCursor.x >= sensorHitBox.x &&
+          lastSectionCursor.x <= sensorHitBox.x + sensorHitBox.width &&
+          lastSectionCursor.y >= sensorHitBox.y &&
+          lastSectionCursor.y <= sensorHitBox.y + sensorHitBox.height
+        ) {
+          showSensorSpecs();
+          return;
+        }
+        isSectionDragging = true;
+        lastSectionPointer = { x: event.clientX, y: event.clientY };
+        sectionCanvas.setPointerCapture(event.pointerId);
+      });
+
+      sectionCanvas.addEventListener("pointermove", (event) => {
+        const rect = sectionCanvas.getBoundingClientRect();
+        lastSectionCursor = { x: event.clientX - rect.left, y: event.clientY - rect.top };
+        sectionCanvas.style.cursor =
+          sensorHitBox &&
+          lastSectionCursor.x >= sensorHitBox.x &&
+          lastSectionCursor.x <= sensorHitBox.x + sensorHitBox.width &&
+          lastSectionCursor.y >= sensorHitBox.y &&
+          lastSectionCursor.y <= sensorHitBox.y + sensorHitBox.height
+            ? "pointer"
+            : "grab";
+        if (!isSectionDragging) {
+          return;
+        }
+        sectionPanX += event.clientX - lastSectionPointer.x;
+        sectionPanY += event.clientY - lastSectionPointer.y;
+        lastSectionPointer = { x: event.clientX, y: event.clientY };
+        drawSectionView();
+      });
+
+      sectionCanvas.addEventListener("pointerup", (event) => {
+        isSectionDragging = false;
+        sectionCanvas.releasePointerCapture(event.pointerId);
+      });
+
+      sectionCanvas.addEventListener("pointercancel", () => {
+        isSectionDragging = false;
+      });
+
+      sectionCanvas.addEventListener(
+        "wheel",
+        (event) => {
+          event.preventDefault();
+          const rect = sectionCanvas.getBoundingClientRect();
+          lastSectionCursor = { x: event.clientX - rect.left, y: event.clientY - rect.top };
+          zoomSectionAt(
+            sectionZoom + (event.deltaY < 0 ? 0.1 : -0.1),
+            lastSectionCursor.x,
+            lastSectionCursor.y
+          );
+        },
+        { passive: false }
+      );
 
       renderer.domElement.addEventListener("pointerdown", (event) => {
+        if (sectionMode) {
+          return;
+        }
         const rect = renderer.domElement.getBoundingClientRect();
         pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
         pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
@@ -778,6 +1547,9 @@
         perspectiveCamera.updateProjectionMatrix();
         updateOrthoCamera();
         renderer.setSize(window.innerWidth, window.innerHeight);
+        if (sectionMode) {
+          drawSectionView();
+        }
       });
 
       function animate() {
