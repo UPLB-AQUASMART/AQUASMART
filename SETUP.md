@@ -13,9 +13,9 @@ Heavy optional geospatial packages such as Rasterio, GeoPandas, and SciPy are in
 
 Completed locally:
 
-- Frontend dependencies installed in `aquasmart-mini/package.json`.
-- Backend scaffold created in `api/`.
-- Backend Python dependencies installed locally in `api/.venv`.
+- Frontend dependencies installed in `frontend/package.json`.
+- Backend scaffold created in `backend/`.
+- Backend Python dependencies installed locally in `backend/.venv`.
 - Supabase project `AQUASMART` configured.
 - Frontend `.env.local` pointed at the Supabase `AQUASMART` project.
 - Supabase PostGIS, tables, RLS policies, and v1 storage buckets created.
@@ -42,9 +42,9 @@ Render backend:
 ```text
 Service URL: https://aquasmart-zf44.onrender.com
 Health URL: https://aquasmart-zf44.onrender.com/health
-Root Directory: api
+Root Directory: backend
 Build Command: pip install -r requirements.txt
-Start Command: uvicorn main:app --host 0.0.0.0 --port $PORT
+Start Command: uvicorn api.main:app --host 0.0.0.0 --port $PORT
 Health Check Path: /health
 ```
 
@@ -52,8 +52,12 @@ Health Check Path: /health
 
 ```text
 AQUASMART/
-  aquasmart-mini/     Next.js frontend
-  api/                FastAPI backend for Render
+  frontend/           Next.js React app
+  backend/            Python backend workspace
+    api/              FastAPI application package
+    scripts/          Data/model generation scripts
+    generated/        Lightweight generated demo data
+    viewer/           Standalone local groundwater scene viewer
   render.yaml         Render Blueprint for the backend
   SETUP.md            Setup guide
 ```
@@ -63,13 +67,13 @@ AQUASMART/
 From the frontend folder:
 
 ```bash
-cd aquasmart-mini
+cd frontend
 npm install
 cp .env.example .env.local
 npm run dev
 ```
 
-Set these values in `aquasmart-mini/.env.local`:
+Set these values in `frontend/.env.local`:
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
@@ -101,16 +105,16 @@ Installed frontend dependencies:
 From the backend folder:
 
 ```bash
-cd api
+cd backend
 python3 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
 cp .env.example .env
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
+uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-Set these values in `api/.env` for local development:
+Set these values in `backend/.env` for local development:
 
 ```bash
 SUPABASE_URL=your_supabase_project_url
@@ -177,14 +181,14 @@ Recommended manual settings:
 ```text
 Service type: Web Service
 Runtime: Python
-Root directory: api
+Root directory: backend
 Build command: pip install -r requirements.txt
-Start command: uvicorn main:app --host 0.0.0.0 --port $PORT
+Start command: uvicorn api.main:app --host 0.0.0.0 --port $PORT
 Health check path: /health
 Plan: Free
 ```
 
-Important: the backend is inside `api/`. If Render uses the repository root, it may detect the wrong runtime or run Node/Yarn commands. Render's Root Directory setting makes the build and start commands run from the backend folder.
+Important: the backend is inside `backend/`. If Render uses the repository root, it may detect the wrong runtime or run Node/Yarn commands. Render's Root Directory setting makes the build and start commands run from the backend folder.
 
 Render environment variables:
 
@@ -216,7 +220,7 @@ Supabase Dashboard
 → service_role key
 ```
 
-Keep the service role key only in Render backend environment variables. Never put it in `aquasmart-mini/.env.local`, Vercel public variables, or browser code.
+Keep the service role key only in Render backend environment variables. Never put it in `frontend/.env.local`, Vercel public variables, or browser code.
 
 Render free services spin down after idle time. That is acceptable for a prototype, but the first request after inactivity can be slow.
 
@@ -240,9 +244,9 @@ Render is trying to deploy the repo root as a Node app. Fix the service settings
 
 ```text
 Language: Python
-Root Directory: api
+Root Directory: backend
 Build Command: pip install -r requirements.txt
-Start Command: uvicorn main:app --host 0.0.0.0 --port $PORT
+Start Command: uvicorn api.main:app --host 0.0.0.0 --port $PORT
 ```
 
 Then click:
@@ -256,7 +260,7 @@ If Render does not let you change the language/runtime on the existing service, 
 
 ## Vercel Frontend Deployment
 
-Deploy `aquasmart-mini` to Vercel.
+Deploy `frontend` to Vercel.
 
 This step still needs Vercel account authentication. The local CLI requested device login, so you can either complete that login locally or deploy from the Vercel dashboard.
 
@@ -264,7 +268,7 @@ Recommended settings:
 
 ```text
 Framework preset: Next.js
-Root directory: aquasmart-mini
+Root directory: frontend
 Build command: npm run build
 Install command: npm install
 Output directory: leave default
@@ -275,7 +279,7 @@ Vercel environment variables:
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=https://erjcmensjjhdpwwqnisq.supabase.co
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=copy_from_aquasmart-mini_env_local_or_supabase_dashboard
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=copy_from_frontend_env_local_or_supabase_dashboard
 NEXT_PUBLIC_API_URL=https://your-render-service.onrender.com
 ```
 
@@ -284,7 +288,7 @@ After Vercel deploys, copy the Vercel URL into Render's `FRONTEND_ORIGIN`.
 CLI deployment path after login:
 
 ```bash
-cd aquasmart-mini
+cd frontend
 npx vercel login
 npx vercel env add NEXT_PUBLIC_SUPABASE_URL production
 npx vercel env add NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY production
@@ -298,7 +302,7 @@ Dashboard deployment path:
 Vercel Dashboard
 → Add New Project
 → Import Git Repository
-→ Set Root Directory to aquasmart-mini
+→ Set Root Directory to frontend
 → Add environment variables
 → Deploy
 ```
@@ -308,7 +312,7 @@ Vercel Dashboard
 Frontend:
 
 ```bash
-cd aquasmart-mini
+cd frontend
 npm run lint
 npm run build
 ```
@@ -316,9 +320,9 @@ npm run build
 Backend:
 
 ```bash
-cd api
+cd backend
 source .venv/bin/activate
-python -m uvicorn main:app --host 0.0.0.0 --port 8000
+python -m uvicorn api.main:app --host 0.0.0.0 --port 8000
 ```
 
 Then open:

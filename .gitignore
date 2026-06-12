@@ -13,5 +13,5 @@ __pycache__/
 venv/
 
 # Local model/output artifacts
-api/data/
-api/outputs/
+backend/data/
+backend/outputs/

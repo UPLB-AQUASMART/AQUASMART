@@ -15,7 +15,7 @@ Avoid heavy live MODFLOW jobs, large timestep downloads, and storing dense simul
 
 ## Current Setup
 
-The active app is in `aquasmart-mini/`.
+The active frontend app is in `frontend/`.
 
 Already configured:
 
@@ -28,9 +28,23 @@ Already configured:
 - Radix Slider
 - Supabase browser/server clients
 - Supabase session middleware
-- FastAPI backend scaffold in `api/`
+- FastAPI backend scaffold in `backend/`
 - FloPy / NumPy / Pandas backend dependencies
 - Render Blueprint in `render.yaml`
+
+## Project Structure
+
+```text
+AQUASMART/
+  frontend/           Next.js React app
+  backend/            Python backend workspace
+    api/              FastAPI application package
+    scripts/          Data/model generation scripts
+    generated/        Lightweight generated demo data
+    viewer/           Standalone local groundwater scene viewer
+  render.yaml         Render Blueprint for the backend
+  SETUP.md            Setup and deployment guide
+```
 
 Not yet added:
 
