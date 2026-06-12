@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import {
   Download,
@@ -58,8 +58,8 @@ function makeReadings(id: number, discharge: number): Readings {
 
 function normalizePdfText(value: string) {
   return value
-    .replace(/mÂ³/g, "m3")
-    .replace(/Â°/g, "deg")
+    .replace(/m³/g, "m3")
+    .replace(/°/g, "deg")
     .replace(/[^\x20-\x7E]/g, " ")
     .replace(/\\/g, "\\\\")
     .replace(/\(/g, "\\(")
@@ -111,7 +111,7 @@ export default function SimulationPage() {
   }, [totalDischarge, wells]);
   const parameterRows = useMemo(() => wells.map((well) => [
     well.name,
-    `${well.discharge} mÂ³/day`,
+    `${well.discharge} m³/day`,
     well.readings.dissolvedOxygen.toFixed(1),
     well.readings.ph.toFixed(1),
     well.readings.temperature.toFixed(1),
@@ -193,10 +193,10 @@ export default function SimulationPage() {
             const units: Record<string, string> = {
               DO: "mg/L",
               pH: "",
-              Temperature: "Â°C",
+              Temperature: "°C",
               Salinity: "ppt",
               TDS: "mg/L",
-              EC: "ÂµS/cm",
+              EC: "µS/cm",
               "GW Level": "m",
             };
             const rawValues: Record<string, number> = {
@@ -226,7 +226,7 @@ export default function SimulationPage() {
         ticks: { color: "#5f7592", font: { size: 12, family: "Inter" } },
       },
       y: {
-        title: { display: true, text: "Temperature (Â°C)", color: "#5f7592", font: { size: 12, family: "Inter" } },
+        title: { display: true, text: "Temperature (°C)", color: "#5f7592", font: { size: 12, family: "Inter" } },
         grid: { color: "rgba(95,117,146,.16)" },
         ticks: { color: "#5f7592", font: { size: 12, family: "Inter" } },
       },
@@ -493,7 +493,7 @@ export default function SimulationPage() {
                         onChange={(event) => updateWellName(well.id, event.target.value)}
                       />
                     </span>
-                    <strong>{well.discharge} mÂ³/day</strong>
+                    <strong>{well.discharge} m³/day</strong>
                     {wells.length > 1 && (
                       <button className="delete-well" title={`Remove ${well.name}`} onClick={() => removeWell(well.id)}>
                         <Trash2 size={14} />
@@ -509,8 +509,8 @@ export default function SimulationPage() {
           ) : (
             <div className="statistics">
               <div className="statistics-card">
-                <div className="stat-row"><span>Total Pumping Discharge</span><strong>{totalDischarge} mÂ³/day</strong></div>
-                <div className="stat-row"><span>Safe Yield Capacity</span><strong>{safeYield} mÂ³/day</strong></div>
+                <div className="stat-row"><span>Total Pumping Discharge</span><strong>{totalDischarge} m³/day</strong></div>
+                <div className="stat-row"><span>Safe Yield Capacity</span><strong>{safeYield} m³/day</strong></div>
                 <div className="stat-row utilization-row"><span>Capacity Utilization</span><strong>{scenario.capacityUtilization.toFixed(1)}%</strong></div>
                 <div className="utilization-track" aria-label={`Capacity utilization: ${scenario.capacityUtilization.toFixed(1)} percent`}><i style={{ width: `${scenario.capacityUtilization}%` }} /></div>
                 <div className="stat-row"><span>Average Drawdown</span><strong>{scenario.averageDrawdown.toFixed(1)} m</strong></div>
@@ -611,4 +611,3 @@ export default function SimulationPage() {
 
   );
 }
-

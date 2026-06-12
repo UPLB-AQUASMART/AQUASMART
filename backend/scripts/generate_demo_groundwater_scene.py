@@ -46,9 +46,9 @@ LAYER_TYPES = [
 
 
 LAYER_COLORS = {
-    "Upper Aquifer": "#8fe46b",
-    "Middle Aquifer": "#32c7c8",
-    "Lower Aquifer": "#1d94dc",
+    "Upper Aquifer": "#1f9bef",
+    "Middle Aquifer": "#158bd7",
+    "Lower Aquifer": "#0d72bd",
     "Confining Layer": "#9a7b48",
     "Bedrock": "#686868",
 }
@@ -182,10 +182,7 @@ def head_to_color(head: float, head_min: float, head_max: float) -> str:
 def layer_side_color(layer_type: str, head: np.ndarray, head_min: float, head_max: float) -> str:
     if layer_type == "Confining Layer":
         return LAYER_COLORS[layer_type]
-    # Bias toward the warmer side of each aquifer's head values so block faces
-    # resemble the reference diagram's hydraulic-head-colored cutaway.
-    representative_head = float(np.nanpercentile(head, 82))
-    return head_to_color(representative_head, head_min, head_max)
+    return LAYER_COLORS[layer_type]
 
 
 def stride_indices(length: int, stride: int) -> np.ndarray:
@@ -405,7 +402,7 @@ def build_scene() -> dict[str, Any]:
                     x,
                     y,
                     edge,
-                    color=LAYER_COLORS[layer_type] if layer_type == "Confining Layer" else None,
+                    color=LAYER_COLORS[layer_type],
                     head_min=global_head_min,
                     head_max=global_head_max,
                 )
@@ -461,7 +458,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--output",
-        default="api/generated/demo_groundwater_scene.json",
+        default="generated/demo_groundwater_scene.json",
         help="Path to write compact scene JSON.",
     )
     args = parser.parse_args()
