@@ -3,6 +3,11 @@
 .env.*
 !.env.example
 
+# iCloud conflict/placeholder copies
+*.icloud
+* 2
+* 2.*
+
 # Python
 __pycache__/
 *.py[cod]
@@ -11,7 +16,23 @@ __pycache__/
 .mypy_cache/
 .venv/
 venv/
+backend/.venv/
 
 # Local model/output artifacts
 backend/data/
 backend/outputs/
+
+# Frontend dependencies and build output
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/.vercel/
+frontend/.npm-cache/
+frontend/*.tsbuildinfo
+
+# Logs and package manager noise
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
