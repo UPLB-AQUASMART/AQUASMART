@@ -257,7 +257,7 @@ img {
   --tagline-base-y: 0vh;
   position: relative;
   display: block;
-  min-height: 320vh;
+  min-height: 245vh;
   overflow: visible;
   padding: 0;
   isolation: isolate;
@@ -287,7 +287,7 @@ img {
   bottom: -1px;
   left: 0;
   z-index: 0;
-  height: 34vh;
+  height: 8vh;
   background: linear-gradient(180deg, rgba(11, 31, 58, 0), var(--navy) 84%);
   content: "";
   opacity: var(--tagline-bg);
@@ -412,6 +412,10 @@ img {
   gap: 24px;
   padding: 120px 60px;
   background: var(--navy);
+}
+
+.goals-section {
+  padding-top: 40px;
 }
 
 .section-pill {
@@ -2012,6 +2016,10 @@ img {
     padding: 80px 20px;
   }
 
+  .goals-section {
+    padding-top: 34px;
+  }
+
   .parameters-card {
     aspect-ratio: auto;
     min-height: 420px;
@@ -2088,7 +2096,7 @@ img {
 
   .tagline-section {
     --tagline-base-y: 0vh;
-    min-height: 285vh;
+    min-height: 220vh;
   }
 
   .tagline-section h2 {
@@ -3902,5 +3910,567 @@ img {
 
   .groundwater-footer {
     padding: 32px 20px;
+  }
+}
+
+@media (max-width: 900px) {
+  html,
+  body {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .home-page,
+  .idw-page,
+  .groundwater-page,
+  .groundwater-v2-page {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  .section-pill {
+    max-width: 100%;
+    min-height: 44px;
+    padding: 12px 24px;
+    font-size: clamp(14px, 4vw, 18px);
+    line-height: 1.15;
+    text-align: center;
+    white-space: normal;
+  }
+
+  .hero-section {
+    min-height: 720px;
+    height: auto;
+    align-items: flex-start;
+    padding: 136px clamp(20px, 6vw, 48px) 72px;
+  }
+
+  .hero-image {
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-position: 60% center;
+  }
+
+  .hero-fade {
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0.72) 48%, rgba(255, 255, 255, 0.18) 100%),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.3));
+  }
+
+  .hero-copy {
+    max-width: min(620px, 100%);
+  }
+
+  .hero-copy h1,
+  .frame-copy h2,
+  .about-mini-section h2,
+  .weather-copy h2,
+  .groundwater-hero h1,
+  .idw-map-content h1 {
+    overflow-wrap: anywhere;
+    text-wrap: balance;
+  }
+
+  .hero-copy h1 {
+    font-size: clamp(42px, 11vw, 72px);
+    line-height: 1.04;
+  }
+
+  .hero-copy p,
+  .frame-copy p,
+  .about-mini-section p,
+  .groundwater-hero p,
+  .idw-map-bottom p,
+  .idw-info-section p,
+  .idw-drawdown-section p {
+    max-width: 100%;
+    overflow-wrap: break-word;
+  }
+
+  .goals-section,
+  .simulations-section,
+  .parameters-section,
+  .about-mini-section {
+    padding-right: clamp(20px, 5vw, 40px);
+    padding-left: clamp(20px, 5vw, 40px);
+  }
+
+  .dark-frame {
+    gap: 32px;
+    border-radius: 16px;
+    padding: clamp(32px, 6vw, 48px) clamp(20px, 5vw, 36px);
+  }
+
+  .frame-copy h2,
+  .about-mini-section h2 {
+    width: 100%;
+    font-size: clamp(34px, 9vw, 54px);
+    line-height: 1.08;
+  }
+
+  .frame-copy p,
+  .about-mini-section p {
+    width: 100%;
+    font-size: clamp(16px, 4vw, 20px);
+    line-height: 1.55;
+  }
+
+  .goal-grid,
+  .simulation-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .goal-card,
+  .simulation-card {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .simulation-card {
+    padding: clamp(18px, 5vw, 24px);
+  }
+
+  .simulation-card h3 {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    padding: 12px 0;
+    font-size: clamp(24px, 7.5vw, 32px);
+    line-height: 1.08;
+    white-space: normal;
+  }
+
+  .simulation-card img {
+    height: clamp(190px, 54vw, 324px);
+  }
+
+  .parameters-card {
+    aspect-ratio: auto;
+    min-height: clamp(440px, 116vw, 620px);
+  }
+
+  .parameters-card-content {
+    justify-content: flex-start;
+  }
+
+  .parameter-switches {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .parameter-switches button {
+    max-width: calc(100% - 34px);
+    white-space: normal;
+  }
+
+  .parameter-switches button.active {
+    transform: translateX(min(28px, 7vw));
+  }
+
+  .weather-layout {
+    grid-template-columns: 1fr;
+    gap: 34px;
+  }
+
+  .weather-copy {
+    min-height: auto;
+  }
+
+  .week-card {
+    width: 100%;
+    max-width: 520px;
+  }
+
+  .forecast-row div {
+    min-width: 0;
+  }
+
+  .forecast-row small {
+    overflow-wrap: anywhere;
+  }
+
+  .team-header-group h2,
+  .partners-header h2 {
+    font-size: clamp(22px, 6vw, 28px);
+    line-height: 1.18;
+    text-wrap: balance;
+  }
+
+  .team-carousel-track {
+    transform: translateX(calc(var(--team-position, 5) * -100vw));
+  }
+
+  .team-carousel-card {
+    flex-basis: calc(100vw - 40px);
+    grid-template-columns: 1fr;
+    gap: 24px;
+    margin: 0 20px;
+    border-radius: 24px;
+    padding: clamp(24px, 6vw, 40px) clamp(18px, 5vw, 28px);
+    text-align: center;
+  }
+
+  .team-tags-row {
+    justify-content: center;
+  }
+
+  .footer-upper,
+  .footer-lower,
+  .groundwater-footer,
+  .groundwater-footer-links {
+    min-width: 0;
+  }
+
+  .footer-upper {
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .footer-brand,
+  .footer-brand img {
+    max-width: 100%;
+  }
+
+  .footer-links {
+    gap: 28px 20px;
+  }
+
+  .footer-lower div {
+    flex-wrap: wrap;
+    gap: 10px 18px;
+  }
+
+  .idw-nav,
+  .groundwater-nav {
+    width: calc(100vw - 28px);
+    max-width: calc(100vw - 28px);
+  }
+
+  .idw-nav-links,
+  .groundwater-nav-links {
+    min-width: 0;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .idw-nav-links::-webkit-scrollbar,
+  .groundwater-nav-links::-webkit-scrollbar {
+    display: none;
+  }
+
+  .idw-info-row,
+  .idw-drawdown-images,
+  .groundwater-overview-row,
+  .groundwater-research-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .idw-info-row img,
+  .idw-drawdown-images img,
+  .groundwater-overview-row img,
+  .groundwater-research-card img {
+    max-width: 100%;
+  }
+
+  .groundwater-table-wrap,
+  .groundwater-table {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .groundwater-table-card {
+    max-width: 100%;
+    overflow: hidden;
+  }
+}
+
+@media (max-width: 520px) {
+  .scroll-top-button {
+    right: 16px;
+    bottom: 16px;
+    width: 50px;
+    height: 50px;
+  }
+
+  .site-nav {
+    width: calc(100vw - 20px);
+    margin-top: 10px;
+  }
+
+  .nav-logo {
+    width: min(150px, 44vw);
+  }
+
+  .nav-menu-toggle {
+    height: 38px;
+    padding: 0 12px;
+    font-size: 11px;
+  }
+
+  .mobile-nav-panel {
+    border-radius: 20px;
+  }
+
+  .hero-section {
+    min-height: 650px;
+    padding: 118px 20px 56px;
+  }
+
+  .hero-copy {
+    gap: 16px;
+  }
+
+  .hero-copy h1 {
+    font-size: clamp(38px, 12vw, 52px);
+  }
+
+  .hero-copy p {
+    font-size: 16px;
+    line-height: 1.55;
+  }
+
+  .tagline-sticky {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .tagline-section h2 {
+    font-size: clamp(30px, 12vw, 46px);
+    white-space: normal;
+  }
+
+  .tagline-layer {
+    white-space: normal;
+  }
+
+  .goals-section,
+  .simulations-section,
+  .parameters-section {
+    padding: 64px 16px;
+  }
+
+  .goals-section {
+    padding-top: 28px;
+  }
+
+  .about-mini-section,
+  .weather-section {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .section-pill {
+    width: fit-content;
+    max-width: 100%;
+    padding: 11px 18px;
+    font-size: 14px;
+  }
+
+  .dark-frame {
+    padding: 28px 16px;
+  }
+
+  .frame-copy h2,
+  .about-mini-section h2 {
+    font-size: clamp(30px, 10.5vw, 42px);
+  }
+
+  .goal-card h3 {
+    padding-right: 0;
+    padding-left: 0;
+    font-size: 18px;
+  }
+
+  .goal-card p {
+    padding-right: 0;
+    padding-left: 0;
+    font-size: 14px;
+  }
+
+  .goals-gif-wrap {
+    width: 112px;
+  }
+
+  .parameters-card {
+    min-height: 500px;
+  }
+
+  .parameters-card-content {
+    padding: 24px 18px;
+  }
+
+  .parameters-card-content h2 {
+    font-size: clamp(28px, 9vw, 36px);
+  }
+
+  .parameter-switches {
+    --parameter-row-gap: 9px;
+    --parameter-row-height: 26px;
+  }
+
+  .parameter-switches button {
+    font-size: 13px;
+  }
+
+  .parameter-description {
+    font-size: 12px;
+  }
+
+  .simulation-card {
+    border-radius: 10px;
+    padding: 16px;
+  }
+
+  .simulation-card h3 {
+    font-size: clamp(22px, 7vw, 28px);
+  }
+
+  .simulation-card p {
+    font-size: 12px;
+    line-height: 1.55;
+  }
+
+  .weather-section {
+    padding-top: 68px;
+    padding-bottom: 68px;
+  }
+
+  .weather-copy .section-pill {
+    padding: 12px 20px;
+    font-size: 15px;
+  }
+
+  .weather-copy h2 {
+    font-size: clamp(30px, 10vw, 42px);
+  }
+
+  .weather-copy h2 span {
+    font-size: clamp(24px, 8vw, 34px);
+  }
+
+  .forecast-row {
+    gap: 8px;
+  }
+
+  .forecast-row div {
+    height: auto;
+    min-height: 58px;
+    padding: 10px 12px;
+  }
+
+  .weather-icon {
+    width: 44px;
+    height: 44px;
+  }
+
+  .team-carousel-card {
+    flex-basis: calc(100vw - 28px);
+    margin: 0 14px;
+  }
+
+  .team-image-box {
+    height: 220px;
+  }
+
+  .team-info-area p {
+    font-size: 14px;
+  }
+
+  .team-tag-pill {
+    padding: 7px 12px;
+    font-size: 12px;
+  }
+
+  .partners-marquee-viewport {
+    mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  }
+
+  .partner-logo-tile {
+    height: 52px;
+    margin: 0 22px;
+  }
+
+  .footer-links {
+    grid-template-columns: 1fr;
+  }
+
+  .site-footer {
+    padding: 40px 20px 0;
+  }
+
+  .idw-nav,
+  .groundwater-nav {
+    width: calc(100vw - 20px);
+    max-width: calc(100vw - 20px);
+    margin-top: 10px;
+    border-radius: 20px;
+  }
+
+  .idw-nav-logo,
+  .groundwater-nav-logo {
+    max-width: 58vw;
+  }
+
+  .groundwater-nav-links {
+    width: 100%;
+    justify-content: flex-start;
+    padding-bottom: 2px;
+  }
+
+  .groundwater-nav-links a:last-child {
+    display: inline-flex;
+  }
+
+  .idw-map-content,
+  .idw-info-section,
+  .idw-drawdown-section,
+  .groundwater-overview,
+  .groundwater-research,
+  .groundwater-footer {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+
+  .idw-map-content h1,
+  .groundwater-hero h1 {
+    font-size: clamp(26px, 9vw, 34px);
+  }
+
+  .idw-map-bottom p,
+  .groundwater-hero-bottom p,
+  .groundwater-overview p,
+  .idw-info-section p,
+  .idw-drawdown-section p {
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  .groundwater-hero-content {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+
+  .groundwater-table-card {
+    border-radius: 0;
+    padding: 18px;
+  }
+
+  .groundwater-table-card th,
+  .groundwater-table-card td {
+    padding: 10px 14px;
+    font-size: 14px;
+  }
+
+  .groundwater-table-card thead th,
+  .groundwater-table-card span {
+    font-size: 12px;
+  }
+
+  .groundwater-research-heading p {
+    font-size: clamp(24px, 9vw, 32px);
+    line-height: 1.1;
   }
 }

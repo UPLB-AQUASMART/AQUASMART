@@ -25,7 +25,7 @@ export function TaglineSection() {
       const fillEnvironment = Math.min(1, Math.max(0, (fill - 0.42) / 0.58));
       const zoom = Math.min(1, Math.max(0, (progress - 0.62) / 0.38));
       const background = Math.min(1, Math.max(0, (progress - 0.5) / 0.4));
-      const vanish = Math.min(1, Math.max(0, (zoom - 0.68) / 0.32));
+      const vanish = Math.min(1, Math.max(0, (zoom - 0.84) / 0.16));
       const maxScale = window.innerWidth < 720 ? 11 : window.innerWidth < 1100 ? 13 : 16;
       const offset = window.innerWidth < 720 ? 20 : window.innerWidth < 1100 ? 24 : 28;
       const pinState = window.scrollY < pinStart ? "before" : window.scrollY > pinEnd ? "after" : "pinned";
