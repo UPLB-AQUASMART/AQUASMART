@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 
 const teamMembers = [
@@ -58,20 +58,73 @@ const partnerLogos = [
 ];
 
 export function PartnersSection() {
-  const [activeIndex, setActiveIndex] = useState(0);
+  const teamCount = teamMembers.length;
+  const [teamPosition, setTeamPosition] = useState(teamCount);
+  const [isCarouselAnimating, setIsCarouselAnimating] = useState(true);
+  const autoSlideTimeoutRef = useRef<number | null>(null);
+  const activeIndex = ((teamPosition % teamCount) + teamCount) % teamCount;
+  const carouselMembers = useMemo(
+    () => [...teamMembers, ...teamMembers, ...teamMembers],
+    [],
+  );
   const partnerLoop = useMemo(() => [...partnerLogos, ...partnerLogos, ...partnerLogos], []);
   const partnerLoopReverse = useMemo(
     () => [...partnerLogos].reverse().concat([...partnerLogos].reverse(), [...partnerLogos].reverse()),
     [],
   );
 
-  useEffect(() => {
-    const intervalId = window.setInterval(() => {
-      setActiveIndex((currentIndex) => (currentIndex + 1) % teamMembers.length);
-    }, 3600);
+  const clearAutoSlide = useCallback(() => {
+    if (autoSlideTimeoutRef.current === null) {
+      return;
+    }
 
-    return () => window.clearInterval(intervalId);
+    window.clearTimeout(autoSlideTimeoutRef.current);
+    autoSlideTimeoutRef.current = null;
   }, []);
+
+  const scheduleAutoSlide = useCallback(() => {
+    clearAutoSlide();
+    autoSlideTimeoutRef.current = window.setTimeout(() => {
+      setIsCarouselAnimating(true);
+      setTeamPosition((currentPosition) => currentPosition + 1);
+    }, 3600);
+  }, [clearAutoSlide]);
+
+  useEffect(() => {
+    scheduleAutoSlide();
+
+    return () => {
+      if (autoSlideTimeoutRef.current !== null) {
+        window.clearTimeout(autoSlideTimeoutRef.current);
+      }
+    };
+  }, [scheduleAutoSlide]);
+
+  const jumpToSlide = (index: number) => {
+    setIsCarouselAnimating(true);
+    setTeamPosition(teamCount + index);
+    scheduleAutoSlide();
+  };
+
+  const handleCarouselTransitionEnd = () => {
+    if (teamPosition >= teamCount * 2) {
+      setIsCarouselAnimating(false);
+      setTeamPosition(teamPosition - teamCount);
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => setIsCarouselAnimating(true));
+      });
+    }
+
+    if (teamPosition < teamCount) {
+      setIsCarouselAnimating(false);
+      setTeamPosition(teamPosition + teamCount);
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => setIsCarouselAnimating(true));
+      });
+    }
+
+    scheduleAutoSlide();
+  };
 
   return (
     <>
@@ -83,13 +136,15 @@ export function PartnersSection() {
 
         <div className="team-carousel-viewport" aria-label="AQUASMART team members">
           <div
-            className="team-carousel-track"
-            style={{ "--team-index": activeIndex } as CSSProperties}
+            className={`team-carousel-track${isCarouselAnimating ? "" : " no-transition"}`}
+            onTransitionEnd={handleCarouselTransitionEnd}
+            style={{ "--team-position": teamPosition } as CSSProperties}
           >
-            {teamMembers.map((member, index) => (
+            {carouselMembers.map((member, index) => (
               <article
-                className={`team-carousel-card${index === activeIndex ? " is-active" : ""}`}
-                key={member.name}
+                aria-hidden={index !== teamPosition}
+                className={`team-carousel-card${index === teamPosition ? " is-active" : ""}`}
+                key={`${member.name}-${index}`}
               >
                 <div className="team-image-box">
                   <div className="team-blob-shape" style={{ backgroundColor: member.color }} />
@@ -119,7 +174,7 @@ export function PartnersSection() {
               aria-pressed={index === activeIndex}
               className={index === activeIndex ? "active" : undefined}
               key={member.name}
-              onClick={() => setActiveIndex(index)}
+              onClick={() => jumpToSlide(index)}
               type="button"
             />
           ))}

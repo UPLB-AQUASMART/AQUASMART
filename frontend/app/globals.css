@@ -1339,9 +1339,13 @@ img {
   display: flex;
   align-items: center;
   padding: 60px 0;
-  transform: translateX(calc(50% - 400px - (var(--team-index, 0) * 880px)));
+  transform: translateX(calc(50% - 400px - (var(--team-position, 5) * 880px)));
   transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   will-change: transform;
+}
+
+.team-carousel-track.no-transition {
+  transition: none;
 }
 
 .team-carousel-card {
@@ -2070,7 +2074,7 @@ img {
 
   .team-carousel-track {
     padding: 32px 0;
-    transform: translateX(calc(var(--team-index, 0) * -100vw));
+    transform: translateX(calc(var(--team-position, 5) * -100vw));
   }
 
   .team-carousel-card {
