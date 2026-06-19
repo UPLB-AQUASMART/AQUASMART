@@ -430,16 +430,12 @@ img {
 
 .scroll-reveal {
   opacity: 0;
-  transform: translateY(58px) scale(0.985);
-  transition:
-    opacity 760ms ease,
-    transform 760ms cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: opacity, transform;
+  transition: opacity 820ms ease;
+  will-change: opacity;
 }
 
 .scroll-reveal.is-visible {
   opacity: 1;
-  transform: translateY(0) scale(1);
 }
 
 .scroll-reveal.is-visible .frame-copy,
@@ -682,7 +678,6 @@ img {
 @media (prefers-reduced-motion: reduce) {
   .scroll-reveal {
     opacity: 1;
-    transform: none;
     transition: none;
   }
 
@@ -1302,54 +1297,260 @@ img {
   content: "";
 }
 
-.partners-section {
-  display: flex;
-  min-height: 730px;
-  flex-direction: column;
-  align-items: center;
-  justify-content: end;
-  gap: 42px;
-  padding: 120px 80px 82px;
-  background: var(--pale);
+.team-section {
+  width: 100%;
+  overflow: hidden;
+  background: #dde7ee;
+  padding: 80px 0 120px;
 }
 
-.partners-section h2 {
-  margin: 0;
-  color: #0a1220;
-  font-family: "Sora", sans-serif;
-  font-size: 18px;
-  font-weight: 700;
-}
-
-.partner-grid {
-  display: grid;
-  width: min(980px, 100%);
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 28px;
-}
-
-.partner-logo {
-  display: flex;
-  min-height: 58px;
-  align-items: center;
-  justify-content: center;
-  color: #75a4bd;
-  font-family: "Sora", sans-serif;
-  font-size: 12px;
-  font-weight: 700;
+.team-header-group {
+  margin-bottom: 50px;
+  padding: 0 5%;
   text-align: center;
 }
 
-.field-strip {
-  height: 614px;
-  overflow: hidden;
+.team-tag {
+  display: inline-block;
+  margin-bottom: 12px;
+  border-radius: 50px;
+  background: rgba(31, 163, 201, 0.1);
+  padding: 6px 18px;
+  color: #1fa3c9;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
-.field-strip img {
+.team-header-group h2 {
+  margin: 0;
+  color: #0b1f3a;
+  font-family: "Sora", sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.team-carousel-viewport {
   width: 100%;
-  height: 746px;
-  object-fit: cover;
-  transform: translateY(-110px);
+  overflow: visible;
+}
+
+.team-carousel-track {
+  display: flex;
+  align-items: center;
+  padding: 60px 0;
+  transform: translateX(calc(50% - 400px - (var(--team-index, 0) * 880px)));
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+.team-carousel-card {
+  display: grid;
+  flex: 0 0 800px;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 40px;
+  align-items: center;
+  box-sizing: border-box;
+  margin: 0 40px;
+  border-radius: 40px;
+  background: #ffffff;
+  padding: 60px;
+  filter: grayscale(100%) blur(2px);
+  opacity: 0.2;
+  transform: scale(0.85);
+  transition:
+    opacity 0.7s ease,
+    filter 0.7s ease,
+    transform 0.7s ease,
+    box-shadow 0.7s ease;
+}
+
+.team-carousel-card.is-active {
+  z-index: 10;
+  box-shadow: 0 30px 70px rgba(11, 31, 58, 0.15);
+  filter: grayscale(0%) blur(0);
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+.team-image-box {
+  position: relative;
+  display: flex;
+  height: 400px;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.team-blob-shape {
+  position: absolute;
+  z-index: 1;
+  bottom: 0;
+  width: 100%;
+  height: 85%;
+  border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+  opacity: 0.6;
+}
+
+.team-image-box img {
+  position: relative;
+  z-index: 2;
+  width: auto;
+  height: 100%;
+  object-fit: contain;
+}
+
+.team-info-area h3 {
+  margin: 0 0 10px;
+  color: #0b1f3a;
+  font-family: "Sora", sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.team-role-label {
+  display: block;
+  margin-bottom: 15px;
+  color: #1fa3c9;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+.team-info-area p {
+  margin: 0 0 30px;
+  color: #5f6b6c;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.team-tags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.team-tag-pill {
+  border-radius: 8px;
+  background: #f0f9fc;
+  padding: 8px 16px;
+  color: #1fa3c9;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.team-pagination {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.team-pagination button {
+  width: 35px;
+  height: 5px;
+  border: 0;
+  border-radius: 10px;
+  background: #5f6b6c;
+  cursor: pointer;
+  opacity: 0.2;
+  padding: 0;
+  transition:
+    width 0.4s ease,
+    opacity 0.4s ease,
+    background-color 0.4s ease;
+}
+
+.team-pagination button.active,
+.team-pagination button[aria-pressed="true"] {
+  width: 60px;
+  background: #1fa3c9;
+  opacity: 1;
+}
+
+.partners-section {
+  width: 100%;
+  overflow: hidden;
+  border-top: 1px solid #dde7ee;
+  border-bottom: 1px solid #dde7ee;
+  background: #f5fafc;
+  padding: 80px 0 100px;
+}
+
+.partners-header {
+  margin-bottom: 60px;
+  padding: 0 5%;
+  text-align: center;
+}
+
+.partners-header h2 {
+  margin: 0;
+  color: #0b1f3a;
+  font-family: "Sora", sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.partners-marquee-viewport {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 40px;
+  overflow: hidden;
+  padding: 40px 0;
+  background: transparent;
+  mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+}
+
+.partners-marquee-track {
+  display: flex;
+  width: max-content;
+  align-items: center;
+}
+
+.partners-row-left {
+  animation: partnersScrollLeft 45s linear infinite;
+}
+
+.partners-row-right {
+  animation: partnersScrollRight 45s linear infinite;
+}
+
+@keyframes partnersScrollLeft {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-33.333%);
+  }
+}
+
+@keyframes partnersScrollRight {
+  from {
+    transform: translateX(-33.333%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+.partner-logo-tile {
+  display: flex;
+  height: 85px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  margin: 0 50px;
+}
+
+.partner-logo-tile img {
+  width: auto;
+  max-width: 250px;
+  height: 100%;
+  object-fit: contain;
 }
 
 .site-footer {
@@ -1549,8 +1750,24 @@ img {
     max-width: 520px;
   }
 
-  .partner-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+  .team-carousel-card {
+    flex-basis: min(800px, 82vw);
+    grid-template-columns: 1fr;
+    padding: 40px 28px;
+    text-align: center;
+  }
+
+  .team-image-box {
+    height: 300px;
+  }
+
+  .team-tags-row {
+    justify-content: center;
+  }
+
+  .partner-logo-tile {
+    height: 70px;
+    margin: 0 34px;
   }
 
   .site-footer {
@@ -1835,9 +2052,59 @@ img {
     font-size: 12px;
   }
 
-  .partner-grid,
   .footer-links {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .team-section {
+    padding: 64px 0 86px;
+  }
+
+  .team-header-group {
+    margin-bottom: 28px;
+  }
+
+  .team-carousel-viewport {
+    overflow: hidden;
+  }
+
+  .team-carousel-track {
+    padding: 32px 0;
+    transform: translateX(calc(var(--team-index, 0) * -100vw));
+  }
+
+  .team-carousel-card {
+    flex-basis: calc(100vw - 48px);
+    margin: 0 24px;
+    border-radius: 28px;
+    padding: 32px 20px;
+    transform: scale(0.94);
+  }
+
+  .team-carousel-card.is-active {
+    transform: scale(1);
+  }
+
+  .team-image-box {
+    height: 260px;
+  }
+
+  .partners-section {
+    padding: 64px 0 76px;
+  }
+
+  .partners-header {
+    margin-bottom: 36px;
+  }
+
+  .partners-marquee-viewport {
+    gap: 28px;
+    padding: 25px 0;
+  }
+
+  .partner-logo-tile {
+    height: 60px;
+    margin: 0 30px;
   }
 
   .site-footer {
@@ -2787,6 +3054,425 @@ img {
   margin: 0 auto;
 }
 
+.groundwater-page {
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: #0b1e39;
+  color: #f5fafc;
+}
+
+.groundwater-nav {
+  display: flex;
+  width: min(1280px, calc(100vw - 80px));
+  min-height: 85px;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(24px, 7vw, 252px);
+  margin: 24px auto 32px;
+  border-radius: 100px;
+  background: rgba(0, 0, 0, 0);
+  padding: 10px;
+}
+
+.groundwater-nav-logo {
+  position: relative;
+  display: flex;
+  min-width: 270px;
+  height: 75px;
+  align-items: center;
+}
+
+.groundwater-nav-logo img {
+  width: 270px;
+  height: 56px;
+  object-fit: contain;
+}
+
+.groundwater-nav-logo span {
+  position: absolute;
+  left: 256px;
+  top: 45px;
+  color: #19629c;
+  font-family: "Sora", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.groundwater-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  overflow-x: auto;
+  padding: 10px;
+}
+
+.groundwater-nav-links a {
+  border-radius: 35px;
+  color: #1fa3c9;
+  font-size: 15px;
+  line-height: 1;
+  padding: 10px 12px;
+  white-space: nowrap;
+  transition:
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.groundwater-nav-links a.active,
+.groundwater-nav-links a:hover {
+  color: #7ddcff;
+  transform: translateY(-1px);
+}
+
+.groundwater-hero {
+  position: relative;
+  width: min(1440px, 100vw);
+  min-height: 675px;
+  overflow: hidden;
+  border-radius: 12px;
+  margin: 0 auto;
+}
+
+.groundwater-hero-map {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.65;
+}
+
+.groundwater-hero::after {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(11, 30, 57, 0.42), rgba(11, 30, 57, 0.58)),
+    radial-gradient(circle at 68% 44%, rgba(31, 163, 201, 0.18), transparent 22%);
+  content: "";
+}
+
+.groundwater-hero-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  min-height: 675px;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: clamp(40px, 5.6vw, 80px);
+}
+
+.groundwater-hero h1 {
+  max-width: 760px;
+  margin: 0;
+  color: #f5fafc;
+  font-family: "Sora", sans-serif;
+  font-size: clamp(34px, 3.2vw, 40px);
+  font-weight: 700;
+  line-height: 1.18;
+  opacity: 0.88;
+}
+
+.groundwater-hero h1 span {
+  display: block;
+}
+
+.groundwater-hero-bottom {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 67px;
+  gap: 40px;
+  align-items: center;
+}
+
+.groundwater-hero-bottom p {
+  max-width: 760px;
+  margin: 0;
+  color: #e2e8f0;
+  font-size: clamp(18px, 1.9vw, 24px);
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.groundwater-plus-button {
+  display: grid;
+  width: 67px;
+  height: 67px;
+  place-items: center;
+  border-radius: 50%;
+  transition:
+    transform 180ms ease,
+    filter 180ms ease;
+}
+
+.groundwater-plus-button:hover,
+.groundwater-plus-button:focus-visible {
+  filter: drop-shadow(0 0 18px rgba(31, 163, 201, 0.55));
+  transform: scale(1.06);
+}
+
+.groundwater-plus-button img {
+  width: 67px;
+  height: 67px;
+}
+
+.groundwater-proximity {
+  position: absolute;
+  left: 45.7%;
+  top: 49.6%;
+  width: 207px;
+  opacity: 0.92;
+}
+
+.groundwater-well-marker {
+  position: absolute;
+  left: 48.5%;
+  top: 33.1%;
+  width: 132px;
+  opacity: 0.9;
+}
+
+.groundwater-overview {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #dde7ee;
+  padding: 40px clamp(24px, 5.6vw, 80px);
+  color: #0b1f3a;
+}
+
+.groundwater-overview h2 {
+  margin: 0;
+  color: #000000;
+  font-family: "Sora", sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.groundwater-overview p {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+.groundwater-overview-row {
+  display: grid;
+  grid-template-columns: minmax(280px, 574px) minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  margin-top: 10px;
+}
+
+.groundwater-overview-row img {
+  width: 100%;
+  min-height: 296px;
+  object-fit: cover;
+}
+
+.groundwater-overview-row p {
+  max-width: 640px;
+}
+
+.groundwater-table-section {
+  background: #f5fafc;
+  padding: 24px clamp(24px, 5.6vw, 80px);
+}
+
+.groundwater-table-card {
+  overflow: hidden;
+  padding: 28px;
+}
+
+.groundwater-table-card h2 {
+  margin: 0 0 23px;
+  color: #1fa3c9;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.groundwater-table-wrap {
+  overflow-x: auto;
+}
+
+.groundwater-table-card table {
+  width: 100%;
+  min-width: 1060px;
+  border-collapse: collapse;
+}
+
+.groundwater-table-card th,
+.groundwater-table-card td {
+  border-bottom: 1px solid #dde5ef;
+  padding: 12px 20px;
+  color: #0b1f3a;
+  font-size: 18px;
+  line-height: 1.25;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.groundwater-table-card thead th {
+  color: #66758f;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.groundwater-table-card tbody th {
+  font-weight: 700;
+  text-align: left;
+}
+
+.groundwater-table-card tbody tr:last-child th,
+.groundwater-table-card tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.groundwater-table-card span {
+  display: inline-flex;
+  min-width: 78px;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.groundwater-table-card .optimal {
+  background: rgba(34, 197, 94, 0.14);
+  color: #15803d;
+}
+
+.groundwater-table-card .watch {
+  background: rgba(31, 163, 201, 0.14);
+  color: #19629c;
+}
+
+.groundwater-research {
+  background: #0b1e39;
+  padding: 56px clamp(24px, 5.6vw, 80px) 72px;
+}
+
+.groundwater-research-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.groundwater-research-heading p {
+  margin: 0;
+  color: #f5fafc;
+  font-family: "Sora", sans-serif;
+  font-size: clamp(28px, 3vw, 40px);
+  font-weight: 700;
+}
+
+.groundwater-carousel-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.groundwater-carousel-buttons span {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid rgba(245, 250, 252, 0.22);
+  border-radius: 50%;
+  background: rgba(245, 250, 252, 0.08);
+}
+
+.groundwater-carousel-buttons img {
+  width: 22px;
+  height: 22px;
+}
+
+.groundwater-research-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.groundwater-research-card {
+  overflow: hidden;
+  border: 1px solid rgba(245, 250, 252, 0.12);
+  border-radius: 8px;
+  background: rgba(245, 250, 252, 0.06);
+}
+
+.groundwater-research-card img {
+  width: 100%;
+  height: 172px;
+  object-fit: cover;
+}
+
+.groundwater-research-card div {
+  padding: 18px;
+}
+
+.groundwater-research-card h3 {
+  margin: 0 0 8px;
+  color: #f5fafc;
+  font-size: 18px;
+}
+
+.groundwater-research-card p {
+  margin: 0;
+  color: rgba(226, 232, 240, 0.76);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.groundwater-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  background: #f5fafc;
+  padding: 42px clamp(24px, 5.6vw, 80px);
+  color: #0b1f3a;
+}
+
+.groundwater-footer-brand {
+  display: flex;
+  max-width: 500px;
+  align-items: center;
+  gap: 18px;
+}
+
+.groundwater-footer-brand img {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+}
+
+.groundwater-footer-brand p {
+  margin: 0 0 6px;
+  font-family: "Sora", sans-serif;
+  font-weight: 700;
+}
+
+.groundwater-footer-brand span {
+  color: #66758f;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.groundwater-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 12px 20px;
+}
+
+.groundwater-footer-links a {
+  color: #19629c;
+  font-size: 14px;
+  font-weight: 600;
+}
+
 @media (max-width: 1180px) {
   .idw-nav {
     width: calc(100vw - 40px);
@@ -2822,6 +3508,41 @@ img {
   .idw-drawdown-images img:first-child,
   .idw-drawdown-images img:last-child {
     height: auto;
+  }
+
+  .groundwater-nav {
+    width: calc(100vw - 40px);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .groundwater-nav-links {
+    width: 100%;
+    gap: 8px;
+    scrollbar-width: none;
+  }
+
+  .groundwater-nav-links::-webkit-scrollbar {
+    display: none;
+  }
+
+  .groundwater-overview-row,
+  .groundwater-research-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .groundwater-overview-row p {
+    max-width: none;
+  }
+
+  .groundwater-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .groundwater-footer-links {
+    justify-content: flex-start;
   }
 }
 
@@ -2900,5 +3621,99 @@ img {
 
   .idw-navy-spacer {
     height: 280px;
+  }
+
+  .groundwater-nav {
+    width: calc(100vw - 28px);
+    margin-top: 14px;
+    padding: 8px 10px;
+  }
+
+  .groundwater-nav-logo {
+    min-width: 220px;
+    height: 58px;
+  }
+
+  .groundwater-nav-logo img {
+    width: 220px;
+    height: 46px;
+  }
+
+  .groundwater-nav-logo span {
+    left: 209px;
+    top: 37px;
+  }
+
+  .groundwater-nav-links {
+    gap: 10px;
+    padding: 4px 0 8px;
+  }
+
+  .groundwater-nav-links a {
+    font-size: 14px;
+    padding: 9px 8px;
+  }
+
+  .groundwater-hero {
+    min-height: 560px;
+    border-radius: 0;
+  }
+
+  .groundwater-hero-content {
+    min-height: 560px;
+    padding: 32px 20px;
+  }
+
+  .groundwater-hero-bottom {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+
+  .groundwater-plus-button,
+  .groundwater-plus-button img {
+    width: 56px;
+    height: 56px;
+  }
+
+  .groundwater-proximity {
+    left: 41%;
+    top: 46%;
+    width: 150px;
+  }
+
+  .groundwater-well-marker {
+    left: 54%;
+    top: 34%;
+    width: 96px;
+  }
+
+  .groundwater-overview {
+    padding: 32px 20px;
+  }
+
+  .groundwater-overview-row,
+  .groundwater-research-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .groundwater-table-section {
+    padding: 20px 0;
+  }
+
+  .groundwater-table-card {
+    padding: 20px;
+  }
+
+  .groundwater-research {
+    padding: 40px 20px 52px;
+  }
+
+  .groundwater-research-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .groundwater-footer {
+    padding: 32px 20px;
   }
 }

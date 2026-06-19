@@ -20,7 +20,7 @@ export const navItems = [
   { label: "About", href: "#about" },
   { label: "Simulation", href: "#simulations" },
   { label: "Weather", href: "#weather" },
-  { label: "Team", href: "#partners" },
+  { label: "Team", href: "#team" },
   { label: "Contact", href: "#contact" },
   { label: "Partners", href: "#partners" },
 ];
@@ -103,7 +103,7 @@ export const simulations = [
   {
     title: "Groundwater",
     highlight: "Simulation",
-    href: "/simulation",
+    href: "/simulation/groundwater",
     image: "/figma/groundwater-card.png",
     body: "Observe groundwater movement, well behavior, and field-level irrigation effects through a simplified interactive model.",
   },
@@ -141,7 +141,7 @@ export const footerColumns = [
     links: [
       { label: "About", href: "#about" },
       { label: "Reports & Research", href: "#simulations" },
-      { label: "Team", href: "#partners" },
+      { label: "Team", href: "#team" },
       { label: "Contact", href: "#contact" },
     ],
   },

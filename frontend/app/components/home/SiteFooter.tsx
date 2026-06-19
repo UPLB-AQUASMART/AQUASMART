@@ -2,7 +2,7 @@ import { footerColumns } from "@/app/data/home";
 
 export function SiteFooter() {
   return (
-    <footer className="site-footer" id="contact">
+    <footer className="site-footer scroll-reveal" id="contact">
       <div className="footer-upper">
         <div className="footer-brand">
           <img src="/assets/logo_2.png" alt="AQUASMART Mini" />

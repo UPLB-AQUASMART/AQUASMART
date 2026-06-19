@@ -1,6 +1,6 @@
 export function HeroSection() {
   return (
-    <section className="hero-section">
+    <section className="hero-section scroll-reveal">
       <img className="hero-image" src="/figma/hero.png" alt="" />
       <div className="hero-fade" />
       <div className="hero-copy">

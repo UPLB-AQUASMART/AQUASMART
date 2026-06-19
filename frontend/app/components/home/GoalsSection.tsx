@@ -39,9 +39,9 @@ function GoalCard({ item }: { item: GoalItem }) {
 
 export function GoalsSection() {
   return (
-    <section className="goals-section" id="about">
+    <section className="goals-section scroll-reveal" id="about">
       <SectionPill>Our Goals</SectionPill>
-      <div className="dark-frame goals-frame scroll-reveal">
+      <div className="dark-frame goals-frame">
         {/* <img className="frame-bg" src="/figma/goals-bg.png" alt="" /> */}
         <img className="goals-dots goals-dots-left" src="/assets/radial.svg" alt="" />
         <img className="goals-dots goals-dots-right" src="/assets/radial.svg" alt="" />

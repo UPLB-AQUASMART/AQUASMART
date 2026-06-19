@@ -2,7 +2,7 @@ import { SectionPill } from "./SectionPill";
 
 export function AboutMiniSection() {
   return (
-    <section className="about-mini-section">
+    <section className="about-mini-section scroll-reveal">
       <SectionPill>About AQUASMART mini</SectionPill>
       <h2>
         <span>Smaller Scale</span>

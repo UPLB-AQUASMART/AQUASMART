@@ -4,9 +4,9 @@ import { SectionPill } from "./SectionPill";
 
 export function SimulationsSection() {
   return (
-    <section className="simulations-section" id="simulations">
+    <section className="simulations-section scroll-reveal" id="simulations">
       <SectionPill>All Simulations</SectionPill>
-      <div className="dark-frame simulations-frame scroll-reveal">
+      <div className="dark-frame simulations-frame">
         <img className="frame-bg" src="/figma/simulations-bg.png" alt="" />
         <div className="frame-copy">
           <h2>Simulate How We Operate</h2>

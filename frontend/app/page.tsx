@@ -1,5 +1,4 @@
 import { AboutMiniSection } from "@/app/components/home/AboutMiniSection";
-import { FieldStrip } from "@/app/components/home/FieldStrip";
 import { GoalsSection } from "@/app/components/home/GoalsSection";
 import { HeroSection } from "@/app/components/home/HeroSection";
 import { ParametersSection } from "@/app/components/home/ParametersSection";
@@ -24,7 +23,6 @@ export default function Home() {
       <SimulationsSection />
       <WeatherSection />
       <PartnersSection />
-      <FieldStrip />
       <SiteFooter />
     </main>
   );

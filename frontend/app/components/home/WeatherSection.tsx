@@ -12,7 +12,7 @@ function WeatherIcon({ type }: { type: ForecastIcon }) {
 
 export function WeatherSection() {
   return (
-    <section className="weather-section" id="weather">
+    <section className="weather-section scroll-reveal" id="weather">
       <div className="weather-sun" aria-hidden="true" />
       <div className="weather-layout">
         <div className="weather-copy">

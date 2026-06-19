@@ -77,7 +77,7 @@ export function ParametersSection() {
   };
 
   return (
-    <section className="parameters-section">
+    <section className="parameters-section scroll-reveal">
       <article
         className={`parameters-card${
           isTransitioning ? " parameter-transitioning" : ""

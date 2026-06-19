@@ -66,7 +66,7 @@ export function TaglineSection() {
 
   return (
     <section className="tagline-section" ref={sectionRef}>
-      <div className="tagline-sticky">
+      <div className="tagline-sticky scroll-reveal">
         <h2 className="tagline-heading" aria-label="For Farmers For Environment">
           <span className="tagline-layer tagline-layer-base" aria-hidden="true">
             <span className="tagline-line-farm">For Farmers</span>

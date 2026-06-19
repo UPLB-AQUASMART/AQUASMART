@@ -26,7 +26,7 @@ export function ScrollRevealInit() {
         }
 
         const rect = element.getBoundingClientRect();
-        const entersViewport = rect.top < viewportHeight * 0.92 && rect.bottom > viewportHeight * 0.04;
+        const entersViewport = rect.top < viewportHeight * 0.92;
 
         if (entersViewport) {
           element.classList.add("is-visible");
