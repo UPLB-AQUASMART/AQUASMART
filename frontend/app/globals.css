@@ -693,6 +693,11 @@ img {
   .goal-icon,
   .goal-card h3,
   .goal-card p,
+  .simulation-card,
+  .simulation-card::after,
+  .simulation-card h3,
+  .simulation-card img,
+  .simulation-card p,
   .parameters-card-media,
   .parameter-active-marker,
   .parameter-active-bar,
@@ -701,7 +706,15 @@ img {
   }
 
   .goal-card:hover,
-  .goal-card:focus-visible {
+  .goal-card:focus-visible,
+  .simulation-card:hover,
+  .simulation-card:focus-visible,
+  .simulation-card:hover h3,
+  .simulation-card:focus-visible h3,
+  .simulation-card:hover img,
+  .simulation-card:focus-visible img,
+  .simulation-card:hover p,
+  .simulation-card:focus-visible p {
     transform: none;
   }
 
@@ -1015,6 +1028,7 @@ img {
 }
 
 .simulation-card {
+  position: relative;
   display: flex;
   min-width: 0;
   flex-direction: column;
@@ -1024,9 +1038,49 @@ img {
   border-radius: 12px;
   background: #ffffff;
   padding: 24px;
+  outline: none;
+  transition:
+    background-color 220ms ease,
+    border-color 220ms ease,
+    box-shadow 220ms ease,
+    transform 220ms ease;
+  will-change: transform;
+}
+
+.simulation-card::after {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    rgba(118, 179, 217, 0.18),
+    transparent 48%
+  );
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 220ms ease;
+}
+
+.simulation-card:hover,
+.simulation-card:focus-visible {
+  border-color: rgba(118, 179, 217, 0.38);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow:
+    0 0 0 1px rgba(118, 179, 217, 0.1),
+    0 0 22px rgba(118, 179, 217, 0.46),
+    0 20px 42px rgba(0, 0, 0, 0.28);
+  transform: translateY(-8px) scale(1.015);
+}
+
+.simulation-card:hover::after,
+.simulation-card:focus-visible::after {
+  opacity: 1;
 }
 
 .simulation-card h3 {
+  position: relative;
+  z-index: 1;
   display: flex;
   justify-content: center;
   gap: 8px;
@@ -1038,6 +1092,9 @@ img {
   font-weight: 700;
   line-height: 1;
   white-space: nowrap;
+  transition:
+    color 220ms ease,
+    transform 220ms ease;
 }
 
 .simulation-card h3 span {
@@ -1045,17 +1102,40 @@ img {
 }
 
 .simulation-card img {
+  position: relative;
+  z-index: 1;
   width: 100%;
   height: 324px;
   object-fit: cover;
+  transition:
+    filter 220ms ease,
+    transform 220ms ease;
 }
 
 .simulation-card p {
+  position: relative;
+  z-index: 1;
   margin: 0;
   color: var(--muted);
   font-size: 12px;
   font-weight: 500;
   line-height: 20px;
+  transition:
+    color 220ms ease,
+    transform 220ms ease;
+}
+
+.simulation-card:hover h3,
+.simulation-card:focus-visible h3,
+.simulation-card:hover p,
+.simulation-card:focus-visible p {
+  transform: translateX(2px);
+}
+
+.simulation-card:hover img,
+.simulation-card:focus-visible img {
+  filter: saturate(1.06) contrast(1.03);
+  transform: scale(1.018);
 }
 
 .weather-section {
