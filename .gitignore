@@ -15,3 +15,8 @@ venv/
 # Local model/output artifacts
 backend/data/
 backend/outputs/
+
+# Frontend generated artifacts
+frontend/.next/
+frontend/.npm-cache/
+frontend/node_modules/
