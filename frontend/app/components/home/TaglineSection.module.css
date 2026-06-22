@@ -1,11 +1,8 @@
 /* Scoped styles extracted from app/globals.css. */
 
 .tagline-section {
-  --tagline-progress: 0;
-  --tagline-fill: 0;
   --tagline-zoom: 0;
   --tagline-bg: 0;
-  --tagline-vanish: 0;
   --tagline-text-opacity: 1;
   --tagline-blur: 0px;
   --tagline-farm-clip: 100%;
@@ -65,18 +62,6 @@
   overflow: hidden;
   padding: 0 80px;
   place-items: center;
-}
-
-.tagline-section[data-pin="pinned"] .tagline-sticky {
-  position: fixed;
-  top: 0;
-  bottom: auto;
-}
-
-.tagline-section[data-pin="after"] .tagline-sticky {
-  position: absolute;
-  top: auto;
-  bottom: 0;
 }
 
 .tagline-section h2 {
