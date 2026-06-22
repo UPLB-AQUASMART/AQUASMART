@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import revealStyles from "./ScrollReveal.module.css";
+import styles from "./TaglineSection.module.css";
 
 export function TaglineSection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -65,16 +67,16 @@ export function TaglineSection() {
   }, []);
 
   return (
-    <section className="tagline-section" ref={sectionRef}>
-      <div className="tagline-sticky scroll-reveal">
-        <h2 className="tagline-heading" aria-label="For Farmers For Environment">
-          <span className="tagline-layer tagline-layer-base" aria-hidden="true">
-            <span className="tagline-line-farm">For Farmers</span>
-            <strong className="tagline-line-environment">For Environment</strong>
+    <section className={styles["tagline-section"]} ref={sectionRef}>
+      <div className={`${styles["tagline-sticky"]} ${revealStyles["scroll-reveal"]}`}>
+        <h2 className={styles["tagline-heading"]} aria-label="For Farmers For Environment">
+          <span className={`${styles["tagline-layer"]} ${styles["tagline-layer-base"]}`} aria-hidden="true">
+            <span className={styles["tagline-line-farm"]}>For Farmers</span>
+            <strong className={styles["tagline-line-environment"]}>For Environment</strong>
           </span>
-          <span className="tagline-layer tagline-layer-fill" aria-hidden="true">
-            <span className="tagline-line-farm">For Farmers</span>
-            <strong className="tagline-line-environment">For Environment</strong>
+          <span className={`${styles["tagline-layer"]} ${styles["tagline-layer-fill"]}`} aria-hidden="true">
+            <span className={styles["tagline-line-farm"]}>For Farmers</span>
+            <strong className={styles["tagline-line-environment"]}>For Environment</strong>
           </span>
         </h2>
       </div>

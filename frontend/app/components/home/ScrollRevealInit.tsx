@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect } from "react";
+import styles from "./ScrollReveal.module.css";
 
 export function ScrollRevealInit() {
   useEffect(() => {
-    const elements = Array.from(document.querySelectorAll<HTMLElement>(".scroll-reveal"));
+    const elements = Array.from(
+      document.querySelectorAll<HTMLElement>(`.${styles["scroll-reveal"]}`),
+    );
 
     if (!elements.length) {
       return;
@@ -13,7 +16,7 @@ export function ScrollRevealInit() {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     if (reducedMotion || !("IntersectionObserver" in window)) {
-      elements.forEach((element) => element.classList.add("is-visible"));
+      elements.forEach((element) => element.classList.add(styles["is-visible"]));
       return;
     }
 
@@ -21,7 +24,7 @@ export function ScrollRevealInit() {
       const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
 
       elements.forEach((element) => {
-        if (element.classList.contains("is-visible")) {
+        if (element.classList.contains(styles["is-visible"])) {
           return;
         }
 
@@ -29,7 +32,7 @@ export function ScrollRevealInit() {
         const entersViewport = rect.top < viewportHeight * 0.92;
 
         if (entersViewport) {
-          element.classList.add("is-visible");
+          element.classList.add(styles["is-visible"]);
         }
       });
     };
@@ -51,7 +54,7 @@ export function ScrollRevealInit() {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            entry.target.classList.add("is-visible");
+            entry.target.classList.add(styles["is-visible"]);
             observer.unobserve(entry.target);
           }
         });

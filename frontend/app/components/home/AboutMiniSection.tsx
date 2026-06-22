@@ -1,9 +1,11 @@
 import { SectionPill } from "./SectionPill";
+import revealStyles from "./ScrollReveal.module.css";
+import styles from "./AboutMiniSection.module.css";
 
 export function AboutMiniSection() {
   return (
-    <section className="about-mini-section scroll-reveal">
-      <SectionPill>About AQUASMART mini</SectionPill>
+    <section className={`${styles["about-mini-section"]} ${revealStyles["scroll-reveal"]}`}>
+      <SectionPill className={styles["section-pill"]}>About AQUASMART mini</SectionPill>
       <h2>
         <span>Smaller Scale</span>
         for Better Understanding

@@ -1,0 +1,263 @@
+/* Scoped styles extracted from app/globals.css. */
+
+.simulations-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 120px 60px;
+  background: var(--navy);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .simulation-card,
+.simulation-card::after,
+.simulation-card h3,
+.simulation-card img,
+.simulation-card p {
+    transition: none;
+  }
+
+  .simulation-card:hover,
+.simulation-card:focus-visible,
+.simulation-card:hover h3,
+.simulation-card:focus-visible h3,
+.simulation-card:hover img,
+.simulation-card:focus-visible img,
+.simulation-card:hover p,
+.simulation-card:focus-visible p {
+    transform: none;
+  }
+}
+
+.simulation-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 40px;
+}
+
+.simulation-card {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 10px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #ffffff;
+  padding: 24px;
+  outline: none;
+  transition:
+    background-color 220ms ease,
+    border-color 220ms ease,
+    box-shadow 220ms ease,
+    transform 220ms ease;
+  will-change: transform;
+}
+
+.simulation-card::after {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    rgba(118, 179, 217, 0.18),
+    transparent 48%
+  );
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 220ms ease;
+}
+
+.simulation-card:hover,
+.simulation-card:focus-visible {
+  border-color: rgba(118, 179, 217, 0.38);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow:
+    0 0 0 1px rgba(118, 179, 217, 0.1),
+    0 0 22px rgba(118, 179, 217, 0.46),
+    0 20px 42px rgba(0, 0, 0, 0.28);
+  transform: translateY(-8px) scale(1.015);
+}
+
+.simulation-card:hover::after,
+.simulation-card:focus-visible::after {
+  opacity: 1;
+}
+
+.simulation-card h3 {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 0;
+  padding: 24px 0;
+  color: var(--navy);
+  font-family: "Sora", sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  transition:
+    color 220ms ease,
+    transform 220ms ease;
+}
+
+.simulation-card h3 span {
+  color: var(--green);
+}
+
+.simulation-card img {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 324px;
+  object-fit: cover;
+  transition:
+    filter 220ms ease,
+    transform 220ms ease;
+}
+
+.simulation-card p {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 20px;
+  transition:
+    color 220ms ease,
+    transform 220ms ease;
+}
+
+.simulation-card:hover h3,
+.simulation-card:focus-visible h3,
+.simulation-card:hover p,
+.simulation-card:focus-visible p {
+  transform: translateX(2px);
+}
+
+.simulation-card:hover img,
+.simulation-card:focus-visible img {
+  filter: saturate(1.06) contrast(1.03);
+  transform: scale(1.018);
+}
+
+@media (max-width: 1100px) {
+
+  .simulation-grid {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 720px) {
+
+  .simulations-section {
+    padding: 80px 20px;
+  }
+
+  .simulation-card h3 {
+    flex-wrap: wrap;
+    font-size: 25px;
+  }
+}
+
+@media (max-width: 900px) {
+
+  .simulations-section {
+    padding-right: clamp(20px, 5vw, 40px);
+    padding-left: clamp(20px, 5vw, 40px);
+  }
+
+  .simulation-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .simulation-card {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .simulation-card {
+    padding: clamp(18px, 5vw, 24px);
+  }
+
+  .simulation-card h3 {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    padding: 12px 0;
+    font-size: clamp(24px, 7.5vw, 32px);
+    line-height: 1.08;
+    white-space: normal;
+  }
+
+  .simulation-card img {
+    height: clamp(190px, 54vw, 324px);
+  }
+}
+
+@media (max-width: 520px) {
+
+  .simulations-section {
+    padding: 64px 16px;
+  }
+
+  .simulation-card {
+    border-radius: 10px;
+    padding: 16px;
+  }
+
+  .simulation-card h3 {
+    font-size: clamp(22px, 7vw, 28px);
+  }
+
+  .simulation-card p {
+    font-size: 12px;
+    line-height: 1.55;
+  }
+}
+
+@media (max-width: 900px) {
+
+  .simulation-card p {
+    overflow-wrap: break-word;
+  }
+
+  .simulations-section {
+    scroll-margin-top: 84px;
+  }
+
+  .simulation-card {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+
+  .simulations-section {
+    padding-top: 56px;
+    padding-bottom: 56px;
+  }
+
+  .simulation-grid {
+    gap: 18px;
+  }
+
+  .simulation-card img {
+    height: clamp(168px, 52vw, 240px);
+  }
+}
+
+@media (max-width: 420px) {
+
+  .simulation-card h3 {
+    font-size: 22px;
+  }
+}

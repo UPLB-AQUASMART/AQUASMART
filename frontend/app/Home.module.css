@@ -1,0 +1,17 @@
+/* Scoped styles extracted from app/globals.css. */
+
+.home-page {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: #ffffff;
+}
+
+@media (max-width: 900px) {
+
+  .home-page {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+}

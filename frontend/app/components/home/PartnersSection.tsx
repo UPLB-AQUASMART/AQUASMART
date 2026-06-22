@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties } from "react";
+import revealStyles from "./ScrollReveal.module.css";
+import styles from "./PartnersSection.module.css";
 
 const teamMembers = [
   {
@@ -128,35 +130,35 @@ export function PartnersSection() {
 
   return (
     <>
-      <section className="team-section scroll-reveal" id="team">
-        <div className="team-header-group">
-          <div className="team-tag">Meet the team</div>
+      <section className={`${styles["team-section"]} ${revealStyles["scroll-reveal"]}`} id="team">
+        <div className={styles["team-header-group"]}>
+          <div className={styles["team-tag"]}>Meet the team</div>
           <h2>The Experts Behind AquaSmart</h2>
         </div>
 
-        <div className="team-carousel-viewport" aria-label="AQUASMART team members">
+        <div className={styles["team-carousel-viewport"]} aria-label="AQUASMART team members">
           <div
-            className={`team-carousel-track${isCarouselAnimating ? "" : " no-transition"}`}
+            className={`${styles["team-carousel-track"]}${isCarouselAnimating ? "" : ` ${styles["no-transition"]}`}`}
             onTransitionEnd={handleCarouselTransitionEnd}
             style={{ "--team-position": teamPosition } as CSSProperties}
           >
             {carouselMembers.map((member, index) => (
               <article
                 aria-hidden={index !== teamPosition}
-                className={`team-carousel-card${index === teamPosition ? " is-active" : ""}`}
+                className={`${styles["team-carousel-card"]}${index === teamPosition ? ` ${styles["is-active"]}` : ""}`}
                 key={`${member.name}-${index}`}
               >
-                <div className="team-image-box">
-                  <div className="team-blob-shape" style={{ backgroundColor: member.color }} />
+                <div className={styles["team-image-box"]}>
+                  <div className={styles["team-blob-shape"]} style={{ backgroundColor: member.color }} />
                   <img src={member.image} alt={member.name} />
                 </div>
-                <div className="team-info-area">
-                  <span className="team-role-label">{member.role}</span>
+                <div className={styles["team-info-area"]}>
+                  <span className={styles["team-role-label"]}>{member.role}</span>
                   <h3>{member.name}</h3>
                   <p>{member.bio}</p>
-                  <div className="team-tags-row">
+                  <div className={styles["team-tags-row"]}>
                     {member.tags.map((tag) => (
-                      <span className="team-tag-pill" key={tag}>
+                      <span className={styles["team-tag-pill"]} key={tag}>
                         {tag}
                       </span>
                     ))}
@@ -167,12 +169,12 @@ export function PartnersSection() {
           </div>
         </div>
 
-        <div className="team-pagination" aria-label="Choose team member">
+        <div className={styles["team-pagination"]} aria-label="Choose team member">
           {teamMembers.map((member, index) => (
             <button
               aria-label={`Show ${member.name}`}
               aria-pressed={index === activeIndex}
-              className={index === activeIndex ? "active" : undefined}
+              className={index === activeIndex ? styles.active : undefined}
               key={member.name}
               onClick={() => jumpToSlide(index)}
               type="button"
@@ -181,21 +183,21 @@ export function PartnersSection() {
         </div>
       </section>
 
-      <section className="partners-section scroll-reveal" id="partners">
-        <div className="partners-header">
+      <section className={`${styles["partners-section"]} ${revealStyles["scroll-reveal"]}`} id="partners">
+        <div className={styles["partners-header"]}>
           <h2>Research &amp; Institutional Partners</h2>
         </div>
-        <div className="partners-marquee-viewport" aria-label="Research and institutional partner logos">
-          <div className="partners-marquee-track partners-row-left">
+        <div className={styles["partners-marquee-viewport"]} aria-label="Research and institutional partner logos">
+          <div className={`${styles["partners-marquee-track"]} ${styles["partners-row-left"]}`}>
             {partnerLoop.map((logo, index) => (
-              <div className="partner-logo-tile" key={`${logo}-left-${index}`}>
+              <div className={styles["partner-logo-tile"]} key={`${logo}-left-${index}`}>
                 <img src={logo} alt="" />
               </div>
             ))}
           </div>
-          <div className="partners-marquee-track partners-row-right">
+          <div className={`${styles["partners-marquee-track"]} ${styles["partners-row-right"]}`}>
             {partnerLoopReverse.map((logo, index) => (
-              <div className="partner-logo-tile" key={`${logo}-right-${index}`}>
+              <div className={styles["partner-logo-tile"]} key={`${logo}-right-${index}`}>
                 <img src={logo} alt="" />
               </div>
             ))}

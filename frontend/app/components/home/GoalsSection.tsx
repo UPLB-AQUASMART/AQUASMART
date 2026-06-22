@@ -4,6 +4,9 @@ import type { ComponentType } from "react";
 import { goals, type GoalIcon, type GoalItem } from "@/app/data/home";
 
 import { SectionPill } from "./SectionPill";
+import frameStyles from "./Frame.module.css";
+import revealStyles from "./ScrollReveal.module.css";
+import styles from "./GoalsSection.module.css";
 
 const goalIcons: Record<GoalIcon, ComponentType<{ size?: number; strokeWidth?: number }>> = {
   soil: Sprout,
@@ -23,8 +26,8 @@ function GoalCard({ item }: { item: GoalItem }) {
   const { before, after } = splitHighlightedTitle(item.title, item.highlight);
 
   return (
-    <article className="goal-card" tabIndex={0}>
-      <div className="goal-icon">
+    <article className={`${styles["goal-card"]} ${revealStyles["goal-card"]}`} tabIndex={0}>
+      <div className={styles["goal-icon"]}>
         <Icon size={34} strokeWidth={1.7} />
       </div>
       <h3>
@@ -39,20 +42,20 @@ function GoalCard({ item }: { item: GoalItem }) {
 
 export function GoalsSection() {
   return (
-    <section className="goals-section scroll-reveal" id="about">
+    <section className={`${styles["goals-section"]} ${revealStyles["scroll-reveal"]}`} id="about">
       <SectionPill>Our Goals</SectionPill>
-      <div className="dark-frame goals-frame">
+      <div className={`${frameStyles["dark-frame"]} ${frameStyles["goals-frame"]}`}>
         {/* <img className="frame-bg" src="/figma/goals-bg.png" alt="" /> */}
-        <img className="goals-dots goals-dots-left" src="/assets/radial.svg" alt="" />
-        <img className="goals-dots goals-dots-right" src="/assets/radial.svg" alt="" />
-        <div className="goals-gif-wrap" aria-hidden="true">
+        <img className={`${styles["goals-dots"]} ${styles["goals-dots-left"]}`} src="/assets/radial.svg" alt="" />
+        <img className={`${styles["goals-dots"]} ${styles["goals-dots-right"]}`} src="/assets/radial.svg" alt="" />
+        <div className={styles["goals-gif-wrap"]} aria-hidden="true">
           <img
-            className="goals-gif"
+            className={styles["goals-gif"]}
             src="/assets/nsp-ezgif.com-gif-maker.gif"
             alt=""
           />
         </div>
-        <div className="frame-copy">
+        <div className={`${frameStyles["frame-copy"]} ${revealStyles["frame-copy"]}`}>
           <h2>Water Intelligence</h2>
           <p>
             AQUASMART is an integrated water resources management initiative
@@ -61,11 +64,11 @@ export function GoalsSection() {
             AI-assisted forecasting, and data-driven irrigation management.
           </p>
         </div>
-        <div className="goal-grid">
+        <div className={styles["goal-grid"]}>
           {goals.map((item) => (
             <GoalCard key={item.title} item={item} />
           ))}
-          <div className="goal-card empty-card" />
+          <div className={`${styles["goal-card"]} ${styles["empty-card"]} ${revealStyles["goal-card"]}`} />
         </div>
       </div>
     </section>

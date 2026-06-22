@@ -9,10 +9,11 @@ import { SiteFooter } from "@/app/components/home/SiteFooter";
 import { SiteNav } from "@/app/components/home/SiteNav";
 import { TaglineSection } from "@/app/components/home/TaglineSection";
 import { WeatherSection } from "@/app/components/home/WeatherSection";
+import styles from "./Home.module.css";
 
 export default function Home() {
   return (
-    <main className="home-page" id="home">
+    <main className={styles["home-page"]} id="home">
       <ScrollRevealInit />
       <SiteNav />
       <HeroSection />

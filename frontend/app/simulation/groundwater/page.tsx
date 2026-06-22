@@ -1,4 +1,5 @@
 import Link from "next/link";
+import styles from "./page.module.css";
 
 const navLinks = [
   { label: "Home", href: "/#home" },
@@ -52,14 +53,14 @@ const researchCards = [
 
 function GroundwaterNav() {
   return (
-    <header className="groundwater-nav" aria-label="AQUASMART Mini navigation">
-      <Link className="groundwater-nav-logo" href="/#home" aria-label="AQUASMART Mini home">
+    <header className={styles["groundwater-nav"]} aria-label="AQUASMART Mini navigation">
+      <Link className={styles["groundwater-nav-logo"]} href="/#home" aria-label="AQUASMART Mini home">
         <img src="/figma/groundwater-logo.png" alt="AQUASMART Mini" />
         <span>mini</span>
       </Link>
-      <nav className="groundwater-nav-links" aria-label="Primary navigation">
+      <nav className={styles["groundwater-nav-links"]} aria-label="Primary navigation">
         {navLinks.map((link) => (
-          <Link className={link.active ? "active" : undefined} href={link.href} key={link.label}>
+          <Link className={link.active ? styles.active : undefined} href={link.href} key={link.label}>
             {link.label}
           </Link>
         ))}
@@ -70,38 +71,38 @@ function GroundwaterNav() {
 
 export default function GroundwaterSimulationPage() {
   return (
-    <main className="groundwater-page">
+    <main className={styles["groundwater-page"]}>
       <GroundwaterNav />
 
-      <section className="groundwater-hero">
-        <img className="groundwater-hero-map" src="/figma/groundwater-map.png" alt="" />
-        <div className="groundwater-hero-content">
+      <section className={styles["groundwater-hero"]}>
+        <img className={styles["groundwater-hero-map"]} src="/figma/groundwater-map.png" alt="" />
+        <div className={styles["groundwater-hero-content"]}>
           <h1>
             MODFLOW/FLOPY
             <span>Groundwater Simulation</span>
           </h1>
-          <div className="groundwater-hero-bottom">
+          <div className={styles["groundwater-hero-bottom"]}>
             <p>
               Simulate groundwater response across wells and field zones using MODFLOW/FLOPY
               outputs, proximity layers, and live parameter readings from AQUASMART mini.
             </p>
-            <a className="groundwater-plus-button" href="#groundwater-overview" aria-label="Read groundwater simulation overview">
+            <a className={styles["groundwater-plus-button"]} href="#groundwater-overview" aria-label="Read groundwater simulation overview">
               <img src="/figma/groundwater-plus.svg" alt="" />
             </a>
           </div>
-          <img className="groundwater-proximity" src="/figma/groundwater-proximity.png" alt="" />
-          <img className="groundwater-well-marker" src="/figma/groundwater-well.png" alt="" />
+          <img className={styles["groundwater-proximity"]} src="/figma/groundwater-proximity.png" alt="" />
+          <img className={styles["groundwater-well-marker"]} src="/figma/groundwater-well.png" alt="" />
         </div>
       </section>
 
-      <section className="groundwater-overview" id="groundwater-overview">
+      <section className={styles["groundwater-overview"]} id="groundwater-overview">
         <h2>Groundwater Simulation</h2>
         <p>
           AQUASMART mini combines well-level sensor data, groundwater level estimates,
           and modelled flow behavior to help teams understand field conditions before
           irrigation decisions are made.
         </p>
-        <div className="groundwater-overview-row">
+        <div className={styles["groundwater-overview-row"]}>
           <img src="/figma/groundwater-detail.png" alt="Groundwater simulation output map" />
           <p>
             The simulation view brings model outputs and monitoring layers into one
@@ -113,10 +114,10 @@ export default function GroundwaterSimulationPage() {
         </div>
       </section>
 
-      <section className="groundwater-table-section" aria-labelledby="groundwater-table-title">
-        <div className="groundwater-table-card">
+      <section className={styles["groundwater-table-section"]} aria-labelledby="groundwater-table-title">
+        <div className={styles["groundwater-table-card"]}>
           <h2 id="groundwater-table-title">ALL PARAMETERS - CURRENT READINGS (ALL ZONES)</h2>
-          <div className="groundwater-table-wrap">
+          <div className={styles["groundwater-table-wrap"]}>
             <table>
               <thead>
                 <tr>
@@ -141,7 +142,7 @@ export default function GroundwaterSimulationPage() {
                     <td>{reading.tds}</td>
                     <td>{reading.gwLevel}</td>
                     <td>
-                      <span className={reading.status === "Optimal" ? "optimal" : "watch"}>
+                      <span className={reading.status === "Optimal" ? styles.optimal : styles.watch}>
                         {reading.status}
                       </span>
                     </td>
@@ -153,10 +154,10 @@ export default function GroundwaterSimulationPage() {
         </div>
       </section>
 
-      <section className="groundwater-research">
-        <div className="groundwater-research-heading">
+      <section className={styles["groundwater-research"]}>
+        <div className={styles["groundwater-research-heading"]}>
           <p>Research Institutions/Partners</p>
-          <div className="groundwater-carousel-buttons" aria-hidden="true">
+          <div className={styles["groundwater-carousel-buttons"]} aria-hidden="true">
             <span>
               <img src="/figma/groundwater-chevron-left.svg" alt="" />
             </span>
@@ -165,9 +166,9 @@ export default function GroundwaterSimulationPage() {
             </span>
           </div>
         </div>
-        <div className="groundwater-research-grid">
+        <div className={styles["groundwater-research-grid"]}>
           {researchCards.map((image, index) => (
-            <article className="groundwater-research-card" key={image}>
+            <article className={styles["groundwater-research-card"]} key={image}>
               <img src={image} alt="" />
               <div>
                 <h3>Partner Research {index + 1}</h3>
@@ -178,15 +179,15 @@ export default function GroundwaterSimulationPage() {
         </div>
       </section>
 
-      <footer className="groundwater-footer">
-        <div className="groundwater-footer-brand">
+      <footer className={styles["groundwater-footer"]}>
+        <div className={styles["groundwater-footer-brand"]}>
           <img src="/figma/groundwater-footer-mark.png" alt="" />
           <div>
             <p>AQUASMART mini</p>
             <span>Groundwater simulation and water-quality monitoring for field decisions.</span>
           </div>
         </div>
-        <div className="groundwater-footer-links">
+        <div className={styles["groundwater-footer-links"]}>
           {navLinks.map((link) => (
             <Link href={link.href} key={link.label}>
               {link.label}

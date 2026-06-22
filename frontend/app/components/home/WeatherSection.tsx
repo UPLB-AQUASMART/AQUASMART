@@ -6,6 +6,8 @@ import { useState } from "react";
 import { forecast, type ForecastIcon } from "@/app/data/home";
 
 import { SectionPill } from "./SectionPill";
+import revealStyles from "./ScrollReveal.module.css";
+import styles from "./WeatherSection.module.css";
 
 const forecastDetails = [
   {
@@ -166,7 +168,10 @@ const forecastDetails = [
 
 function WeatherIcon({ type }: { type: ForecastIcon }) {
   return (
-    <span className={`weather-icon ${type}`} aria-hidden="true">
+    <span
+      className={`${styles["weather-icon"]}${type === "sun" ? "" : ` ${styles[type]}`}`}
+      aria-hidden="true"
+    >
       <span />
     </span>
   );
@@ -187,22 +192,25 @@ export function WeatherSection() {
   };
 
   const weatherClassName = [
-    "weather-section",
-    isRainy ? "weather-rainy" : "",
-    `weather-slide-${slideDirection}`,
-    "scroll-reveal",
+    styles["weather-section"],
+    isRainy ? styles["weather-rainy"] : "",
+    styles[`weather-slide-${slideDirection}`],
+    revealStyles["scroll-reveal"],
   ]
     .filter(Boolean)
     .join(" ");
 
   return (
     <section className={weatherClassName} id="weather">
-      <div className={`weather-sun weather-sun-${activeForecast.icon}`} aria-hidden="true" />
-      <div className="weather-layout">
-        <div className="weather-copy">
-          <div className="weather-copy-panel" key={activeIndex}>
-            <SectionPill>Weather Forecast</SectionPill>
-            <div className="weather-meta">
+      <div
+        className={`${styles["weather-sun"]}${activeForecast.icon === "sun" ? "" : ` ${styles[`weather-sun-${activeForecast.icon}`]}`}`}
+        aria-hidden="true"
+      />
+      <div className={styles["weather-layout"]}>
+        <div className={styles["weather-copy"]}>
+          <div className={styles["weather-copy-panel"]} key={activeIndex}>
+            <SectionPill className={styles["section-pill"]}>Weather Forecast</SectionPill>
+            <div className={styles["weather-meta"]}>
               <strong>{activeDetail.date}</strong>
               <span>{activeDetail.time}</span>
             </div>
@@ -215,19 +223,19 @@ export function WeatherSection() {
                 <li key={bullet}>{bullet}</li>
               ))}
             </ul>
-            <p className="weather-recommendation">
+            <p className={styles["weather-recommendation"]}>
               {activeDetail.recommendation}
             </p>
           </div>
         </div>
 
-        <div className={detailsOpen ? "week-card detail-mode" : "week-card"}>
+        <div className={`${styles["week-card"]}${detailsOpen ? ` ${styles["detail-mode"]}` : ""}`}>
           {detailsOpen ? (
-            <div className="forecast-detail-view" aria-live="polite">
-              <div className="forecast-detail-header">
+            <div className={styles["forecast-detail-view"]} aria-live="polite">
+              <div className={styles["forecast-detail-header"]}>
                 <button
                   aria-label="Back to weekly forecast"
-                  className="forecast-back-button"
+                  className={styles["forecast-back-button"]}
                   onClick={() => setDetailsOpen(false)}
                   type="button"
                 >
@@ -237,7 +245,7 @@ export function WeatherSection() {
                 <span>Open-Meteo</span>
               </div>
 
-              <div className="forecast-current-card">
+              <div className={styles["forecast-current-card"]}>
                 <WeatherIcon type={activeForecast.icon} />
                 <div>
                   <strong>{activeForecast.temp}</strong>
@@ -246,12 +254,12 @@ export function WeatherSection() {
                 <span>{activeDetail.status}</span>
               </div>
 
-              <div className="forecast-outlook">
+              <div className={styles["forecast-outlook"]}>
                 <strong>Irrigation outlook</strong>
                 <p>{activeDetail.recommendation}</p>
               </div>
 
-              <dl className="forecast-detail-list">
+              <dl className={styles["forecast-detail-list"]}>
                 {activeDetail.metrics.slice(0, 6).map(([label, value]) => (
                   <div key={label}>
                     <dt>
@@ -263,7 +271,7 @@ export function WeatherSection() {
                 ))}
               </dl>
 
-              <div className="forecast-eto-row">
+              <div className={styles["forecast-eto-row"]}>
                 <span aria-hidden="true" />
                 <strong>ET0 {activeDetail.metrics[6]?.[1] ?? "3.1 mm"} demand</strong>
               </div>
@@ -276,17 +284,17 @@ export function WeatherSection() {
 
                 return (
                   <div
-                    className={isActive ? "forecast-row active" : "forecast-row"}
+                    className={`${styles["forecast-row"]}${isActive ? ` ${styles.active}` : ""}`}
                     key={item.day}
                   >
                     <button
                       aria-pressed={isActive}
-                      className="forecast-day-button"
+                      className={styles["forecast-day-button"]}
                       onClick={() => handleSelectDay(index)}
                       type="button"
                     >
                       <WeatherIcon type={item.icon} />
-                      <span className="forecast-day-info">
+                      <span className={styles["forecast-day-info"]}>
                         <strong>{item.temp}</strong>
                         <small>{item.day}</small>
                       </span>
@@ -295,7 +303,7 @@ export function WeatherSection() {
                       <button
                         aria-expanded="false"
                         aria-label={`Show forecast details for ${item.day}`}
-                        className="forecast-arrow-button"
+                        className={styles["forecast-arrow-button"]}
                         onClick={() => setDetailsOpen(true)}
                         type="button"
                       >

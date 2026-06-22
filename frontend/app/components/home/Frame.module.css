@@ -1,0 +1,168 @@
+/* Scoped styles extracted from app/globals.css. */
+
+.dark-frame {
+  position: relative;
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 48px;
+  overflow: hidden;
+  border-radius: 20px;
+  background: var(--navy);
+  padding: 64px 60px 40px;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.25);
+}
+
+.goals-frame {
+  min-height: 870px;
+}
+
+.frame-bg {
+  position: absolute;
+  inset: -240px auto auto -145px;
+  width: 1610px;
+  height: 1231px;
+  max-width: none;
+  object-fit: cover;
+  opacity: 0.96;
+}
+
+.simulations-frame .frame-bg {
+  inset: -403px auto auto -381px;
+  width: 2110px;
+  height: 1742px;
+}
+
+.frame-copy {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.frame-copy h2 {
+  width: 615px;
+  margin: 0;
+  color: var(--aqua);
+  font-family: "Sora", sans-serif;
+  font-size: 65px;
+  font-weight: 600;
+  line-height: 1.14;
+}
+
+.frame-copy p {
+  margin: 0;
+  color: var(--pale);
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+@media (max-width: 1100px) {
+
+  .frame-copy h2 {
+    font-size: 54px;
+  }
+
+  .goals-frame {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 720px) {
+
+  .frame-copy h2 {
+    width: 100%;
+    font-size: 39px;
+  }
+
+  .frame-copy p {
+    width: 100%;
+    font-size: 18px;
+    line-height: 1.55;
+  }
+
+  .dark-frame {
+    padding: 40px 24px;
+  }
+
+  .goals-frame {
+    padding-bottom: 180px;
+  }
+}
+
+@media (max-width: 900px) {
+
+  .frame-copy h2 {
+    overflow-wrap: anywhere;
+    text-wrap: balance;
+  }
+
+  .frame-copy p {
+    max-width: 100%;
+    overflow-wrap: break-word;
+  }
+
+  .dark-frame {
+    gap: 32px;
+    border-radius: 16px;
+    padding: clamp(32px, 6vw, 48px) clamp(20px, 5vw, 36px);
+  }
+
+  .frame-copy h2 {
+    width: 100%;
+    font-size: clamp(34px, 9vw, 54px);
+    line-height: 1.08;
+  }
+
+  .frame-copy p {
+    width: 100%;
+    font-size: clamp(16px, 4vw, 20px);
+    line-height: 1.55;
+  }
+}
+
+@media (max-width: 520px) {
+
+  .dark-frame {
+    padding: 28px 16px;
+  }
+
+  .frame-copy h2 {
+    font-size: clamp(30px, 10.5vw, 42px);
+  }
+}
+
+@media (max-width: 900px) {
+
+  .frame-copy {
+    min-width: 0;
+  }
+
+  .frame-copy h2 {
+    max-width: 100%;
+    overflow-wrap: break-word;
+    text-wrap: balance;
+  }
+
+  .frame-copy p {
+    overflow-wrap: break-word;
+  }
+}
+
+@media (max-width: 640px) {
+
+  .dark-frame {
+    gap: 24px;
+  }
+
+  .frame-copy h2 {
+    font-size: clamp(28px, 9vw, 38px);
+  }
+
+  .frame-copy p {
+    font-size: 15px;
+    line-height: 1.52;
+  }
+}

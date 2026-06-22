@@ -1,9 +1,12 @@
+import revealStyles from "./ScrollReveal.module.css";
+import styles from "./HeroSection.module.css";
+
 export function HeroSection() {
   return (
-    <section className="hero-section scroll-reveal">
-      <img className="hero-image" src="/figma/hero.png" alt="" />
-      <div className="hero-fade" />
-      <div className="hero-copy">
+    <section className={`${styles["hero-section"]} ${revealStyles["scroll-reveal"]}`}>
+      <img className={styles["hero-image"]} src="/figma/hero.png" alt="" />
+      <div className={styles["hero-fade"]} />
+      <div className={styles["hero-copy"]}>
         <h1>
           Smarter System
           <span>

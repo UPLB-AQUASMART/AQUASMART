@@ -2,6 +2,7 @@
 
 import { ArrowUp } from "lucide-react";
 import { useEffect, useState } from "react";
+import styles from "./ScrollToTopButton.module.css";
 
 export function ScrollToTopButton() {
   const [isVisible, setIsVisible] = useState(false);
@@ -19,7 +20,7 @@ export function ScrollToTopButton() {
 
   return (
     <button
-      className={isVisible ? "scroll-top-button is-visible" : "scroll-top-button"}
+      className={`${styles["scroll-top-button"]}${isVisible ? ` ${styles["is-visible"]}` : ""}`}
       type="button"
       aria-label="Scroll back to top"
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}

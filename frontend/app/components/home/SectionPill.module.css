@@ -1,0 +1,47 @@
+/* Scoped styles extracted from app/globals.css. */
+
+.section-pill {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  justify-content: center;
+  border-radius: 100px;
+  background: var(--pill);
+  color: var(--aqua);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 24px;
+  padding: 20px 48px;
+}
+
+@media (max-width: 900px) {
+
+  .section-pill {
+    max-width: 100%;
+    min-height: 44px;
+    padding: 12px 24px;
+    font-size: clamp(14px, 4vw, 18px);
+    line-height: 1.15;
+    text-align: center;
+    white-space: normal;
+  }
+}
+
+@media (max-width: 520px) {
+
+  .section-pill {
+    width: fit-content;
+    max-width: 100%;
+    padding: 11px 18px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 420px) {
+
+  .section-pill {
+    min-height: 40px;
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+}

@@ -5,6 +5,8 @@ import type { CSSProperties } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { parameterCards, parameterNames } from "@/app/data/home";
+import revealStyles from "./ScrollReveal.module.css";
+import styles from "./ParametersSection.module.css";
 
 export function ParametersSection() {
   const [activeParameter, setActiveParameter] = useState(parameterCards[0].active);
@@ -77,40 +79,40 @@ export function ParametersSection() {
   };
 
   return (
-    <section className="parameters-section scroll-reveal">
+    <section className={`${styles["parameters-section"]} ${revealStyles["scroll-reveal"]}`}>
       <article
-        className={`parameters-card${
-          isTransitioning ? " parameter-transitioning" : ""
+        className={`${styles["parameters-card"]}${
+          isTransitioning ? ` ${styles["parameter-transitioning"]}` : ""
         }`}
       >
         {previousCard
           ? renderMedia(
-              "parameters-card-media parameter-card-media-previous",
+              `${styles["parameters-card-media"]} ${styles["parameter-card-media-previous"]}`,
               previousCard.image,
             )
           : null}
-        {renderMedia("parameters-card-media parameter-card-media-current", activeCard.image)}
-        <div className="parameters-card-overlay" />
+        {renderMedia(`${styles["parameters-card-media"]} ${styles["parameter-card-media-current"]}`, activeCard.image)}
+        <div className={styles["parameters-card-overlay"]} />
         <img
-          className="parameters-radial parameters-radial-left"
+          className={`${styles["parameters-radial"]} ${styles["parameters-radial-left"]}`}
           src="/assets/radial.svg"
           alt=""
         />
         <img
-          className="parameters-radial parameters-radial-right"
+          className={`${styles["parameters-radial"]} ${styles["parameters-radial-right"]}`}
           src="/assets/radial.svg"
           alt=""
         />
         <img
-          className="parameters-radial parameters-radial-bottom"
+          className={`${styles["parameters-radial"]} ${styles["parameters-radial-bottom"]}`}
           src="/assets/radial.svg"
           alt=""
         />
-        <div className="parameters-card-content">
+        <div className={`${styles["parameters-card-content"]} ${revealStyles["parameters-card-content"]}`}>
           <h2>Parameters We Track</h2>
 
           <div
-            className="parameter-switches"
+            className={styles["parameter-switches"]}
             aria-label="Water quality parameters"
             style={
               {
@@ -118,8 +120,8 @@ export function ParametersSection() {
               } as CSSProperties
             }
           >
-            <div className="parameter-active-marker" aria-hidden="true">
-              <span className="parameter-active-bar" />
+            <div className={styles["parameter-active-marker"]} aria-hidden="true">
+              <span className={styles["parameter-active-bar"]} />
               <Leaf size={24} strokeWidth={2.25} />
             </div>
             {parameterNames.map((parameter) => {
@@ -128,7 +130,7 @@ export function ParametersSection() {
               return (
                 <button
                   aria-pressed={isActive}
-                  className={isActive ? "active" : undefined}
+                  className={isActive ? styles.active : undefined}
                   key={parameter}
                   onClick={() => handleParameterChange(parameter)}
                   type="button"
@@ -139,7 +141,7 @@ export function ParametersSection() {
             })}
           </div>
 
-          <p className="parameter-description" key={activeCard.active}>
+          <p className={styles["parameter-description"]} key={activeCard.active}>
             <Leaf aria-hidden="true" size={24} strokeWidth={2.25} />
             <span>{activeCard.description}</span>
           </p>
