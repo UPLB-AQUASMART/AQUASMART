@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 
 import { ScrollToTopButton } from "@/app/components/ScrollToTopButton";
@@ -14,6 +15,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <Script id="reset-scroll-position" strategy="beforeInteractive">
+          {`if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+window.scrollTo(0, 0);
+window.addEventListener("DOMContentLoaded", function () { window.scrollTo(0, 0); }, { once: true });`}
+        </Script>
         {children}
         <ScrollToTopButton />
       </body>

@@ -1,6 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Rubik:wght@400;500&family=Sora:wght@600;700;800&display=swap");
 
 :root {
+  --app-canvas-width: 1440px;
   --navy: #0b1f3a;
   --aqua: #1fa3c9;
   --green: #22c55e;
@@ -16,13 +17,37 @@
 
 html {
   scroll-behavior: smooth;
+  background: #ffffff;
 }
 
 body {
+  display: flex;
+  min-width: 320px;
+  min-height: 100vh;
+  flex-direction: column;
+  align-items: center;
   margin: 0;
   color: var(--navy);
   background: #ffffff;
   font-family: "Inter", Arial, sans-serif;
+}
+
+body > main {
+  width: 100%;
+  max-width: var(--app-canvas-width);
+  flex: 0 0 auto;
+  margin-inline: auto;
+  overflow-x: hidden;
+  background: #ffffff;
+  box-shadow: 0 0 70px rgba(0, 0, 0, 0.22);
+}
+
+body > main > section,
+body > main > footer {
+  width: 100%;
+  max-width: 100%;
+  margin-right: auto;
+  margin-left: auto;
 }
 
 a {
