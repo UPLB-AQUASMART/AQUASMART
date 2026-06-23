@@ -2,16 +2,21 @@
 
 import { Leaf } from "lucide-react";
 import type { CSSProperties } from "react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { parameterCards, parameterNames } from "@/app/data/home";
 import revealStyles from "./ScrollReveal.module.css";
 import styles from "./ParametersSection.module.css";
 
+const MOBILE_PARAMETER_DELAY_MS = 4500;
+
 export function ParametersSection() {
   const [activeParameter, setActiveParameter] = useState(parameterCards[0].active);
   const [previousParameter, setPreviousParameter] = useState<string | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isInView, setIsInView] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
   const transitionTimer = useRef<number | null>(null);
 
   const activeCard = useMemo(
@@ -35,6 +40,29 @@ export function ParametersSection() {
   );
 
   useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 720px)");
+    const updateViewport = () => setIsMobile(mediaQuery.matches);
+
+    updateViewport();
+    mediaQuery.addEventListener("change", updateViewport);
+
+    return () => mediaQuery.removeEventListener("change", updateViewport);
+  }, []);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsInView(entry.isIntersecting),
+      { threshold: 0.35 },
+    );
+
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
     return () => {
       if (transitionTimer.current) {
         window.clearTimeout(transitionTimer.current);
@@ -42,7 +70,7 @@ export function ParametersSection() {
     };
   }, []);
 
-  const handleParameterChange = (parameter: string) => {
+  const handleParameterChange = useCallback((parameter: string) => {
     if (parameter === activeParameter) return;
 
     if (transitionTimer.current) {
@@ -57,7 +85,18 @@ export function ParametersSection() {
       setIsTransitioning(false);
       setPreviousParameter(null);
     }, 640);
-  };
+  }, [activeParameter]);
+
+  useEffect(() => {
+    if (!isMobile || !isInView) return;
+
+    const autoRotateTimer = window.setTimeout(() => {
+      const nextIndex = (activeParameterIndex + 1) % parameterNames.length;
+      handleParameterChange(parameterNames[nextIndex]);
+    }, MOBILE_PARAMETER_DELAY_MS);
+
+    return () => window.clearTimeout(autoRotateTimer);
+  }, [activeParameterIndex, handleParameterChange, isInView, isMobile]);
 
   const renderMedia = (className: string, source: string) => {
     if (source.endsWith(".mp4") || source.endsWith(".webm")) {
@@ -79,7 +118,12 @@ export function ParametersSection() {
   };
 
   return (
-    <section className={`${styles["parameters-section"]} ${revealStyles["scroll-reveal"]}`}>
+    <section
+      className={`${styles["parameters-section"]} ${revealStyles["scroll-reveal"]}`}
+      data-mobile-auto-advance={isMobile ? "true" : undefined}
+      id="parameters"
+      ref={sectionRef}
+    >
       <article
         className={`${styles["parameters-card"]}${
           isTransitioning ? ` ${styles["parameter-transitioning"]}` : ""

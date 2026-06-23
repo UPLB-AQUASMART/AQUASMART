@@ -7,7 +7,11 @@ export function SiteFooter({ className }: { className?: string }) {
     <footer className={`${styles["site-footer"]} ${revealStyles["scroll-reveal"]}${className ? ` ${className}` : ""}`} id="contact">
       <div className={styles["footer-upper"]}>
         <div className={styles["footer-brand"]}>
-          <img src="/assets/logo_2.png" alt="AQUASMART Mini" />
+          <img
+            className={styles["footer-logo"]}
+            src="/assets/logo_2.png"
+            alt="AQUASMART Mini"
+          />
           <p>
             AQUASMART empowers farmers and water managers with real-time data,
             AI insights, and smart irrigation recommendations for a sustainable
