@@ -1,0 +1,207 @@
+/* Scoped styles extracted from app/globals.css. */
+
+.tagline-section {
+  --tagline-zoom: 0;
+  --tagline-bg: 0;
+  --tagline-text-opacity: 1;
+  --tagline-blur: 0px;
+  --tagline-farm-clip: 100%;
+  --tagline-environment-clip: 100%;
+  --tagline-scale: 1;
+  --tagline-y: 0vh;
+  --tagline-base-y: 0vh;
+  position: relative;
+  display: block;
+  min-height: 245vh;
+  overflow: visible;
+  padding: 0;
+  isolation: isolate;
+  background: #ffffff;
+  text-align: center;
+}
+
+.tagline-section::before {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(
+      circle at 50% 50%,
+      rgba(31, 163, 201, 0.16),
+      transparent 48%
+    ),
+    var(--navy);
+  content: "";
+  opacity: var(--tagline-bg);
+  pointer-events: none;
+}
+
+.tagline-section::after {
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  z-index: 0;
+  height: 8vh;
+  background: linear-gradient(180deg, rgba(11, 31, 58, 0), var(--navy) 84%);
+  content: "";
+  opacity: var(--tagline-bg);
+  pointer-events: none;
+}
+
+.tagline-sticky {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 1;
+  display: grid;
+  width: 100%;
+  height: 100vh;
+  box-sizing: border-box;
+  overflow: hidden;
+  padding: 0 80px;
+  place-items: center;
+}
+
+.tagline-section h2 {
+  position: relative;
+  display: flex;
+  margin: 0;
+  flex-direction: column;
+  gap: clamp(6px, 1vw, 14px);
+  font-family: "Inter", sans-serif;
+  font-size: clamp(28px, 8.6vw, 80px);
+  font-weight: 600;
+  line-height: 0.95;
+  letter-spacing: 0;
+  transform: translateY(calc(var(--tagline-base-y) + var(--tagline-y)))
+    scale(var(--tagline-scale));
+  transform-origin: center;
+  opacity: var(--tagline-text-opacity);
+  filter: blur(var(--tagline-blur));
+  will-change: transform, opacity, filter;
+}
+
+.tagline-layer {
+  display: flex;
+  flex-direction: column;
+  gap: inherit;
+  white-space: nowrap;
+}
+
+.tagline-layer-base {
+  color: #a7adb3;
+}
+
+.tagline-layer-fill {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.tagline-layer-fill .tagline-line-farm,
+.tagline-layer-fill .tagline-line-environment {
+  overflow: hidden;
+  color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+}
+
+.tagline-layer-fill .tagline-line-farm {
+  background-image: linear-gradient(90deg, #0b1f3a 0%, #19629c 76%);
+  clip-path: inset(0 var(--tagline-farm-clip) 0 0);
+}
+
+.tagline-layer-fill .tagline-line-environment {
+  background-image: linear-gradient(90deg, #1fa3c9 0%, #22c55e 82%);
+  clip-path: inset(0 var(--tagline-environment-clip) 0 0);
+}
+
+.tagline-line-environment {
+  font-weight: 600;
+}
+
+.tagline-heading::after {
+  position: absolute;
+  inset: -22% -6%;
+  z-index: -1;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(31, 163, 201, calc(var(--tagline-zoom) * 0.1)),
+    transparent 56%
+  );
+  content: "";
+  opacity: var(--tagline-zoom);
+  transform: scale(var(--tagline-scale));
+}
+
+@supports not (clip-path: inset(0 0 0 0)) {
+  .tagline-layer-fill .tagline-line-farm,
+.tagline-layer-fill .tagline-line-environment {
+    clip-path: none;
+  }
+}
+
+.tagline-section strong {
+  background-clip: text;
+  font-weight: 600;
+}
+
+@media (max-width: 1100px) {
+
+  .tagline-section h2 {
+    font-size: clamp(48px, 10.5vw, 96px);
+  }
+}
+
+@media (max-width: 720px) {
+
+  .tagline-sticky {
+    padding-right: 24px;
+    padding-left: 24px;
+  }
+
+  .tagline-section {
+    --tagline-base-y: 0vh;
+    min-height: 220vh;
+  }
+
+  .tagline-section h2 {
+    width: 100%;
+    font-size: clamp(34px, 13vw, 58px);
+    line-height: 1.02;
+  }
+}
+
+@media (max-width: 520px) {
+
+  .tagline-sticky {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .tagline-section h2 {
+    font-size: clamp(30px, 12vw, 46px);
+    white-space: normal;
+  }
+
+  .tagline-layer {
+    white-space: normal;
+  }
+}
+
+@media (max-width: 640px) {
+
+  .tagline-section {
+    min-height: 170vh;
+  }
+
+  .tagline-sticky {
+    height: 100svh;
+  }
+
+  .tagline-heading {
+    width: 100%;
+  }
+}
