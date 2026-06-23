@@ -226,6 +226,15 @@
         pointer-events: auto;
       }
 
+      .section-view canvas {
+        transition: opacity 180ms ease, transform 180ms ease;
+      }
+
+      .section-view.is-changing canvas {
+        opacity: 0;
+        transform: scale(0.992);
+      }
+
       #section-canvas {
         width: 100%;
         height: 100%;
@@ -421,6 +430,967 @@
         font: inherit;
         padding: 7px 8px;
       }
+
+      .panel {
+        width: min(680px, calc(100vw - 32px));
+        max-height: calc(100vh - 32px);
+        overflow: hidden;
+        border: 1px solid #b9dce6;
+        border-radius: 19px;
+        background: rgba(223, 246, 253, 0.86);
+        box-shadow: 0 0 12px rgba(0, 0, 0, 0.25);
+        padding: 30px 34px 28px;
+        backdrop-filter: blur(12px);
+      }
+
+      .panel.is-section-mode {
+        width: min(760px, calc(100vw - 32px));
+        overflow-y: auto;
+      }
+
+      .panel.is-section-mode.is-plan-mode {
+        width: min(560px, calc(200vw - 64px));
+        min-height: min(720px, calc(100vh - 32px));
+      }
+
+      .panel.is-plan-mode .section-panel-eyebrow,
+      .panel.is-plan-mode .metric-grid,
+      .panel.is-plan-mode .section-option-grid {
+        display: none;
+      }
+
+      .panel.is-plan-mode .section-panel-header,
+      .panel.is-plan-mode .section-slider-grid,
+      .panel.is-plan-mode .section-option-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .panel.is-plan-mode #menu-section-state {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .panel.is-plan-mode .section-panel-header { order: 0; }
+      .panel.is-plan-mode .plan-view-summary { order: 1; }
+      .panel.is-plan-mode .section-slider-grid { order: 2; }
+      .panel.is-plan-mode .section-option-grid { order: 3; }
+
+      .panel.is-plan-mode .section-panel-header {
+        gap: 8px;
+      }
+
+      .panel.is-plan-mode .section-well-location {
+        font-size: 20px;
+        text-align: left;
+      }
+
+      .panel.is-plan-mode .section-slider-grid,
+      .panel.is-plan-mode .section-option-grid {
+        margin-top: 18px;
+        gap: 14px;
+      }
+
+      .panel.is-plan-mode .section-option-card {
+        min-height: 126px;
+      }
+
+      .plan-view-summary {
+        margin-top: 24px;
+        border: 1px solid #b9dce6;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.72);
+        padding: 18px;
+        color: #0b1f3a;
+        line-height: 1.45;
+      }
+
+      .plan-view-summary[hidden],
+      .section-actions > button[hidden] {
+        display: none;
+      }
+
+      .plan-view-summary strong,
+      .plan-view-summary span {
+        display: block;
+      }
+
+      .plan-view-summary span {
+        margin-top: 4px;
+        color: #52657d;
+        font-size: 13px;
+      }
+
+      .plan-scenario-status {
+        margin: 14px 0 0;
+        border-left: 4px solid #1fa3c9;
+        background: rgba(223, 246, 253, 0.86);
+        padding: 10px 12px;
+        color: #0b1f3a;
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .plan-config-readout {
+        display: grid;
+        margin: 14px 0 0;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .plan-config-readout div {
+        border: 1px solid #c7e4ec;
+        border-radius: 7px;
+        background: rgba(255, 255, 255, 0.72);
+        padding: 9px 10px;
+      }
+
+      .plan-config-readout span,
+      .plan-config-readout strong {
+        display: block;
+        margin: 0;
+      }
+
+      .plan-config-readout span {
+        color: #66758f;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+
+      .plan-config-readout strong {
+        margin-top: 3px;
+        color: #0b1f3a;
+        font-size: 13px;
+      }
+
+      .plan-legend {
+        display: grid;
+        margin-top: 16px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px 14px;
+      }
+
+      .plan-legend-item {
+        display: grid;
+        grid-template-columns: 38px minmax(0, 1fr);
+        align-items: center;
+        gap: 9px;
+        color: #334a66;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .plan-legend-item span {
+        margin: 0;
+        color: inherit;
+        font-size: inherit;
+      }
+
+      .plan-legend-symbol {
+        position: relative;
+        display: block;
+        width: 38px;
+        height: 12px;
+      }
+
+      .plan-legend-symbol.head {
+        border: 1px solid rgba(11, 31, 58, 0.2);
+        background: linear-gradient(90deg, #440154, #21918c, #fde725);
+      }
+
+      .plan-legend-symbol.contour::before,
+      .plan-legend-symbol.stream::before {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 5px;
+        border-top: 2px solid #ffffff;
+        content: "";
+      }
+
+      .plan-legend-symbol.contour {
+        border: 1px solid rgba(11, 31, 58, 0.18);
+        background: #4b9b83;
+      }
+
+      .plan-legend-symbol.stream::before {
+        border-color: #0ea5e9;
+        border-width: 3px;
+      }
+
+      .plan-legend-symbol.flow::before {
+        position: absolute;
+        left: 2px;
+        top: 5px;
+        width: 30px;
+        border-top: 2px solid #0b1f3a;
+        content: "";
+      }
+
+      .plan-legend-symbol.flow::after {
+        position: absolute;
+        right: 2px;
+        top: 2px;
+        width: 7px;
+        height: 7px;
+        border-right: 2px solid #0b1f3a;
+        border-top: 2px solid #0b1f3a;
+        content: "";
+        transform: rotate(45deg);
+      }
+
+      .plan-legend-symbol.well::before {
+        position: absolute;
+        left: 13px;
+        top: -2px;
+        width: 12px;
+        height: 12px;
+        border: 3px solid #e11d48;
+        border-radius: 50%;
+        background: #fff;
+        content: "";
+      }
+
+      .menu-state {
+        animation: menu-state-in 260ms ease both;
+      }
+
+      .menu-state[hidden] {
+        display: none;
+      }
+
+      @keyframes menu-state-in {
+        from {
+          opacity: 0;
+          transform: translateY(-6px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .cluster-header,
+      .section-panel-header {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: baseline;
+        gap: 8px 18px;
+      }
+
+      .cluster-header h1,
+      .section-panel-header h2 {
+        margin: 0;
+        color: #0b1f3a;
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+        font-size: clamp(23px, 2.35vw, 30px);
+        font-weight: 500;
+        line-height: 1.15;
+      }
+
+      .cluster-location,
+      .section-well-location {
+        color: #1fa3c9;
+        font-family: Sora, Inter, ui-sans-serif, system-ui, sans-serif;
+        font-size: clamp(21px, 2.25vw, 29px);
+        font-weight: 600;
+        line-height: 1.15;
+        text-align: right;
+      }
+
+      .active-wells-label {
+        color: #0b1f3a;
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+        font-size: clamp(18px, 1.8vw, 24px);
+        font-weight: 500;
+      }
+
+      .active-wells-count {
+        color: #1fa3c9;
+        font-family: Sora, Inter, ui-sans-serif, system-ui, sans-serif;
+        font-size: clamp(20px, 2vw, 26px);
+        font-weight: 600;
+        text-align: right;
+      }
+
+      .well-picker {
+        max-height: 226px;
+        margin-top: 28px;
+        padding: 0 8px 0 0;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 24px 54px;
+        overflow-y: auto;
+        scrollbar-color: #7a7a7a #fcfcfc;
+        scrollbar-width: thin;
+      }
+
+      .well-picker::-webkit-scrollbar {
+        width: 12px;
+      }
+
+      .well-picker::-webkit-scrollbar-track {
+        border-inline: 1px solid #e8e8e8;
+        background: #fcfcfc;
+      }
+
+      .well-picker::-webkit-scrollbar-thumb {
+        border: 3px solid #fcfcfc;
+        border-radius: 999px;
+        background: #7a7a7a;
+      }
+
+      .well-selector {
+        position: relative;
+        display: flex;
+        min-width: 0;
+        min-height: 66px;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        gap: 8px;
+        border: 0;
+        border-radius: 8px;
+        background: #fff;
+        padding: 12px 20px 12px 12px;
+        color: #0b1f3a;
+        text-align: left;
+        transition: box-shadow 180ms ease, transform 180ms ease, background 180ms ease;
+      }
+
+      .well-selector:hover,
+      .well-selector:focus-visible {
+        background: #fff;
+        box-shadow: 0 5px 10px rgba(11, 31, 58, 0.18);
+        transform: translateY(-2px);
+        outline: none;
+      }
+
+      .well-selector.is-selected {
+        background: linear-gradient(38deg, rgba(118, 179, 217, 0.82) 12%, #19629c 100%);
+        box-shadow: 0 5px 5px rgba(0, 0, 0, 0.25);
+        color: #f5fafc;
+      }
+
+      .well-selector.is-alert {
+        background: #d53437;
+        color: #f5fafc;
+      }
+
+      .well-selector.is-monitoring:not(.is-alert):not(.is-selected) .well-selector-icon {
+        color: #0b1f3a;
+      }
+
+      .well-selector-label {
+        display: flex;
+        min-width: 0;
+        align-items: center;
+        gap: 8px;
+        font-family: Sora, Inter, ui-sans-serif, system-ui, sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+        line-height: 1.2;
+      }
+
+      .well-selector-icon {
+        display: grid;
+        width: 20px;
+        height: 20px;
+        flex: 0 0 20px;
+        place-items: center;
+        color: currentColor;
+      }
+
+      .well-selector-icon svg {
+        width: 20px;
+        height: 20px;
+        fill: currentColor;
+      }
+
+      .well-selector-location {
+        max-width: 100%;
+        overflow: hidden;
+        color: #857f7f;
+        font-size: 12px;
+        line-height: 1;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .well-selector.is-selected .well-selector-label,
+      .well-selector.is-selected .well-selector-location {
+        color: rgba(245, 250, 252, 0.9);
+      }
+
+      .well-selector.is-alert .well-selector-location {
+        color: #f5fafc;
+        font-weight: 700;
+      }
+
+      .well-menu-hint {
+        margin-top: 26px;
+        color: #0b1f3a;
+        font-size: 15px;
+        font-style: italic;
+        text-align: center;
+      }
+
+      .panel-utility-row {
+        display: flex;
+        margin-top: 16px;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+      }
+
+      .panel-utility-row button,
+      .panel-toggle,
+      .section-actions > button {
+        border: 1px solid #b9dce6;
+        background: rgba(245, 250, 252, 0.92);
+        color: #0b1f3a;
+      }
+
+      .panel-utility-row button {
+        padding: 6px 9px;
+        font-size: 10px;
+      }
+
+      .status,
+      .legend {
+        display: none;
+      }
+
+      .section-view.is-open + .sensor-specs {
+        display: block;
+      }
+
+      .section-toolbar {
+        left: auto;
+        right: 18px;
+        top: 18px;
+        width: auto;
+        justify-content: flex-end;
+      }
+
+      .section-title,
+      .section-controls {
+        display: none;
+      }
+
+      .section-actions {
+        gap: 7px;
+      }
+
+      .section-actions > button {
+        min-height: 34px;
+        padding: 8px 11px;
+      }
+
+      .section-panel-header {
+        margin-bottom: 14px;
+      }
+
+      .section-panel-eyebrow {
+        margin: 0 0 14px;
+        color: #66758f;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .metric-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px 36px;
+      }
+
+      .metric-card {
+        min-width: 0;
+        border: 1px solid rgba(178, 219, 232, 0.82);
+        border-radius: 13px;
+        background: rgba(244, 253, 255, 0.9);
+        padding: 13px 14px 12px;
+      }
+
+      .metric-card-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .metric-icon {
+        display: grid;
+        width: 34px;
+        height: 34px;
+        flex: 0 0 34px;
+        place-items: center;
+        border: 1px solid rgba(184, 219, 229, 0.7);
+        border-radius: 50%;
+        background: rgba(219, 246, 251, 0.7);
+        color: #1fa3c9;
+        font-family: Sora, Inter, sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .metric-name {
+        color: #66758f;
+        font-size: 11px;
+        font-weight: 600;
+        line-height: 1.2;
+      }
+
+      .metric-unit {
+        color: #1fa3c9;
+        font-size: 9px;
+      }
+
+      .metric-value-row {
+        display: grid;
+        margin-top: 8px;
+        grid-template-columns: 38px minmax(0, 1fr);
+        align-items: center;
+        gap: 8px;
+        color: #66758f;
+        font-size: 9px;
+      }
+
+      .metric-value-row input {
+        width: 100%;
+        height: 30px;
+        border: 1px solid #b8dbe5;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.95);
+        color: #0b1f3a;
+        font: 600 15px Inter, ui-sans-serif, system-ui, sans-serif;
+        padding: 4px 10px;
+      }
+
+      .section-slider-grid,
+      .section-option-grid {
+        display: grid;
+        margin-top: 18px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .section-discharge,
+      .derived-control {
+        width: auto;
+        border: 0;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.8);
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.25);
+        padding: 12px 16px;
+        color: #0b1f3a;
+      }
+
+      .section-discharge label,
+      .derived-control-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        font-family: Sora, Inter, sans-serif;
+        font-size: 11px;
+        font-weight: 600;
+      }
+
+      .section-discharge input {
+        height: 16px;
+        margin-top: 7px;
+        accent-color: #1fa3c9;
+      }
+
+      .slider-range {
+        display: flex;
+        justify-content: space-between;
+        color: #857f7f;
+        font-size: 10px;
+      }
+
+      .derived-control-value {
+        color: #1fa3c9;
+      }
+
+      .derived-control-track {
+        position: relative;
+        height: 2px;
+        margin: 13px 0 10px;
+        border-radius: 10px;
+        background: #dde7ee;
+      }
+
+      .derived-control-track::after {
+        position: absolute;
+        left: var(--influence-progress, 0%);
+        top: 50%;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #1fa3c9;
+        content: "";
+        transform: translate(-50%, -50%);
+      }
+
+      .section-option-card {
+        display: grid;
+        min-height: 144px;
+        grid-template-columns: 82px minmax(0, 1fr);
+        align-items: center;
+        gap: 14px;
+        border: 1px solid rgba(178, 219, 232, 0.82);
+        border-radius: 13px;
+        background: rgba(244, 253, 255, 0.9);
+        padding: 8px 16px;
+      }
+
+      .soil-swatch {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background:
+          radial-gradient(circle at 28% 24%, rgba(255,255,255,.15) 0 2px, transparent 3px),
+          radial-gradient(circle at 68% 70%, rgba(0,0,0,.18) 0 2px, transparent 3px),
+          radial-gradient(circle at 40% 72%, #6b4a31 0 4px, transparent 5px),
+          #75543b;
+        background-size: 17px 17px, 13px 13px, 23px 23px, auto;
+        box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.3);
+      }
+
+      .section-option-content {
+        min-width: 0;
+        min-height: 116px;
+        border-left: 1px solid #9aafc0;
+        padding: 8px 0 8px 16px;
+      }
+
+      .section-card {
+        min-width: 0;
+        border: 0;
+        background: transparent;
+        padding: 0;
+      }
+
+      .section-card select {
+        height: 28px;
+        border: 1px solid #e2e8f0;
+        border-radius: 0;
+        background: #f5fafc;
+        color: #0b1f3a;
+        font-size: 11px;
+        font-weight: 600;
+        text-align: center;
+      }
+
+      .soil-description {
+        margin-top: 14px;
+        color: #0b1f3a;
+        font-size: 9px;
+        line-height: 1.2;
+      }
+
+      .pipe-screen-preview {
+        width: 70px;
+        height: 112px;
+        object-fit: contain;
+      }
+
+      .screen-card-title {
+        border: 1px solid #e2e8f0;
+        background: #f5fafc;
+        color: #0b1f3a;
+        font-size: 11px;
+        font-weight: 600;
+        text-align: center;
+      }
+
+      .screen-options {
+        display: flex;
+        margin-top: 9px;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .screen-options label {
+        min-height: 0;
+        border: 0;
+        background: transparent;
+        padding: 0;
+        color: #0b1f3a;
+        font-size: 9px;
+      }
+
+      .screen-options input {
+        width: 13px;
+        height: 13px;
+        accent-color: #0b1f3a;
+      }
+
+      @media (max-width: 760px) {
+        .panel,
+        .panel.is-section-mode {
+          left: 8px;
+          top: 8px;
+          width: calc(100vw - 16px);
+          max-height: calc(100vh - 16px);
+          padding: 22px 18px;
+        }
+
+        .cluster-header,
+        .section-panel-header {
+          grid-template-columns: 1fr;
+        }
+
+        .cluster-location,
+        .section-well-location,
+        .active-wells-count {
+          text-align: left;
+        }
+
+        .well-picker,
+        .metric-grid,
+        .section-slider-grid,
+        .section-option-grid {
+          grid-template-columns: 1fr;
+          gap: 12px;
+        }
+
+        .well-picker {
+          max-height: 42vh;
+        }
+
+        .section-toolbar {
+          right: 10px;
+          top: auto;
+          bottom: 10px;
+        }
+      }
+
+      /* Preserve the Figma layout internally, then scale the complete panel as one unit. */
+      .panel {
+        width: min(680px, calc(200vw - 64px));
+        border-radius: 19px;
+        padding: 30px 34px 28px;
+        transform: scale(0.65);
+        transform-origin: top left;
+        z-index: 60;
+      }
+
+      .panel.is-section-mode {
+        width: min(760px, calc(200vw - 64px));
+      }
+
+      .menu-state {
+        width: auto;
+        zoom: 1;
+      }
+
+      .panel.is-hidden {
+        transform: translateX(-18px) scale(0.65);
+      }
+
+      .section-toolbar {
+        transform: scale(0.65);
+        transform-origin: top right;
+      }
+
+      .panel-toggle {
+        transform: scale(0.65);
+        transform-origin: top left;
+      }
+
+      .soil-figure {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      .soil-dropdown {
+        position: relative;
+        width: 100%;
+        z-index: 1000;
+      }
+
+      .soil-select-button {
+        display: grid;
+        width: 100%;
+        min-height: 24px;
+        grid-template-columns: 1fr 16px;
+        align-items: center;
+        border: 1px solid #e2e8f0;
+        border-radius: 0;
+        background: #f5fafc;
+        color: #0b1f3a;
+        padding: 2px 4px 2px 26px;
+        font: 600 12.5px Inter, ui-sans-serif, system-ui, sans-serif;
+        text-align: center;
+      }
+
+      .soil-select-button:hover,
+      .soil-select-button:focus-visible {
+        background: #f5fafc;
+        outline: 1px solid #9aafc0;
+      }
+
+      .soil-select-chevron {
+        display: inline-block;
+        width: 7px;
+        height: 7px;
+        border-right: 1.5px solid currentColor;
+        border-bottom: 1.5px solid currentColor;
+        transform: translateY(-2px) rotate(45deg);
+        transition: transform 160ms ease;
+      }
+
+      .soil-select-button[aria-expanded="true"] .soil-select-chevron {
+        transform: translateY(2px) rotate(225deg);
+      }
+
+      .soil-select-menu {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 100%;
+        z-index: 9999;
+        border-inline: 1px solid #e2e8f0;
+        background: #f5fafc;
+        box-shadow: 0 5px 12px rgba(11, 31, 58, 0.16);
+      }
+
+      .soil-select-menu[hidden] {
+        display: none;
+      }
+
+      .soil-select-option {
+        position: relative;
+        z-index: 1;
+        display: block;
+        width: 100%;
+        min-height: 24px;
+        border: 0;
+        border-bottom: 1px solid #e2e8f0;
+        border-radius: 0;
+        background: #f5fafc;
+        color: #0b1f3a;
+        padding: 3px 8px;
+        font: 600 12.5px Inter, ui-sans-serif, system-ui, sans-serif;
+        text-align: center;
+      }
+
+      .soil-select-option:hover,
+      .soil-select-option:focus-visible {
+        background: #dff6fd;
+        outline: none;
+      }
+
+      .soil-select-option.is-current {
+        background: #f5fafc;
+        color: rgba(11, 31, 58, 0.3);
+        opacity: 1;
+      }
+
+      #soil-type {
+        display: none;
+      }
+
+      .pipe-screen-stack {
+        display: flex;
+        width: 70px;
+        height: 105px;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .pipe-screen-segment {
+        position: relative;
+        width: 70px;
+        height: 35px;
+        flex: 0 0 35px;
+        overflow: hidden;
+        opacity: 0.4;
+        transition: opacity 160ms ease;
+      }
+
+      .pipe-screen-segment.is-active {
+        opacity: 1;
+      }
+
+      .pipe-screen-segment img {
+        position: absolute;
+        left: 23px;
+        width: 23px;
+        height: 87px;
+      }
+
+      .pipe-screen-segment[data-level="1"] img {
+        top: 0;
+      }
+
+      .pipe-screen-segment[data-level="2"] img {
+        top: -19px;
+      }
+
+      .pipe-screen-segment[data-level="3"] img {
+        top: -50px;
+      }
+
+      .section-option-grid {
+        position: relative;
+        isolation: isolate;
+      }
+
+      .section-option-card {
+        position: relative;
+        overflow: visible;
+      }
+
+      .section-option-card:first-child {
+        z-index: 20;
+      }
+
+      .soil-description {
+        position: relative;
+        z-index: 1;
+      }
+
+      @media (max-width: 760px) {
+        .panel,
+        .panel.is-section-mode {
+          left: 8px;
+          top: 8px;
+          width: min(760px, calc(153.846vw - 25px));
+          max-height: calc(153.846vh - 25px);
+          padding: 30px 34px 28px;
+        }
+
+        .panel:not(.is-section-mode) {
+          width: min(680px, calc(153.846vw - 25px));
+        }
+
+        .cluster-header,
+        .section-panel-header {
+          grid-template-columns: minmax(0, 1fr) auto;
+        }
+
+        .cluster-location,
+        .section-well-location,
+        .active-wells-count {
+          text-align: right;
+        }
+
+        .well-picker,
+        .metric-grid,
+        .section-slider-grid,
+        .section-option-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .metric-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
     </style>
     <script type="importmap">
       {
@@ -445,52 +1415,136 @@
       </div>
     </aside>
     <aside class="panel" id="menu-panel">
-      <h1>AQUASMART 3D Groundwater Sample</h1>
-      <p>
-        Drag to orbit, scroll to zoom, right-drag to pan. Red-orange zones show higher/deeper
-        downward-flow emphasis; lighter/cooler zones are closer to the surface.
-      </p>
-      <div class="status" id="status">Loading scene JSON...</div>
-      <div class="legend" id="legend"></div>
-      <div class="well-picker" id="well-picker"></div>
-      <div class="controls">
-        <button id="toggle-heads" type="button">Toggle heads</button>
-        <button id="toggle-arrows" type="button">Toggle arrows</button>
-        <button id="toggle-wells" type="button">Toggle wells</button>
-        <button id="reset-camera" type="button">Reset view</button>
-        <button id="hide-panel" type="button">Hide menu</button>
+      <div class="menu-state" id="menu-3d-state">
+        <header class="cluster-header">
+          <h1>Cluster 1A</h1>
+          <div class="cluster-location">Los Baños Laguna</div>
+          <div class="active-wells-label">Active Wells</div>
+          <div class="active-wells-count" id="active-well-count">0/0</div>
+        </header>
+        <div class="status" id="status">Loading scene JSON...</div>
+        <div class="legend" id="legend"></div>
+        <div class="well-picker" id="well-picker"></div>
+        <p class="well-menu-hint">click an active well for more information</p>
+        <div class="panel-utility-row" aria-label="3D view controls">
+          <button id="toggle-heads" type="button">Heads</button>
+          <button id="toggle-arrows" type="button">Flow</button>
+          <button id="toggle-wells" type="button">Wells</button>
+          <button id="reset-camera" type="button">Reset</button>
+          <button id="hide-panel" type="button">Hide menu</button>
+        </div>
+      </div>
+
+      <div class="menu-state" id="menu-section-state" hidden>
+        <header class="section-panel-header">
+          <h2 id="section-title">2D Well Section</h2>
+          <div class="section-well-location" id="section-well-location">Los Baños Laguna</div>
+        </header>
+        <p class="section-panel-eyebrow">Latest water quality readings</p>
+        <div class="metric-grid" id="metric-grid">
+          <label class="metric-card">
+            <span class="metric-card-header"><span class="metric-icon">O₂</span><span><span class="metric-name">Dissolved Oxygen</span><br /><span class="metric-unit">mg/L</span></span></span>
+            <span class="metric-value-row"><span>Latest</span><input data-metric="oxygen" type="number" step="0.1" value="7.2" /></span>
+          </label>
+          <label class="metric-card">
+            <span class="metric-card-header"><span class="metric-icon">pH</span><span><span class="metric-name">pH Balance</span><br /><span class="metric-unit">pH</span></span></span>
+            <span class="metric-value-row"><span>Latest</span><input data-metric="ph" type="number" step="0.1" value="7.6" /></span>
+          </label>
+          <label class="metric-card">
+            <span class="metric-card-header"><span class="metric-icon">°C</span><span><span class="metric-name">Temperature</span><br /><span class="metric-unit">degrees C</span></span></span>
+            <span class="metric-value-row"><span>Latest</span><input data-metric="temperature" type="number" step="0.1" value="27.7" /></span>
+          </label>
+          <label class="metric-card">
+            <span class="metric-card-header"><span class="metric-icon">S</span><span><span class="metric-name">Salinity</span><br /><span class="metric-unit">ppt</span></span></span>
+            <span class="metric-value-row"><span>Latest</span><input data-metric="salinity" type="number" step="0.1" value="0.9" /></span>
+          </label>
+          <label class="metric-card">
+            <span class="metric-card-header"><span class="metric-icon">T</span><span><span class="metric-name">TDS</span><br /><span class="metric-unit">mg/L</span></span></span>
+            <span class="metric-value-row"><span>Latest</span><input data-metric="tds" type="number" step="1" value="536" /></span>
+          </label>
+          <label class="metric-card">
+            <span class="metric-card-header"><span class="metric-icon">GW</span><span><span class="metric-name">GW Level</span><br /><span class="metric-unit">meters</span></span></span>
+            <span class="metric-value-row"><span>Latest</span><input data-metric="gwLevel" type="number" step="0.1" value="12.0" /></span>
+          </label>
+        </div>
+
+        <div class="section-slider-grid">
+          <div class="section-discharge">
+            <label for="section-discharge">
+              <span>Water Discharge</span>
+              <span id="section-discharge-value">0 m³/day</span>
+            </label>
+            <input id="section-discharge" type="range" min="0" max="8000" step="100" value="0" />
+            <div class="slider-range"><span>0</span><span>8,000</span></div>
+          </div>
+          <div class="derived-control">
+            <div class="derived-control-header"><span>Area of Influence</span><span class="derived-control-value" id="influence-value">0 km</span></div>
+            <div class="derived-control-track" id="influence-track"></div>
+            <div class="slider-range"><span>0</span><span>18 km</span></div>
+          </div>
+        </div>
+
+        <div class="section-option-grid">
+          <div class="section-option-card">
+            <img class="soil-figure" id="soil-figure" src="./assets/soil/loam.png" alt="Loam soil texture" />
+            <div class="section-option-content">
+              <div class="soil-dropdown" id="soil-dropdown">
+                <button class="soil-select-button" id="soil-select-button" type="button" aria-haspopup="listbox" aria-expanded="false">
+                  <span id="soil-select-value">Loam</span>
+                  <span class="soil-select-chevron" aria-hidden="true"></span>
+                </button>
+                <div class="soil-select-menu" id="soil-select-menu" role="listbox" hidden>
+                  <button class="soil-select-option is-current" type="button" role="option" data-soil-option="loam" aria-selected="true">Loam</button>
+                  <button class="soil-select-option" type="button" role="option" data-soil-option="sand" aria-selected="false">Sand</button>
+                  <button class="soil-select-option" type="button" role="option" data-soil-option="clay" aria-selected="false">Clay</button>
+                </div>
+                <select id="soil-type" aria-hidden="true" tabindex="-1">
+                  <option value="loam" selected>Loam</option>
+                  <option value="sand">Sand</option>
+                  <option value="clay">Clay</option>
+                </select>
+              </div>
+              <p class="soil-description" id="soil-description">Holds a balanced amount of water and allows moderate drainage, so water drawdown is usually steady and controlled.</p>
+            </div>
+          </div>
+          <div class="section-option-card">
+            <div class="pipe-screen-stack" id="pipe-screen-stack" aria-label="Pipe screen levels preview">
+              <div class="pipe-screen-segment" data-level="1"><img src="./assets/pipe-screen.svg" alt="" /></div>
+              <div class="pipe-screen-segment" data-level="2"><img src="./assets/pipe-screen.svg" alt="" /></div>
+              <div class="pipe-screen-segment" data-level="3"><img src="./assets/pipe-screen.svg" alt="" /></div>
+            </div>
+            <div class="section-option-content">
+              <div class="screen-card-title">Pipe Screen Level</div>
+              <div class="screen-options" id="screen-options"></div>
+            </div>
+          </div>
+        </div>
+        <div class="plan-view-summary" id="plan-view-summary" hidden>
+          <strong id="plan-view-model">MODFLOW 6 steady-state result</strong>
+          <span id="plan-view-details">FloPy processed DISV head and specific-discharge output.</span>
+          <p class="plan-scenario-status" id="plan-scenario-status">Scenario configuration active</p>
+          <div class="plan-config-readout" aria-label="Fixed scenario configuration">
+            <div><span>Soil type</span><strong id="plan-soil-readout">Loam</strong></div>
+            <div><span>Pipe screens</span><strong id="plan-screen-readout">Levels 1–3</strong></div>
+          </div>
+          <div class="plan-legend" aria-label="Top view legend">
+            <div class="plan-legend-item"><i class="plan-legend-symbol head"></i><span>Hydraulic head: low to high</span></div>
+            <div class="plan-legend-item"><i class="plan-legend-symbol contour"></i><span>Equal-head contour</span></div>
+            <div class="plan-legend-item"><i class="plan-legend-symbol flow"></i><span>Groundwater flow</span></div>
+            <div class="plan-legend-item"><i class="plan-legend-symbol well"></i><span>MODFLOW MAW well</span></div>
+            <div class="plan-legend-item"><i class="plan-legend-symbol stream"></i><span>SFR stream cells</span></div>
+          </div>
+        </div>
       </div>
     </aside>
     <section class="section-view" id="section-view" aria-label="2D well section view">
       <canvas id="section-canvas"></canvas>
       <div class="section-toolbar">
-        <div class="section-title" id="section-title">2D Well Section</div>
         <div class="section-actions">
-          <div class="section-controls">
-            <div class="section-discharge">
-              <label for="section-discharge">
-                Discharge
-                <span id="section-discharge-value">0 m3/day</span>
-              </label>
-              <input id="section-discharge" type="range" min="0" max="8000" step="100" value="0" />
-            </div>
-            <div class="section-card">
-              <label for="soil-type">Aquifer soil</label>
-              <select id="soil-type">
-                <option value="sand">Sand</option>
-                <option value="loam" selected>Loam</option>
-                <option value="silt">Silt</option>
-                <option value="clay">Clay</option>
-                <option value="gravel">Gravel</option>
-              </select>
-            </div>
-            <div class="section-card">
-              <span class="card-title">Pipe screens</span>
-              <div class="screen-options" id="screen-options"></div>
-            </div>
-          </div>
+          <button id="top-view-back" type="button" hidden>Back to section</button>
           <button id="section-zoom-out" type="button">Zoom out</button>
           <button id="section-zoom-in" type="button">Zoom in</button>
+          <button id="hide-section-panel" type="button">Hide menu</button>
           <button id="section-exit" type="button">Exit 2D view</button>
         </div>
       </div>
@@ -513,18 +1567,38 @@
       const legendEl = document.querySelector("#legend");
       const wellPickerEl = document.querySelector("#well-picker");
       const menuPanelEl = document.querySelector("#menu-panel");
+      const menu3dStateEl = document.querySelector("#menu-3d-state");
+      const menuSectionStateEl = document.querySelector("#menu-section-state");
+      const activeWellCountEl = document.querySelector("#active-well-count");
       const showPanelButton = document.querySelector("#show-panel");
       const sectionViewEl = document.querySelector("#section-view");
       const sectionCanvas = document.querySelector("#section-canvas");
       const sectionTitleEl = document.querySelector("#section-title");
+      const sectionWellLocationEl = document.querySelector("#section-well-location");
       const sectionDischargeInput = document.querySelector("#section-discharge");
       const sectionDischargeValueEl = document.querySelector("#section-discharge-value");
+      const influenceValueEl = document.querySelector("#influence-value");
+      const influenceTrackEl = document.querySelector("#influence-track");
       const soilTypeSelect = document.querySelector("#soil-type");
+      const soilDropdownEl = document.querySelector("#soil-dropdown");
+      const soilSelectButtonEl = document.querySelector("#soil-select-button");
+      const soilSelectValueEl = document.querySelector("#soil-select-value");
+      const soilSelectMenuEl = document.querySelector("#soil-select-menu");
+      const soilFigureEl = document.querySelector("#soil-figure");
+      const soilDescriptionEl = document.querySelector("#soil-description");
       const screenOptionsEl = document.querySelector("#screen-options");
+      const pipeScreenStackEl = document.querySelector("#pipe-screen-stack");
       const sensorSpecsEl = document.querySelector("#sensor-specs");
       const sensorSpecsTitleEl = document.querySelector("#sensor-specs-title");
       const sensorSpecsSelectEl = document.querySelector("#sensor-specs-select");
       const sensorSpecsListEl = document.querySelector("#sensor-specs-list");
+      const topViewBackButton = document.querySelector("#top-view-back");
+      const planViewSummaryEl = document.querySelector("#plan-view-summary");
+      const planViewModelEl = document.querySelector("#plan-view-model");
+      const planViewDetailsEl = document.querySelector("#plan-view-details");
+      const planScenarioStatusEl = document.querySelector("#plan-scenario-status");
+      const planSoilReadoutEl = document.querySelector("#plan-soil-readout");
+      const planScreenReadoutEl = document.querySelector("#plan-screen-readout");
       const sectionContext = sectionCanvas.getContext("2d");
       const xScale = 1 / 1000;
       const yScale = 1 / 1000;
@@ -554,6 +1628,7 @@
       const pointer = new THREE.Vector2();
       let cameraTween = null;
       let sceneData = null;
+      let modflowTopViewData = null;
       let activeSectionWell = null;
       let sectionZoom = 1;
       let sectionMode = false;
@@ -566,6 +1641,15 @@
       let lastSectionPointer = { x: 0, y: 0 };
       let lastSectionCursor = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
       let sensorHitBoxes = [];
+      let aquiferHitRegions = [];
+      let hoveredAquiferLevel = null;
+      let topViewMode = false;
+      let activeTopLayer = 0;
+      let topViewZoom = 1;
+      let topViewPanX = 0;
+      let topViewPanY = 0;
+      let topViewAnimatedDischarge = 0;
+      let topViewDischargeFrame = null;
       let sensorSpecsVisible = false;
       let activeSensorIndex = 0;
       const aquiferLevelNames = {
@@ -584,6 +1668,28 @@
         silt: { label: "Silt", influence: 1.22, depth: 0.78 },
         clay: { label: "Clay", influence: 1.38, depth: 0.66 },
         gravel: { label: "Gravel", influence: 0.82, depth: 1.02 },
+      };
+      const soilDescriptions = {
+        sand: "Drains water quickly because of large particles, causing faster water drawdown and lower water retention.",
+        loam: "Holds a balanced amount of water and allows moderate drainage, so water drawdown is usually steady and controlled.",
+        clay: "Holds water for a long time because of very small particles, resulting in slower water drawdown and poor drainage.",
+      };
+      const soilImages = {
+        loam: "./assets/soil/loam.png",
+        sand: "./assets/soil/sand.png",
+        clay: "./assets/soil/clay.png",
+      };
+      const wellPresentation = {
+        "W-1": { name: "UP Pumping", location: "Batong Malake UP Pumping", sectionLocation: "Batong Malake Los Baños", active: true },
+        "W-2": { name: "DOST Monitoring", location: "Quezon City DOST", sectionLocation: "DOST Los Baños", active: true },
+        "W-3": { name: "Pili Pumping", location: "Pili Drive 1251", sectionLocation: "Pili Drive Los Baños", active: true },
+        "W-4": { name: "Calamba Monitoring", location: "SM City Calamba", sectionLocation: "Calamba Laguna", active: false },
+      };
+      const wellMetrics = {
+        "W-1": { oxygen: 7.2, ph: 7.6, temperature: 27.7, salinity: 0.9, tds: 536, gwLevel: 12.0 },
+        "W-2": { oxygen: 6.9, ph: 7.3, temperature: 27.1, salinity: 0.7, tds: 488, gwLevel: 10.8 },
+        "W-3": { oxygen: 7.4, ph: 7.5, temperature: 28.2, salinity: 1.0, tds: 552, gwLevel: 13.6 },
+        "W-4": { oxygen: 6.4, ph: 7.1, temperature: 28.7, salinity: 1.3, tds: 611, gwLevel: 14.2 },
       };
 
       const headsGroup = new THREE.Group();
@@ -713,10 +1819,12 @@
         const materialOptions = {
           transparent: options.solid ? false : true,
           opacity: options.opacity ?? 0.74,
-          roughness: 0.9,
-          metalness: 0,
           side: THREE.DoubleSide,
         };
+        if (!options.unlit) {
+          materialOptions.roughness = 0.9;
+          materialOptions.metalness = 0;
+        }
 
         if (options.waterColor) {
           materialOptions.color = options.waterColor;
@@ -912,12 +2020,21 @@
               input.checked = true;
               selectedScreenLevels.add(band.level);
             }
+            updateScreenPreview();
             drawSectionView();
           });
           const text = document.createElement("span");
-          text.textContent = `L${band.level}`;
+          text.textContent = `Level ${band.level}`;
           label.append(input, text);
           screenOptionsEl.appendChild(label);
+        }
+        updateScreenPreview();
+      }
+
+      function updateScreenPreview() {
+        for (const segment of pipeScreenStackEl.querySelectorAll(".pipe-screen-segment")) {
+          const level = Number(segment.dataset.level);
+          segment.classList.toggle("is-active", selectedScreenLevels.has(level));
         }
       }
 
@@ -1232,7 +2349,303 @@
         context.restore();
       }
 
+      function pointInPolygon(point, polygon) {
+        let inside = false;
+        for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i, i += 1) {
+          const a = polygon[i];
+          const b = polygon[j];
+          const crosses = (a.y > point.y) !== (b.y > point.y) &&
+            point.x < ((b.x - a.x) * (point.y - a.y)) / (b.y - a.y || 1e-9) + a.x;
+          if (crosses) inside = !inside;
+        }
+        return inside;
+      }
+
+      function headColor(value, low, high) {
+        const stops = [
+          [0, [68, 1, 84]],
+          [0.25, [59, 82, 139]],
+          [0.5, [33, 145, 140]],
+          [0.75, [94, 201, 98]],
+          [1, [253, 231, 37]],
+        ];
+        const t = Math.max(0, Math.min(1, (value - low) / Math.max(1e-9, high - low)));
+        const upperIndex = Math.min(stops.length - 1, Math.ceil(t * (stops.length - 1)));
+        const lowerIndex = Math.max(0, upperIndex - 1);
+        const lower = stops[lowerIndex];
+        const upper = stops[upperIndex];
+        const span = upper[0] - lower[0] || 1;
+        const local = (t - lower[0]) / span;
+        const rgb = lower[1].map((channel, index) => Math.round(channel + (upper[1][index] - channel) * local));
+        return `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+      }
+
+      function drawPlanArrow(context, start, dx, dy, color = "rgba(5, 19, 34, 0.82)") {
+        const end = { x: start.x + dx, y: start.y + dy };
+        const angle = Math.atan2(dy, dx);
+        const head = 4.5;
+        context.beginPath();
+        context.moveTo(start.x, start.y);
+        context.lineTo(end.x, end.y);
+        context.lineTo(end.x - head * Math.cos(angle - Math.PI / 6), end.y - head * Math.sin(angle - Math.PI / 6));
+        context.moveTo(end.x, end.y);
+        context.lineTo(end.x - head * Math.cos(angle + Math.PI / 6), end.y - head * Math.sin(angle + Math.PI / 6));
+        context.strokeStyle = color;
+        context.lineWidth = 1.35;
+        context.stroke();
+      }
+
+      function getTopViewLayout(width, height) {
+        const panelBounds = menuPanelEl.classList.contains("is-hidden")
+          ? null
+          : menuPanelEl.getBoundingClientRect();
+        const safeLeft = panelBounds ? panelBounds.right + 28 : 68;
+        const marginLeft = Math.min(Math.max(68, width - 390), safeLeft);
+        const marginRight = 170;
+        const marginTop = 98;
+        const marginBottom = 72;
+        return {
+          marginLeft,
+          marginRight,
+          marginTop,
+          marginBottom,
+          plotWidth: Math.max(220, width - marginLeft - marginRight),
+          plotHeight: Math.max(220, height - marginTop - marginBottom),
+        };
+      }
+
+      function getTopViewScenario(data, layer, dischargeValue = sectionDischarge) {
+        const soil = soilDrawdownProfiles[selectedSoilType] || soilDrawdownProfiles.loam;
+        const dischargeRatio = dischargeValue / Math.max(1, Number(sectionDischargeInput.max));
+        const screenLevel = activeTopLayer + 1;
+        const screenActive = selectedScreenLevels.has(screenLevel);
+        const domainWidth = data.domain.xmax - data.domain.xmin;
+        const domainHeight = data.domain.ymax - data.domain.ymin;
+        const wellX = data.domain.xmin + (activeSectionWell.x_m / sceneData.domain.lx_m) * domainWidth;
+        const wellY = data.domain.ymin + (activeSectionWell.y_m / sceneData.domain.ly_m) * domainHeight;
+        const radius = Math.min(domainWidth, domainHeight) * (0.08 + 0.16 * soil.influence);
+        const maximumDrawdown = screenActive ? dischargeRatio * 9.5 * soil.depth : 0;
+        const baselineFlowScale = Math.max(
+          ...layer.qx.map((qx, index) => Math.hypot(qx, layer.qy[index])),
+          1e-9
+        );
+        const flowBoost = screenActive ? dischargeRatio * baselineFlowScale * 1.15 * soil.depth : 0;
+        const adjustedHead = [];
+        const adjustedQx = [];
+        const adjustedQy = [];
+
+        for (let index = 0; index < data.grid.cells.length; index += 1) {
+          const [cellX, cellY] = data.grid.cells[index].center;
+          const dx = wellX - cellX;
+          const dy = wellY - cellY;
+          const distance = Math.hypot(dx, dy);
+          const influence = Math.exp(-(distance * distance) / (2 * radius * radius));
+          const directionX = distance > 1e-6 ? dx / distance : 0;
+          const directionY = distance > 1e-6 ? dy / distance : 0;
+          adjustedHead.push(layer.head[index] - maximumDrawdown * influence);
+          adjustedQx.push(layer.qx[index] + directionX * flowBoost * influence);
+          adjustedQy.push(layer.qy[index] + directionY * flowBoost * influence);
+        }
+
+        return {
+          soil,
+          discharge: dischargeValue,
+          dischargeRatio,
+          screenLevel,
+          screenActive,
+          wellX,
+          wellY,
+          radius,
+          maximumDrawdown,
+          head: adjustedHead,
+          qx: adjustedQx,
+          qy: adjustedQy,
+        };
+      }
+
+      function drawTopView() {
+        if (!modflowTopViewData) return;
+        const ratio = Math.min(window.devicePixelRatio, 2);
+        const width = sectionCanvas.clientWidth;
+        const height = sectionCanvas.clientHeight;
+        sectionCanvas.width = Math.max(1, Math.floor(width * ratio));
+        sectionCanvas.height = Math.max(1, Math.floor(height * ratio));
+        sensorHitBoxes = [];
+        aquiferHitRegions = [];
+        sectionContext.setTransform(ratio, 0, 0, ratio, 0, 0);
+        sectionContext.clearRect(0, 0, width, height);
+        sectionContext.fillStyle = "#DFF6FD";
+        sectionContext.fillRect(0, 0, width, height);
+
+        const data = modflowTopViewData;
+        const layer = data.layers[Math.min(activeTopLayer, data.layers.length - 1)];
+        const scenario = getTopViewScenario(data, layer, topViewAnimatedDischarge);
+        const domainWidth = data.domain.xmax - data.domain.xmin;
+        const domainHeight = data.domain.ymax - data.domain.ymin;
+        const { marginLeft, marginRight, marginTop, marginBottom, plotWidth, plotHeight } = getTopViewLayout(width, height);
+        const baseScale = Math.min(plotWidth / domainWidth, plotHeight / domainHeight);
+        const scale = baseScale * topViewZoom;
+        const centerX = marginLeft + plotWidth / 2 + topViewPanX;
+        const centerY = marginTop + plotHeight / 2 + topViewPanY;
+        const worldCenterX = (data.domain.xmin + data.domain.xmax) / 2;
+        const worldCenterY = (data.domain.ymin + data.domain.ymax) / 2;
+        const project = (x, y) => ({
+          x: centerX + (x - worldCenterX) * scale,
+          y: centerY - (y - worldCenterY) * scale,
+        });
+        const low = Math.min(...scenario.head);
+        const high = Math.max(...scenario.head);
+
+        sectionContext.lineJoin = "round";
+        for (let index = 0; index < data.grid.cells.length; index += 1) {
+          const cell = data.grid.cells[index];
+          const points = cell.vertexIds.map((vertexId) => project(...data.grid.vertices[vertexId]));
+          sectionContext.beginPath();
+          points.forEach((point, pointIndex) => pointIndex === 0
+            ? sectionContext.moveTo(point.x, point.y)
+            : sectionContext.lineTo(point.x, point.y));
+          sectionContext.closePath();
+          sectionContext.fillStyle = headColor(scenario.head[index], low, high);
+          sectionContext.fill();
+          sectionContext.strokeStyle = "rgba(11, 31, 58, 0.12)";
+          sectionContext.lineWidth = 0.55;
+          sectionContext.stroke();
+        }
+
+        for (const cellIndex of data.streamCells) {
+          const cell = data.grid.cells[cellIndex];
+          if (!cell) continue;
+          const points = cell.vertexIds.map((vertexId) => project(...data.grid.vertices[vertexId]));
+          sectionContext.beginPath();
+          points.forEach((point, pointIndex) => pointIndex === 0
+            ? sectionContext.moveTo(point.x, point.y)
+            : sectionContext.lineTo(point.x, point.y));
+          sectionContext.closePath();
+          sectionContext.strokeStyle = "rgba(14, 165, 233, 0.95)";
+          sectionContext.lineWidth = 2.2;
+          sectionContext.stroke();
+        }
+
+        sectionContext.font = "700 11px Inter, system-ui, sans-serif";
+        for (const contour of layer.contours) {
+          const points = contour.points.map((point) => project(point[0], point[1]));
+          sectionContext.beginPath();
+          points.forEach((point, index) => index === 0
+            ? sectionContext.moveTo(point.x, point.y)
+            : sectionContext.lineTo(point.x, point.y));
+          sectionContext.strokeStyle = "rgba(255, 255, 255, 0.88)";
+          sectionContext.lineWidth = 1.35;
+          sectionContext.stroke();
+          if (points.length > 4) {
+            const labelPoint = points[Math.floor(points.length * 0.55)];
+            sectionContext.fillStyle = "#ffffff";
+            sectionContext.fillText(String(contour.level), labelPoint.x + 4, labelPoint.y - 4);
+          }
+        }
+
+        if (scenario.maximumDrawdown > 0.01) {
+          const wellPosition = project(scenario.wellX, scenario.wellY);
+          sectionContext.save();
+          sectionContext.setLineDash([6, 5]);
+          for (let ring = 1; ring <= 4; ring += 1) {
+            const ringRatio = ring / 4;
+            const ringRadius = scenario.radius * ringRatio * scale;
+            const drawdown = scenario.maximumDrawdown * Math.exp(-(ringRatio * ringRatio) / 2);
+            sectionContext.beginPath();
+            sectionContext.arc(wellPosition.x, wellPosition.y, ringRadius, 0, Math.PI * 2);
+            sectionContext.strokeStyle = "rgba(255, 255, 255, 0.9)";
+            sectionContext.lineWidth = 1.4;
+            sectionContext.stroke();
+            sectionContext.fillStyle = "#ffffff";
+            sectionContext.font = "700 10px Inter, system-ui, sans-serif";
+            sectionContext.fillText(`-${drawdown.toFixed(1)} m`, wellPosition.x + ringRadius + 4, wellPosition.y);
+          }
+          sectionContext.restore();
+        }
+
+        const magnitudes = scenario.qx.map((qx, index) => Math.hypot(qx, scenario.qy[index]));
+        const maxMagnitude = Math.max(...magnitudes, 1e-9);
+        const visibleMagnitude = maxMagnitude * 0.006;
+        for (let index = 0; index < data.grid.cells.length; index += 4) {
+          const magnitude = magnitudes[index];
+          if (magnitude <= visibleMagnitude) continue;
+          const center = project(...data.grid.cells[index].center);
+          const length = 27 * Math.sqrt(magnitude / maxMagnitude);
+          drawPlanArrow(
+            sectionContext,
+            center,
+            (scenario.qx[index] / magnitude) * length,
+            -(scenario.qy[index] / magnitude) * length
+          );
+        }
+
+        for (const well of data.wells) {
+          const position = project(well.x, well.y);
+          sectionContext.beginPath();
+          sectionContext.arc(position.x, position.y, 7, 0, Math.PI * 2);
+          sectionContext.fillStyle = "#ffffff";
+          sectionContext.fill();
+          sectionContext.strokeStyle = "#e11d48";
+          sectionContext.lineWidth = 3;
+          sectionContext.stroke();
+          sectionContext.fillStyle = "#0b1f3a";
+          sectionContext.font = "800 11px Inter, system-ui, sans-serif";
+          sectionContext.fillText(well.id, position.x + 10, position.y - 8);
+        }
+
+        const scenarioWellPosition = project(scenario.wellX, scenario.wellY);
+        sectionContext.beginPath();
+        sectionContext.arc(scenarioWellPosition.x, scenarioWellPosition.y, 10, 0, Math.PI * 2);
+        sectionContext.fillStyle = scenario.screenActive ? "#22d3ee" : "#ffffff";
+        sectionContext.fill();
+        sectionContext.strokeStyle = scenario.screenActive ? "#0b1f3a" : "#94a3b8";
+        sectionContext.lineWidth = 3;
+        sectionContext.stroke();
+        sectionContext.fillStyle = "#0b1f3a";
+        sectionContext.font = "800 11px Inter, system-ui, sans-serif";
+        sectionContext.fillText(`${activeSectionWell.id} scenario`, scenarioWellPosition.x + 14, scenarioWellPosition.y + 4);
+
+        sectionContext.fillStyle = "#0b1f3a";
+        sectionContext.font = "700 20px Inter, system-ui, sans-serif";
+        sectionContext.fillText(`${layer.name}: hydraulic head and flow`, marginLeft, 42);
+        sectionContext.font = "500 12px Inter, system-ui, sans-serif";
+        sectionContext.fillStyle = "#52657d";
+        sectionContext.fillText(`${data.source.solver} · ${data.grid.cells.length} DISV cells · ${data.wells.length} MAW wells`, marginLeft, 64);
+
+        const screenState = scenario.screenActive ? "screen active" : "screen inactive";
+        planScenarioStatusEl.textContent = scenario.screenActive
+          ? `${scenario.soil.label} · ${Math.round(scenario.discharge).toLocaleString()} m³/day · Level ${scenario.screenLevel} ${screenState} · estimated maximum drawdown ${scenario.maximumDrawdown.toFixed(1)} m`
+          : `${scenario.soil.label} · Level ${scenario.screenLevel} ${screenState} · showing the unadjusted MODFLOW result`;
+        planSoilReadoutEl.textContent = scenario.soil.label;
+        const screenLabels = [...selectedScreenLevels].sort((a, b) => a - b).map((level) => `L${level}`);
+        planScreenReadoutEl.textContent = screenLabels.length > 0 ? screenLabels.join(", ") : "None";
+
+        const legendX = width - 96;
+        const legendY = Math.max(120, height / 2 - 110);
+        const gradient = sectionContext.createLinearGradient(0, legendY + 190, 0, legendY);
+        for (let step = 0; step <= 10; step += 1) {
+          gradient.addColorStop(step / 10, headColor(low + (high - low) * (step / 10), low, high));
+        }
+        sectionContext.fillStyle = gradient;
+        sectionContext.fillRect(legendX, legendY, 24, 190);
+        sectionContext.strokeStyle = "rgba(11, 31, 58, 0.55)";
+        sectionContext.strokeRect(legendX, legendY, 24, 190);
+        sectionContext.fillStyle = "#0b1f3a";
+        sectionContext.font = "700 11px Inter, system-ui, sans-serif";
+        sectionContext.fillText(`${high.toFixed(1)} m`, legendX + 34, legendY + 5);
+        sectionContext.fillText(`${low.toFixed(1)} m`, legendX + 34, legendY + 190);
+        sectionContext.save();
+        sectionContext.translate(legendX - 14, legendY + 126);
+        sectionContext.rotate(-Math.PI / 2);
+        sectionContext.fillText("Hydraulic head", 0, 0);
+        sectionContext.restore();
+      }
+
       function drawSectionView() {
+        if (topViewMode) {
+          drawTopView();
+          return;
+        }
         if (!sceneData || !activeSectionWell) {
           return;
         }
@@ -1242,6 +2655,7 @@
         sectionCanvas.width = Math.max(1, Math.floor(width * ratio));
         sectionCanvas.height = Math.max(1, Math.floor(height * ratio));
         sensorHitBoxes = [];
+        aquiferHitRegions = [];
         sectionContext.setTransform(ratio, 0, 0, ratio, 0, 0);
         sectionContext.clearRect(0, 0, width, height);
         sectionContext.fillStyle = "#DFF6FD";
@@ -1380,6 +2794,18 @@
           sectionContext.fill();
           if (isAquiferType(layer.type)) {
             drawSubtleWaterTexture(sectionContext, top, bottom);
+            const polygon = [...top, ...bottom];
+            const level = aquiferLevelNumbers[layer.type];
+            aquiferHitRegions.push({ level, type: layer.type, polygon });
+            if (hoveredAquiferLevel === level) {
+              sectionContext.beginPath();
+              polygon.forEach((point, pointIndex) => pointIndex === 0
+                ? sectionContext.moveTo(point.x, point.y)
+                : sectionContext.lineTo(point.x, point.y));
+              sectionContext.closePath();
+              sectionContext.fillStyle = "rgba(56, 189, 248, 0.16)";
+              sectionContext.fill();
+            }
           }
           sectionContext.strokeStyle = "rgba(2, 4, 10, 0.78)";
           sectionContext.lineWidth = 1.25;
@@ -1673,6 +3099,7 @@
       function openSectionView(well) {
         activeSectionWell = well;
         sectionMode = true;
+        topViewMode = false;
         sectionZoom = 1;
         sectionPanX = 0;
         sectionPanY = 0;
@@ -1684,7 +3111,22 @@
         updateScreenOptions(well);
         updateDischargeLabel();
         controls.enabled = false;
-        sectionTitleEl.textContent = `${well.id} ${well.role} - 2D Section View`;
+        const presentation = wellPresentation[well.id] || {
+          name: `${well.id} ${well.role}`,
+          sectionLocation: "Los Baños Laguna",
+        };
+        sectionTitleEl.textContent = presentation.name;
+        sectionWellLocationEl.textContent = presentation.sectionLocation;
+        updateMetricFields(well);
+        menuPanelEl.classList.add("is-section-mode");
+        menuPanelEl.classList.remove("is-plan-mode");
+        planViewSummaryEl.hidden = true;
+        topViewBackButton.hidden = true;
+        menu3dStateEl.hidden = true;
+        menuSectionStateEl.hidden = false;
+        menuPanelEl.classList.remove("is-hidden");
+        showPanelButton.classList.remove("is-visible");
+        updateWellSelectorStates(well.id);
         statusEl.textContent = `Selected ${well.id}: 2D section view.`;
         sectionViewEl.classList.add("is-open");
         try {
@@ -1695,11 +3137,20 @@
       }
 
       function closeSectionView() {
+        stopTopViewDischargeAnimation();
         sectionMode = false;
+        topViewMode = false;
         activeSectionWell = null;
         hideSensorSpecs();
         controls.enabled = true;
         sectionViewEl.classList.remove("is-open");
+        menuPanelEl.classList.remove("is-section-mode");
+        menuPanelEl.classList.remove("is-plan-mode");
+        planViewSummaryEl.hidden = true;
+        topViewBackButton.hidden = true;
+        menuSectionStateEl.hidden = true;
+        menu3dStateEl.hidden = false;
+        updateWellSelectorStates(null);
         statusEl.textContent = sceneData
           ? `${sceneData.layers.length} layers, ${sceneData.flowArrows.length} arrows, ${sceneData.wells.length} wells loaded.`
           : "3D view restored.";
@@ -1737,10 +3188,144 @@
         drawSectionView();
       }
 
+      function zoomTopViewAt(nextZoom, anchorX, anchorY) {
+        const previousZoom = topViewZoom;
+        const clampedZoom = Math.min(5, Math.max(0.65, nextZoom));
+        if (clampedZoom === previousZoom) return;
+        const ratio = clampedZoom / previousZoom;
+        const width = sectionCanvas.clientWidth;
+        const height = sectionCanvas.clientHeight;
+        const { marginLeft, marginTop, plotWidth, plotHeight } = getTopViewLayout(width, height);
+        const baseCenterX = marginLeft + plotWidth / 2;
+        const baseCenterY = marginTop + plotHeight / 2;
+        const oldCenterX = baseCenterX + topViewPanX;
+        const oldCenterY = baseCenterY + topViewPanY;
+        topViewPanX = anchorX - baseCenterX - (anchorX - oldCenterX) * ratio;
+        topViewPanY = anchorY - baseCenterY - (anchorY - oldCenterY) * ratio;
+        topViewZoom = clampedZoom;
+        drawSectionView();
+      }
+
+      function animateTopViewDischarge(targetDischarge) {
+        if (topViewDischargeFrame !== null) {
+          cancelAnimationFrame(topViewDischargeFrame);
+        }
+        const startDischarge = topViewAnimatedDischarge;
+        const change = targetDischarge - startDischarge;
+        const startedAt = performance.now();
+        const duration = 420;
+
+        const step = (timestamp) => {
+          const progress = Math.min(1, (timestamp - startedAt) / duration);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          topViewAnimatedDischarge = startDischarge + change * eased;
+          drawSectionView();
+          if (progress < 1 && topViewMode) {
+            topViewDischargeFrame = requestAnimationFrame(step);
+          } else {
+            topViewAnimatedDischarge = targetDischarge;
+            topViewDischargeFrame = null;
+            if (topViewMode) drawSectionView();
+          }
+        };
+
+        topViewDischargeFrame = requestAnimationFrame(step);
+      }
+
+      function stopTopViewDischargeAnimation() {
+        if (topViewDischargeFrame !== null) {
+          cancelAnimationFrame(topViewDischargeFrame);
+          topViewDischargeFrame = null;
+        }
+      }
+
+      function transitionSectionCanvas(callback) {
+        sectionViewEl.classList.add("is-changing");
+        window.setTimeout(() => {
+          callback();
+          drawSectionView();
+          requestAnimationFrame(() => sectionViewEl.classList.remove("is-changing"));
+        }, 180);
+      }
+
+      function openTopView(region) {
+        if (!modflowTopViewData) {
+          statusEl.textContent = "MODFLOW plan-view data is not available.";
+          return;
+        }
+        transitionSectionCanvas(() => {
+          topViewMode = true;
+          activeTopLayer = Math.max(0, Math.min(modflowTopViewData.layers.length - 1, region.level - 1));
+          topViewZoom = 1;
+          topViewPanX = 0;
+          topViewPanY = 0;
+          stopTopViewDischargeAnimation();
+          topViewAnimatedDischarge = sectionDischarge;
+          hoveredAquiferLevel = null;
+          hideSensorSpecs();
+          menuPanelEl.classList.add("is-plan-mode");
+          planViewSummaryEl.hidden = false;
+          topViewBackButton.hidden = false;
+          const layer = modflowTopViewData.layers[activeTopLayer];
+          sectionTitleEl.textContent = `${region.type} Top View`;
+          sectionWellLocationEl.textContent = `MODFLOW Layer ${activeTopLayer + 1}`;
+          planViewModelEl.textContent = `${modflowTopViewData.source.solver} ${modflowTopViewData.source.state} result`;
+          planViewDetailsEl.textContent = `${modflowTopViewData.grid.cells.length} DISV cells rendered from FloPy head, contour, well, stream, and specific-discharge output for ${layer.name}.`;
+          sectionViewEl.setAttribute("aria-label", `${region.type} MODFLOW plan view`);
+        });
+      }
+
+      function closeTopView() {
+        if (!topViewMode) return;
+        transitionSectionCanvas(() => {
+          stopTopViewDischargeAnimation();
+          topViewMode = false;
+          menuPanelEl.classList.remove("is-plan-mode");
+          planViewSummaryEl.hidden = true;
+          topViewBackButton.hidden = true;
+          const presentation = wellPresentation[activeSectionWell.id] || {};
+          sectionTitleEl.textContent = presentation.name || `${activeSectionWell.id} ${activeSectionWell.role}`;
+          sectionWellLocationEl.textContent = presentation.sectionLocation || "Los Baños Laguna";
+          sectionViewEl.setAttribute("aria-label", "2D well section view");
+        });
+      }
+
       function updateDischargeLabel() {
         const soilProfile = soilDrawdownProfiles[selectedSoilType] || soilDrawdownProfiles.loam;
-        sectionDischargeValueEl.textContent = `${Math.round(sectionDischarge).toLocaleString()} m3/day`;
+        const discharge01 = sectionDischarge / Number(sectionDischargeInput.max);
+        const influenceKm = ((4.5 + discharge01 * 12) * soilProfile.influence).toFixed(1);
+        sectionDischargeValueEl.textContent = `${Math.round(sectionDischarge).toLocaleString()} m³/day`;
         sectionDischargeValueEl.title = `${soilProfile.label} drawdown profile`;
+        influenceValueEl.textContent = `${influenceKm} km`;
+        influenceTrackEl.style.setProperty("--influence-progress", `${Math.min(100, Number(influenceKm) / 18 * 100)}%`);
+        soilDescriptionEl.textContent = soilDescriptions[selectedSoilType] || soilDescriptions.loam;
+      }
+
+      function updateSoilControl() {
+        const profile = soilDrawdownProfiles[selectedSoilType] || soilDrawdownProfiles.loam;
+        soilSelectValueEl.textContent = profile.label;
+        soilFigureEl.src = soilImages[selectedSoilType] || soilImages.loam;
+        soilFigureEl.alt = `${profile.label} soil texture`;
+        for (const option of soilSelectMenuEl.querySelectorAll("[data-soil-option]")) {
+          const isCurrent = option.dataset.soilOption === selectedSoilType;
+          option.classList.toggle("is-current", isCurrent);
+          option.setAttribute("aria-selected", String(isCurrent));
+        }
+      }
+
+      function setSoilMenuOpen(isOpen) {
+        soilSelectMenuEl.hidden = !isOpen;
+        soilSelectButtonEl.setAttribute("aria-expanded", String(isOpen));
+      }
+
+      function updateMetricFields(well) {
+        const values = wellMetrics[well.id] || wellMetrics["W-1"];
+        for (const input of document.querySelectorAll("[data-metric]")) {
+          const value = values[input.dataset.metric];
+          if (value !== undefined) {
+            input.value = String(value);
+          }
+        }
       }
 
       function getSensorSpecs(well, sensorIndex = activeSensorIndex) {
@@ -1815,15 +3400,51 @@
         }
       }
 
+      function wellIconMarkup(role) {
+        if (role === "Monitoring") {
+          return `
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M3 18.5h2.25v-4H3v4Zm4.1 0h2.25v-7H7.1v7Zm4.1 0h2.25V9h-2.25v9.5Zm4.1 0h2.25V6h-2.25v12.5Zm4.1 0h1.5V3.5h-1.5v15ZM3.4 11.6l4.3-4.1 3.3 2.6 6.1-6.2 1.3 1.3-7.3 7.4-3.3-2.5-3.1 3-1.3-1.5Z"/>
+            </svg>`;
+        }
+        return `
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 2.4c-.7 1.3-6.2 8.2-6.2 12.2A6.2 6.2 0 0 0 12 20.8a6.2 6.2 0 0 0 6.2-6.2C18.2 10.6 12.7 3.7 12 2.4Zm-2.8 13c.2 1.4 1.1 2.2 2.4 2.6-2.1.3-3.8-1.2-3.8-3.3 0-1.2.6-2.5 1.5-3.8-.2 1.6-.3 3.1-.1 4.5Z"/>
+          </svg>`;
+      }
+
+      function updateWellSelectorStates(selectedWellId) {
+        for (const button of wellPickerEl.querySelectorAll(".well-selector")) {
+          button.classList.toggle("is-selected", button.dataset.wellId === selectedWellId);
+        }
+      }
+
       function addWellPicker(wells) {
         wellPickerEl.replaceChildren();
         for (const well of wells) {
+          const presentation = wellPresentation[well.id] || {
+            name: `${well.id} ${well.role}`,
+            location: `${Math.round(well.x_m / 1000)} km model station`,
+            active: true,
+          };
           const button = document.createElement("button");
           button.type = "button";
-          button.textContent = `${well.id} ${well.role}`;
-          button.addEventListener("click", () => openSectionView(well));
+          button.className = "well-selector";
+          button.dataset.wellId = well.id;
+          button.classList.toggle("is-monitoring", well.role === "Monitoring");
+          button.classList.toggle("is-alert", presentation.active === false);
+          button.setAttribute("aria-label", `Open ${presentation.name} 2D section`);
+          button.innerHTML = `
+            <span class="well-selector-label">
+              <span class="well-selector-icon">${wellIconMarkup(well.role)}</span>
+              <span>${presentation.name}</span>
+            </span>
+            <span class="well-selector-location">${presentation.location}</span>`;
+          button.addEventListener("click", () => transitionToWell(well));
           wellPickerEl.appendChild(button);
         }
+        const activeCount = wells.filter((well) => wellPresentation[well.id]?.active !== false).length;
+        activeWellCountEl.textContent = `${activeCount}/${wells.length}`;
       }
 
       async function loadScene() {
@@ -1837,6 +3458,18 @@
 
           const data = await response.json();
           sceneData = data;
+          try {
+            const topViewResponse = await fetch(`../generated/modflow_topview.json?v=${Date.now()}`, {
+              cache: "no-store",
+            });
+            if (topViewResponse.ok) {
+              modflowTopViewData = await topViewResponse.json();
+            } else {
+              console.warn(`MODFLOW plan-view data returned HTTP ${topViewResponse.status}`);
+            }
+          } catch (topViewError) {
+            console.warn("MODFLOW plan-view data could not be loaded", topViewError);
+          }
           domain.lx_m = data.domain.lx_m;
           domain.ly_m = data.domain.ly_m;
 
@@ -1916,37 +3549,73 @@
         menuPanelEl.classList.add("is-hidden");
         showPanelButton.classList.add("is-visible");
       });
+      document.querySelector("#hide-section-panel").addEventListener("click", () => {
+        menuPanelEl.classList.add("is-hidden");
+        showPanelButton.classList.add("is-visible");
+        if (topViewMode) requestAnimationFrame(drawSectionView);
+      });
       showPanelButton.addEventListener("click", () => {
         menuPanelEl.classList.remove("is-hidden");
         showPanelButton.classList.remove("is-visible");
+        if (topViewMode) requestAnimationFrame(drawSectionView);
       });
       document.querySelector("#section-exit").addEventListener("click", closeSectionView);
+      topViewBackButton.addEventListener("click", closeTopView);
       document.querySelector("#sensor-specs-close").addEventListener("click", hideSensorSpecs);
       sensorSpecsSelectEl.addEventListener("change", () => {
         showSensorSpecs(Number(sensorSpecsSelectEl.value));
       });
       document.querySelector("#section-zoom-out").addEventListener("click", () => {
-        zoomSectionAt(sectionZoom - 0.12, lastSectionCursor.x, lastSectionCursor.y);
+        if (topViewMode) {
+          zoomTopViewAt(topViewZoom - 0.14, lastSectionCursor.x, lastSectionCursor.y);
+        } else {
+          zoomSectionAt(sectionZoom - 0.12, lastSectionCursor.x, lastSectionCursor.y);
+        }
       });
       document.querySelector("#section-zoom-in").addEventListener("click", () => {
-        zoomSectionAt(sectionZoom + 0.12, lastSectionCursor.x, lastSectionCursor.y);
+        if (topViewMode) {
+          zoomTopViewAt(topViewZoom + 0.14, lastSectionCursor.x, lastSectionCursor.y);
+        } else {
+          zoomSectionAt(sectionZoom + 0.12, lastSectionCursor.x, lastSectionCursor.y);
+        }
       });
       sectionDischargeInput.addEventListener("input", () => {
         sectionDischarge = Number(sectionDischargeInput.value);
         updateDischargeLabel();
-        drawSectionView();
+        if (topViewMode) {
+          animateTopViewDischarge(sectionDischarge);
+        } else {
+          drawSectionView();
+        }
         if (sensorSpecsVisible) {
           showSensorSpecs();
         }
       });
       soilTypeSelect.addEventListener("change", () => {
         selectedSoilType = soilTypeSelect.value;
+        updateSoilControl();
         updateDischargeLabel();
         drawSectionView();
         if (sensorSpecsVisible) {
           showSensorSpecs();
         }
       });
+      soilSelectButtonEl.addEventListener("click", () => {
+        setSoilMenuOpen(soilSelectMenuEl.hidden);
+      });
+      for (const option of soilSelectMenuEl.querySelectorAll("[data-soil-option]")) {
+        option.addEventListener("click", () => {
+          soilTypeSelect.value = option.dataset.soilOption;
+          soilTypeSelect.dispatchEvent(new Event("change"));
+          setSoilMenuOpen(false);
+        });
+      }
+      document.addEventListener("pointerdown", (event) => {
+        if (!soilDropdownEl.contains(event.target)) {
+          setSoilMenuOpen(false);
+        }
+      });
+      updateSoilControl();
 
       sectionCanvas.addEventListener("pointerdown", (event) => {
         if (!sectionMode) {
@@ -1965,6 +3634,13 @@
           showSensorSpecs(sensorHit.index);
           return;
         }
+        if (!topViewMode) {
+          const aquiferHit = aquiferHitRegions.find((region) => pointInPolygon(lastSectionCursor, region.polygon));
+          if (aquiferHit) {
+            openTopView(aquiferHit);
+            return;
+          }
+        }
         isSectionDragging = true;
         lastSectionPointer = { x: event.clientX, y: event.clientY };
         sectionCanvas.setPointerCapture(event.pointerId);
@@ -1980,20 +3656,35 @@
             lastSectionCursor.y >= box.y &&
             lastSectionCursor.y <= box.y + box.height
         );
+        const aquiferHit = topViewMode
+          ? null
+          : aquiferHitRegions.find((region) => pointInPolygon(lastSectionCursor, region.polygon));
+        const nextHoveredLevel = aquiferHit?.level || null;
+        if (!isSectionDragging && hoveredAquiferLevel !== nextHoveredLevel) {
+          hoveredAquiferLevel = nextHoveredLevel;
+          drawSectionView();
+        }
         sectionCanvas.style.cursor =
-          sensorHit ? "pointer" : "grab";
+          sensorHit || aquiferHit ? "pointer" : isSectionDragging ? "grabbing" : "grab";
         if (!isSectionDragging) {
           return;
         }
-        sectionPanX += event.clientX - lastSectionPointer.x;
-        sectionPanY += event.clientY - lastSectionPointer.y;
+        if (topViewMode) {
+          topViewPanX += event.clientX - lastSectionPointer.x;
+          topViewPanY += event.clientY - lastSectionPointer.y;
+        } else {
+          sectionPanX += event.clientX - lastSectionPointer.x;
+          sectionPanY += event.clientY - lastSectionPointer.y;
+        }
         lastSectionPointer = { x: event.clientX, y: event.clientY };
         drawSectionView();
       });
 
       sectionCanvas.addEventListener("pointerup", (event) => {
         isSectionDragging = false;
-        sectionCanvas.releasePointerCapture(event.pointerId);
+        if (sectionCanvas.hasPointerCapture(event.pointerId)) {
+          sectionCanvas.releasePointerCapture(event.pointerId);
+        }
       });
 
       sectionCanvas.addEventListener("pointercancel", () => {
@@ -2006,11 +3697,19 @@
           event.preventDefault();
           const rect = sectionCanvas.getBoundingClientRect();
           lastSectionCursor = { x: event.clientX - rect.left, y: event.clientY - rect.top };
-          zoomSectionAt(
-            sectionZoom + (event.deltaY < 0 ? 0.1 : -0.1),
-            lastSectionCursor.x,
-            lastSectionCursor.y
-          );
+          if (topViewMode) {
+            zoomTopViewAt(
+              topViewZoom + (event.deltaY < 0 ? 0.12 : -0.12),
+              lastSectionCursor.x,
+              lastSectionCursor.y
+            );
+          } else {
+            zoomSectionAt(
+              sectionZoom + (event.deltaY < 0 ? 0.1 : -0.1),
+              lastSectionCursor.x,
+              lastSectionCursor.y
+            );
+          }
         },
         { passive: false }
       );
