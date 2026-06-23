@@ -25,7 +25,6 @@ Completed locally:
 
 Still requires account-side action:
 
-- Vercel deployment. The local Vercel CLI requested device login, so deployment cannot finish until the Vercel account is authenticated.
 - Render `SUPABASE_SERVICE_ROLE_KEY`. Supabase service role keys are secret dashboard credentials and are not exposed by the available Supabase connector.
 
 Supabase project used:
@@ -46,6 +45,16 @@ Root Directory: backend
 Build Command: pip install -r requirements.txt
 Start Command: uvicorn api.main:app --host 0.0.0.0 --port $PORT
 Health Check Path: /health
+```
+
+Vercel frontend:
+
+```text
+Project: aquasmart-frontend
+Production URL: https://aquasmart-frontend-tawny.vercel.app
+Latest deployment: https://aquasmart-frontend-g6dxkc6n1-quevinjamesx26-9519s-projects.vercel.app
+Root Directory: frontend
+Build Command: npm run build
 ```
 
 ## Project Structure
@@ -196,7 +205,7 @@ Render environment variables:
 PYTHON_VERSION=3.12.8
 SUPABASE_URL=your_supabase_project_url
 SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
-FRONTEND_ORIGIN=https://your-vercel-app.vercel.app
+FRONTEND_ORIGIN=https://aquasmart-frontend-tawny.vercel.app
 ```
 
 For this project:
@@ -208,7 +217,7 @@ SUPABASE_SERVICE_ROLE_KEY=copy_from_supabase_dashboard
 FRONTEND_ORIGIN=http://localhost:3000
 ```
 
-After Vercel is deployed, update `FRONTEND_ORIGIN` to the production Vercel URL.
+After changing `render.yaml`, redeploy the Render service so `FRONTEND_ORIGIN` is applied in production.
 
 Where to get the service role key:
 

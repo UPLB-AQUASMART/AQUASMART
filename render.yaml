@@ -11,4 +11,4 @@ services:
       - key: PYTHON_VERSION
         value: 3.12.8
       - key: FRONTEND_ORIGIN
-        value: http://localhost:3000
+        value: https://aquasmart-frontend-tawny.vercel.app
