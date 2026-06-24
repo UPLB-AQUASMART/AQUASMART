@@ -24,7 +24,7 @@ export default function Home() {
       <SimulationsSection />
       <WeatherSection />
       <PartnersSection />
-      <SiteFooter />
+      <SiteFooter reveal />
     </main>
   );
 }

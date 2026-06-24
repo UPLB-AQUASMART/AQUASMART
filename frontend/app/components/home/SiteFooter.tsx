@@ -2,9 +2,18 @@ import { footerColumns } from "@/app/data/home";
 import revealStyles from "./ScrollReveal.module.css";
 import styles from "./SiteFooter.module.css";
 
-export function SiteFooter({ className }: { className?: string }) {
+export function SiteFooter({
+  className,
+  reveal = false,
+}: {
+  className?: string;
+  reveal?: boolean;
+}) {
   return (
-    <footer className={`${styles["site-footer"]} ${revealStyles["scroll-reveal"]}${className ? ` ${className}` : ""}`} id="contact">
+    <footer
+      className={`${styles["site-footer"]}${reveal ? ` ${revealStyles["scroll-reveal"]}` : ""}${className ? ` ${className}` : ""}`}
+      id="contact"
+    >
       <div className={styles["footer-upper"]}>
         <div className={styles["footer-brand"]}>
           <img
