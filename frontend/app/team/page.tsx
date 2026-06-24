@@ -53,22 +53,22 @@ const coreTeam = [
 const interns = [
   {
     name: "Daphne Canape",
-    focus: "Research Support",
+    focus: "Designer & Developer",
     bio: "Supports the AQUASMART team through research assistance, documentation, and collaborative project work.",
   },
   {
-    name: "Quevin James A. Custodio",
-    focus: "Field & Data Support",
+    name: "Quevin James Custodio",
+    focus: "Model Developer",
     bio: "Assists with field activities, data organization, and day-to-day coordination across project tasks.",
   },
   {
-    name: "Jhulianah Lagrimas Carino",
-    focus: "Communications Support",
+    name: "Jhulianah Cariño",
+    focus: "Sensor Development",
     bio: "Contributes to project communications, research materials, and community-focused AQUASMART initiatives.",
   },
   {
-    name: "Jake",
-    focus: "Project Support",
+    name: "Marzell Jhake Llamas",
+    focus: "Sensor Development",
     bio: "Provides general project support and assists the team with research, documentation, and field preparation.",
   },
 ];
