@@ -104,15 +104,40 @@ export const simulations = [
     title: "Groundwater",
     highlight: "Simulation",
     href: "/simulation/groundwater",
-    image: "/figma/groundwater-card.png",
-    body: "Observe groundwater movement, well behavior, and field-level irrigation effects through a simplified interactive model.",
+    states: [
+      {
+        label: "Scenario overview",
+        image: "/figma/groundwater-state-overview.png",
+        body: "Review total pumping, safe-yield utilization, average drawdown, recovery time, and the current well footprint before changing the model.",
+      },
+      {
+        label: "Well configuration",
+        image: "/figma/groundwater-state-configure.png",
+        body: "Add another well, position it on the field, and adjust its daily discharge while statistics and water-quality readings recalculate dynamically.",
+      },
+    ],
   },
   {
     title: "Spatial Drawdown",
     highlight: "Map",
     href: "/simulation",
-    image: "/figma/drawdown-card.png",
-    body: "Compare spatial drawdown changes and understand how pumping pressure affects the surrounding area.",
+    states: [
+      {
+        label: "Regional context",
+        image: "/figma/drawdown-state-regional.png",
+        body: "Locate active wells and monitoring points across the field to see where pumping pressure may influence neighboring zones.",
+      },
+      {
+        label: "Aquifer profile",
+        image: "/figma/drawdown-state-aquifer.png",
+        body: "Inspect the layered aquifer cross-section, well depth, and pumping controls to understand how extraction moves through the subsurface.",
+      },
+      {
+        label: "Hydraulic head",
+        image: "/figma/drawdown-state-head.png",
+        body: "Compare hydraulic-head contours and flow gradients around wells to identify drawdown cones, interference, and higher-risk areas.",
+      },
+    ],
   },
 ];
 

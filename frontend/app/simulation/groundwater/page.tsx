@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ChartNoAxesCombined,
   Download,
   Droplet,
   Eye,
@@ -28,6 +29,7 @@ import {
 import Link from "next/link";
 import { useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { Doughnut, Line } from "react-chartjs-2";
+import { SiteNav } from "@/app/components/home/SiteNav";
 import styles from "./page.module.css";
 
 type ReadingKey =
@@ -105,23 +107,6 @@ function decodePdfText(value: string) {
 
 function extractPdfCells(pdfText: string) {
   return Array.from(pdfText.matchAll(/\(([^()]*(?:\\.[^()]*)*)\)\s*Tj/g), (match) => decodePdfText(match[1]));
-}
-
-function GroundwaterNav() {
-  return (
-    <header className={styles.nav} aria-label="AQUASMART Mini navigation">
-      <Link className={styles.logo} href="/#home" aria-label="AQUASMART Mini home">
-        <img src="/figma/groundwater-logo.png" alt="AQUASMART Mini" />
-      </Link>
-      <nav className={styles.links} aria-label="Primary navigation">
-        {navLinks.map((link) => (
-          <Link className={link.active ? styles.active : undefined} href={link.href} key={link.label}>
-            {link.label}
-          </Link>
-        ))}
-      </nav>
-    </header>
-  );
 }
 
 export default function GroundwaterSimulationPage() {
@@ -424,11 +409,13 @@ export default function GroundwaterSimulationPage() {
 
   return (
     <main className={styles.page}>
-      <GroundwaterNav />
+      <div className={`${styles.mapStage} ${simulationOpen ? styles.simulating : ""}`}>
+        <img className={styles.map} src="/figma/groundwater-map-expanded.png" alt="Groundwater simulation field map" />
+        <SiteNav activeLabel="Simulation" />
+        <div className={styles.navClearance} aria-hidden="true" />
 
-      <section className={`${styles.hero} ${simulationOpen ? styles.simulating : ""}`}>
-        <img className={styles.map} src="/figma/groundwater-map.png" alt="Groundwater simulation field map" />
-        <div className={styles.heroContent}>
+        <section className={styles.hero}>
+          <div className={styles.heroContent}>
           {!simulationOpen && <h1>MODFLOW/FLOPY<span>Groundwater Simulation</span></h1>}
 
           {!simulationOpen ? (
@@ -441,19 +428,22 @@ export default function GroundwaterSimulationPage() {
           ) : (
             <>
               <aside ref={scenarioCardRef} className={styles.scenarioCard} aria-label="Current scenario statistics">
-                <div><span>Total Pumping Discharge</span><strong>{totalDischarge} m³/day</strong></div>
-                <div><span>Safe Yield Capacity</span><strong>{safeYield} m³/day</strong></div>
-                <div><span>Capacity Utilization</span><strong>{scenario.capacityUtilization.toFixed(1)}%</strong></div>
-                <i className={styles.progress}><b style={{ width: `${scenario.capacityUtilization}%` }} /></i>
-                <div><span>Average Drawdown</span><strong>{scenario.averageDrawdown.toFixed(1)} m</strong></div>
-                <div><span>Critical Wells</span><strong>{scenario.criticalWells}</strong></div>
-                <div><span>Sustainability Status</span><em data-status={scenario.sustainability}>{scenario.sustainability}</em></div>
-                <div><span>Est. Recovery Time</span><strong>{scenario.recoveryTime} days</strong></div>
+                <div className={styles.scenarioHeader}>
+                  <h2><ChartNoAxesCombined size={20} strokeWidth={2.5} /> Model Statistics</h2>
+                  <button type="button" onClick={resetSimulation} title="Reset wells" aria-label="Reset wells"><RefreshCw size={16} /></button>
+                </div>
+                <div className={styles.scenarioBody}>
+                  <div><span>Total Pumping Discharge</span><strong>{totalDischarge} m³/day</strong></div>
+                  <div><span>Safe Yield Capacity</span><strong>{safeYield} m³/day</strong></div>
+                  <div><span>Capacity Utilization</span><strong>{scenario.capacityUtilization.toFixed(1)}%</strong></div>
+                  <i className={styles.progress}><b style={{ width: `${scenario.capacityUtilization}%` }} /></i>
+                  <div><span>Average Drawdown</span><strong>{scenario.averageDrawdown.toFixed(1)} m</strong></div>
+                  <div><span>Critical Wells</span><strong>{scenario.criticalWells}</strong></div>
+                  <div><span>Sustainability Status</span><em data-status={scenario.sustainability}>{scenario.sustainability}</em></div>
+                  <div><span>Est. Recovery Time</span><strong>{scenario.recoveryTime} days</strong></div>
+                </div>
               </aside>
-              <div className={styles.simulationActions}>
-                <button type="button" onClick={resetSimulation} title="Reset wells"><RefreshCw size={18} /></button>
-                <button type="button" onClick={exitSimulation} title="Exit simulation"><LogOut size={18} /></button>
-              </div>
+              <button className={styles.exitButton} type="button" onClick={exitSimulation} title="Exit simulation" aria-label="Exit simulation"><LogOut size={20} /></button>
               <button className={styles.addButton} type="button" onClick={addWell} aria-label={wells.length >= maxWells ? "Maximum of 7 wells reached" : "Add well"} disabled={wells.length >= maxWells} title={wells.length >= maxWells ? "Maximum of 7 wells reached" : "Add well"}><Plus size={35} strokeWidth={3.5} /></button>
             </>
           )}
@@ -492,8 +482,9 @@ export default function GroundwaterSimulationPage() {
               {wells.length > 1 && <button className={styles.removeButton} onClick={() => removeWell(selectedWell.id)}><Trash2 size={14} /> Remove well</button>}
             </div>
           )}
-        </div>
-      </section>
+          </div>
+        </section>
+      </div>
 
       <section className={styles.readings} aria-labelledby="readings-title">
         <div className={styles.readingsHeader}>

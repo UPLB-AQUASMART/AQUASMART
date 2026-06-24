@@ -840,25 +840,11 @@
         text-align: center;
       }
 
-      .panel-utility-row {
-        display: flex;
-        margin-top: 16px;
-        align-items: center;
-        justify-content: center;
-        gap: 7px;
-      }
-
-      .panel-utility-row button,
       .panel-toggle,
       .section-actions > button {
         border: 1px solid #b9dce6;
         background: rgba(245, 250, 252, 0.92);
         color: #0b1f3a;
-      }
-
-      .panel-utility-row button {
-        padding: 6px 9px;
-        font-size: 10px;
       }
 
       .status,
@@ -1472,13 +1458,6 @@
         <div class="legend" id="legend"></div>
         <div class="well-picker" id="well-picker"></div>
         <p class="well-menu-hint">click an active well for more information</p>
-        <div class="panel-utility-row" aria-label="3D view controls">
-          <button id="toggle-heads" type="button">Heads</button>
-          <button id="toggle-arrows" type="button">Flow</button>
-          <button id="toggle-wells" type="button">Wells</button>
-          <button id="reset-camera" type="button">Reset</button>
-          <button id="hide-panel" type="button">Hide menu</button>
-        </div>
       </div>
 
       <div class="menu-state" id="menu-section-state" hidden>
@@ -2642,8 +2621,9 @@
           }),
         );
         screen.position.copy(bottom.clone().lerp(top, 0.22));
+        const presentation = wellPresentation[well.id];
         const label = makeTextSprite(
-          `${well.id} (${well.role})`,
+          presentation?.name || `${well.id} ${well.role}`,
           well.role === "Pumping" ? "#65a8ff" : "#f8fafc",
         );
         label.position.copy(top);
@@ -3105,6 +3085,7 @@
           sectionContext.stroke();
         }
 
+        const foregroundLabels = [];
         sectionContext.font = "700 11px Inter, system-ui, sans-serif";
         for (const contour of layer.contours) {
           const points = contour.points.map((point) =>
@@ -3121,12 +3102,12 @@
           sectionContext.stroke();
           if (points.length > 4) {
             const labelPoint = points[Math.floor(points.length * 0.55)];
-            sectionContext.fillStyle = "#ffffff";
-            sectionContext.fillText(
-              String(contour.level),
-              labelPoint.x + 4,
-              labelPoint.y - 4,
-            );
+            foregroundLabels.push({
+              text: String(contour.level),
+              x: labelPoint.x + 4,
+              y: labelPoint.y - 4,
+              font: "700 11px Inter, system-ui, sans-serif",
+            });
           }
         }
 
@@ -3156,11 +3137,12 @@
             sectionContext.fillStyle = "#ffffff";
             sectionContext.font = "700 10px Inter, system-ui, sans-serif";
             if (drawdown >= 0.05) {
-              sectionContext.fillText(
-                `-${drawdown.toFixed(1)} m`,
-                wellPosition.x + ringRadius + 4,
-                wellPosition.y,
-              );
+              foregroundLabels.push({
+                text: `-${drawdown.toFixed(1)} m`,
+                x: wellPosition.x + ringRadius + 4,
+                y: wellPosition.y,
+                font: "700 10px Inter, system-ui, sans-serif",
+              });
             }
           }
           sectionContext.restore();
@@ -3218,11 +3200,27 @@
         sectionContext.stroke();
         sectionContext.fillStyle = "#0b1f3a";
         sectionContext.font = "800 11px Inter, system-ui, sans-serif";
+        const scenarioWellName =
+          wellPresentation[activeSectionWell.id]?.name || activeSectionWell.id;
         sectionContext.fillText(
-          `${activeSectionWell.id} scenario`,
+          `${scenarioWellName} scenario`,
           scenarioWellPosition.x + 14,
           scenarioWellPosition.y + 4,
         );
+
+        sectionContext.save();
+        sectionContext.textAlign = "left";
+        sectionContext.textBaseline = "alphabetic";
+        sectionContext.lineJoin = "round";
+        for (const label of foregroundLabels) {
+          sectionContext.font = label.font;
+          sectionContext.lineWidth = 3.5;
+          sectionContext.strokeStyle = "rgba(11, 31, 58, 0.92)";
+          sectionContext.strokeText(label.text, label.x, label.y);
+          sectionContext.fillStyle = "#ffffff";
+          sectionContext.fillText(label.text, label.x, label.y);
+        }
+        sectionContext.restore();
 
         sectionContext.fillStyle = "#0b1f3a";
         sectionContext.font = "700 20px Inter, system-ui, sans-serif";
@@ -3488,8 +3486,11 @@
             drawSubtleWaterTexture(sectionContext, top, bottom);
             const polygon = [...top, ...bottom];
             const level = aquiferLevelNumbers[layer.type];
-            aquiferHitRegions.push({ level, type: layer.type, polygon });
-            if (hoveredAquiferLevel === level) {
+            const hasScreen = selectedScreenLevels.has(level);
+            if (hasScreen) {
+              aquiferHitRegions.push({ level, type: layer.type, polygon });
+            }
+            if (hasScreen && hoveredAquiferLevel === level) {
               sectionContext.beginPath();
               polygon.forEach((point, pointIndex) =>
                 pointIndex === 0
@@ -3562,7 +3563,7 @@
         if (visibleScreenBands.length > 0) {
           for (const [bandIndex, band] of visibleScreenBands.entries()) {
             const originalHeadZ = (band.topZ + band.bottomZ) / 2;
-            const bandScale = Math.max(0.52, 1 - bandIndex * 0.12);
+            const bandScale = 1;
             const originalWater = topRows[0].map((point) =>
               project(point[0], originalHeadZ),
             );
@@ -3619,7 +3620,7 @@
             wellX,
             deepestBand,
             deepestOriginalHeadZ,
-            Math.max(0.52, 1 - (visibleScreenBands.length - 1) * 0.12),
+            1,
           );
           const coneLabel = project(
             Math.max(2400, wellX - influenceRadius * 0.46),
@@ -3827,13 +3828,9 @@
           activeSectionWell.role === "Pumping" ? "#65a8ff" : "#f8fafc";
         sectionContext.font = "800 16px Inter, system-ui, sans-serif";
         sectionContext.textAlign = "center";
-        sectionContext.fillText(activeSectionWell.id, top.x, top.y - 66);
-        sectionContext.font = "600 12px Inter, system-ui, sans-serif";
-        sectionContext.fillText(
-          `(${activeSectionWell.role})`,
-          top.x,
-          top.y - 49,
-        );
+        const activeWellName =
+          wellPresentation[activeSectionWell.id]?.name || activeSectionWell.id;
+        sectionContext.fillText(activeWellName, top.x, top.y - 58);
         const sensorLabels = ["WL", "pH", "T", "EC"];
         const sensorTipY = bottom.y + 22;
         const sensorOffsets = [-33, -11, 11, 33];
@@ -3893,21 +3890,6 @@
             height: 38,
           };
         });
-        if (sensorHitBoxes.length > 0) {
-          drawCalloutText(
-            sectionContext,
-            "well sensors",
-            bottom.x,
-            sensorTipY - 25,
-            {
-              align: "center",
-              font: "900 11px Inter, system-ui, sans-serif",
-              color: "#0b1f3a",
-              background: "rgba(223, 246, 253, 0.94)",
-              border: "rgba(125, 211, 252, 0.62)",
-            },
-          );
-        }
       }
 
       function openSectionView(well) {
@@ -4426,22 +4408,6 @@
         }
       }
 
-      document.querySelector("#toggle-heads").addEventListener("click", () => {
-        headsGroup.visible = !headsGroup.visible;
-      });
-      document.querySelector("#toggle-arrows").addEventListener("click", () => {
-        arrowsGroup.visible = !arrowsGroup.visible;
-      });
-      document.querySelector("#toggle-wells").addEventListener("click", () => {
-        wellsGroup.visible = !wellsGroup.visible;
-      });
-      document
-        .querySelector("#reset-camera")
-        .addEventListener("click", resetCamera);
-      document.querySelector("#hide-panel").addEventListener("click", () => {
-        menuPanelEl.classList.add("is-hidden");
-        showPanelButton.classList.add("is-visible");
-      });
       document
         .querySelector("#hide-section-panel")
         .addEventListener("click", () => {
