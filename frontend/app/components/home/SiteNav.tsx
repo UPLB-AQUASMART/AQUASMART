@@ -7,12 +7,20 @@ import { useState } from "react";
 import { navItems } from "@/app/data/home";
 import styles from "./SiteNav.module.css";
 
+const glassBlurStyle = {
+  backdropFilter: "blur(25px)",
+  WebkitBackdropFilter: "blur(25px)",
+};
+
 export function SiteNav({ activeLabel = "Home" }: { activeLabel?: string }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const closeMenu = () => setIsMenuOpen(false);
 
   return (
-    <header className={`${styles["site-nav"]}${isMenuOpen ? ` ${styles["menu-open"]}` : ""}`}>
+    <header
+      className={`${styles["site-nav"]}${isMenuOpen ? ` ${styles["menu-open"]}` : ""}`}
+      style={glassBlurStyle}
+    >
       <Link className={styles["nav-logo"]} href="/#home" aria-label="AQUASMART Mini home" onClick={closeMenu}>
         <img src="/assets/logo_2.png" alt="AQUASMART Mini" />
       </Link>
@@ -39,7 +47,12 @@ export function SiteNav({ activeLabel = "Home" }: { activeLabel?: string }) {
           </Link>
         ))}
       </nav>
-      <nav className={styles["mobile-nav-panel"]} id="home-mobile-menu" aria-label="Mobile navigation">
+      <nav
+        className={styles["mobile-nav-panel"]}
+        id="home-mobile-menu"
+        aria-label="Mobile navigation"
+        style={glassBlurStyle}
+      >
         {navItems.map((item) => (
           <Link
             className={item.label === activeLabel ? styles.active : undefined}
