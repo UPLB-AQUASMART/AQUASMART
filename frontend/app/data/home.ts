@@ -16,13 +16,13 @@ export type ForecastItem = {
 };
 
 export const navItems = [
-  { label: "Home", href: "#home", active: true },
-  { label: "About", href: "#about" },
-  { label: "Simulation", href: "#simulations" },
-  { label: "Weather", href: "#weather" },
-  { label: "Team", href: "#team" },
-  { label: "Contact", href: "#contact" },
-  { label: "Partners", href: "#partners" },
+  { label: "Home", href: "/#home" },
+  { label: "About", href: "/#about" },
+  { label: "Simulation", href: "/#simulations" },
+  { label: "Weather", href: "/#weather" },
+  { label: "Team", href: "/team" },
+  { label: "Contact", href: "/#contact" },
+  { label: "Partners", href: "/#partners" },
 ];
 
 export const goals: GoalItem[] = [
@@ -139,23 +139,23 @@ export const footerColumns = [
   {
     title: "Quick Links",
     links: [
-      { label: "About", href: "#about" },
-      { label: "Reports & Research", href: "#simulations" },
-      { label: "Team", href: "#team" },
-      { label: "Contact", href: "#contact" },
+      { label: "About", href: "/#about" },
+      { label: "Reports & Research", href: "/#simulations" },
+      { label: "Team", href: "/team" },
+      { label: "Contact", href: "/#contact" },
     ],
   },
   {
     title: "Monitoring",
     links: [
-      { label: "Live Monitoring", href: "#about" },
-      { label: "Updates", href: "#weather" },
-      { label: "AI Insights", href: "#weather" },
-      { label: "Data Portal", href: "#simulations" },
+      { label: "Live Monitoring", href: "/#about" },
+      { label: "Updates", href: "/#weather" },
+      { label: "AI Insights", href: "/#weather" },
+      { label: "Data Portal", href: "/#simulations" },
     ],
   },
   {
     title: "Partners",
-    links: partners.map((partner) => ({ label: partner, href: "#partners" })),
+    links: partners.map((partner) => ({ label: partner, href: "/#partners" })),
   },
 ];

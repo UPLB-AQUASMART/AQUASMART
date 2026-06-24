@@ -2,12 +2,25 @@ import { footerColumns } from "@/app/data/home";
 import revealStyles from "./ScrollReveal.module.css";
 import styles from "./SiteFooter.module.css";
 
-export function SiteFooter({ className }: { className?: string }) {
+export function SiteFooter({
+  className,
+  reveal = false,
+}: {
+  className?: string;
+  reveal?: boolean;
+}) {
   return (
-    <footer className={`${styles["site-footer"]} ${revealStyles["scroll-reveal"]}${className ? ` ${className}` : ""}`} id="contact">
+    <footer
+      className={`${styles["site-footer"]}${reveal ? ` ${revealStyles["scroll-reveal"]}` : ""}${className ? ` ${className}` : ""}`}
+      id="contact"
+    >
       <div className={styles["footer-upper"]}>
         <div className={styles["footer-brand"]}>
-          <img src="/assets/logo_2.png" alt="AQUASMART Mini" />
+          <img
+            className={styles["footer-logo"]}
+            src="/assets/logo_2.png"
+            alt="AQUASMART Mini"
+          />
           <p>
             AQUASMART empowers farmers and water managers with real-time data,
             AI insights, and smart irrigation recommendations for a sustainable

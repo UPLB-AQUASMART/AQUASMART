@@ -18,7 +18,7 @@
   width: 298px;
 }
 
-.footer-brand img {
+.footer-logo {
   width: 270px;
   height: 75px;
   object-fit: cover;
@@ -34,12 +34,16 @@
 
 .socials {
   display: flex;
-  gap: 10px;
+  flex-wrap: wrap;
+  gap: clamp(10px, 2.5vw, 14px);
 }
 
 .socials img {
-  width: 40px;
-  height: 40px;
+  width: clamp(34px, 9vw, 40px);
+  height: clamp(34px, 9vw, 40px);
+  max-width: none;
+  flex: 0 0 auto;
+  object-fit: contain;
 }
 
 .footer-links {
@@ -132,7 +136,7 @@
   }
 
   .footer-brand,
-.footer-brand img {
+.footer-logo {
     max-width: 100%;
   }
 
@@ -174,12 +178,12 @@
     padding-bottom: 0;
   }
 
-  .footer-brand img {
+  .footer-logo {
     width: min(230px, 72vw);
     height: auto;
   }
 
-  .footer-socials {
+  .socials {
     flex-wrap: wrap;
   }
 }

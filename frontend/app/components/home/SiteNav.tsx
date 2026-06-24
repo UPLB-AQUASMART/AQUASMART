@@ -1,20 +1,21 @@
 "use client";
 
 import { Menu, X } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 
 import { navItems } from "@/app/data/home";
 import styles from "./SiteNav.module.css";
 
-export function SiteNav() {
+export function SiteNav({ activeLabel = "Home" }: { activeLabel?: string }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const closeMenu = () => setIsMenuOpen(false);
 
   return (
     <header className={`${styles["site-nav"]}${isMenuOpen ? ` ${styles["menu-open"]}` : ""}`}>
-      <a className={styles["nav-logo"]} href="#home" aria-label="AQUASMART Mini home" onClick={closeMenu}>
+      <Link className={styles["nav-logo"]} href="/#home" aria-label="AQUASMART Mini home" onClick={closeMenu}>
         <img src="/assets/logo_2.png" alt="AQUASMART Mini" />
-      </a>
+      </Link>
       <button
         className={styles["nav-menu-toggle"]}
         type="button"
@@ -28,26 +29,26 @@ export function SiteNav() {
       </button>
       <nav className={styles["nav-links"]} aria-label="Primary navigation">
         {navItems.map((item) => (
-          <a
-            className={item.active ? styles.active : undefined}
+          <Link
+            className={item.label === activeLabel ? styles.active : undefined}
             href={item.href}
             key={item.label}
             onClick={closeMenu}
           >
             {item.label}
-          </a>
+          </Link>
         ))}
       </nav>
       <nav className={styles["mobile-nav-panel"]} id="home-mobile-menu" aria-label="Mobile navigation">
         {navItems.map((item) => (
-          <a
-            className={item.active ? styles.active : undefined}
+          <Link
+            className={item.label === activeLabel ? styles.active : undefined}
             href={item.href}
             key={item.label}
             onClick={closeMenu}
           >
             {item.label}
-          </a>
+          </Link>
         ))}
       </nav>
     </header>

@@ -23,7 +23,7 @@ export function Header() {
         <Link href="/simulation">About</Link>
         <Link className={activePage === "simulation" ? "active" : ""} href="/simulation">Simulation</Link>
         <Link className={activePage === "forecast" ? "active" : ""} href="/forecast">Weather Forecast</Link>
-        <Link href="/simulation">Team</Link>
+        <Link href="/team">Team</Link>
         <Link href="/simulation">Contact</Link>
       </nav>
     </header>
