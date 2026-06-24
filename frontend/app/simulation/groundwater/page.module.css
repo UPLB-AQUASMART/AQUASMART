@@ -833,7 +833,7 @@
 }
 
 @media (max-width: 1050px) {
-  <<<<<<< HEAD .navClearance {
+  .navClearance {
     height: 92px;
   }
   .nav {
@@ -852,6 +852,9 @@
   }
   .analytics {
     grid-template-columns: 1fr;
+  }
+  .scenarioCard {
+    right: 120px;
   }
 }
 
@@ -884,19 +887,7 @@
     padding: 8px 7px;
     font-size: 13px;
   }
-  ======= .scenarioCard {
-    right: 120px;
-  }
-  .researchGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .analytics {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 760px) {
-  >>>>>>>5ab58e448c6637d24f1b26278a4bf91db3a021c6 .hero,
+  .hero,
   .heroContent {
     min-height: 640px;
     border-radius: 0;
