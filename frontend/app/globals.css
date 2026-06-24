@@ -37,7 +37,7 @@ body > main {
   max-width: var(--app-canvas-width);
   flex: 0 0 auto;
   margin-inline: auto;
-  overflow-x: hidden;
+  overflow-x: clip;
   background: #ffffff;
   box-shadow: 0 0 70px rgba(0, 0, 0, 0.22);
 }
@@ -58,6 +58,10 @@ a {
 img {
   display: block;
   max-width: 100%;
+}
+
+.forecast-page > .page-intro {
+  padding-top: 140px;
 }
 
 @media (max-width: 900px){

@@ -28,6 +28,7 @@ import {
 import Link from "next/link";
 import { useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { Doughnut, Line } from "react-chartjs-2";
+import { SiteNav } from "@/app/components/home/SiteNav";
 import styles from "./page.module.css";
 
 type ReadingKey =
@@ -57,7 +58,7 @@ const navLinks = [
   { label: "About", href: "/#about" },
   { label: "Simulation", href: "/#simulations", active: true },
   { label: "Weather", href: "/#weather" },
-  { label: "Team", href: "/#team" },
+  { label: "Team", href: "/team" },
   { label: "Contact", href: "/#contact" },
   { label: "Partners", href: "/#partners" },
 ];
@@ -105,23 +106,6 @@ function decodePdfText(value: string) {
 
 function extractPdfCells(pdfText: string) {
   return Array.from(pdfText.matchAll(/\(([^()]*(?:\\.[^()]*)*)\)\s*Tj/g), (match) => decodePdfText(match[1]));
-}
-
-function GroundwaterNav() {
-  return (
-    <header className={styles.nav} aria-label="AQUASMART Mini navigation">
-      <Link className={styles.logo} href="/#home" aria-label="AQUASMART Mini home">
-        <img src="/figma/groundwater-logo.png" alt="AQUASMART Mini" />
-      </Link>
-      <nav className={styles.links} aria-label="Primary navigation">
-        {navLinks.map((link) => (
-          <Link className={link.active ? styles.active : undefined} href={link.href} key={link.label}>
-            {link.label}
-          </Link>
-        ))}
-      </nav>
-    </header>
-  );
 }
 
 export default function GroundwaterSimulationPage() {
@@ -424,7 +408,7 @@ export default function GroundwaterSimulationPage() {
 
   return (
     <main className={styles.page}>
-      <GroundwaterNav />
+      <SiteNav activeLabel="Simulation" />
 
       <section className={`${styles.hero} ${simulationOpen ? styles.simulating : ""}`}>
         <img className={styles.map} src="/figma/groundwater-map.png" alt="Groundwater simulation field map" />

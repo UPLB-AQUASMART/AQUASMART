@@ -1,62 +1,8 @@
 .page {
   min-height: 100vh;
-  overflow-x: hidden;
+  overflow-x: clip;
   background: #0b1e39;
   color: #f5fafc;
-}
-
-.nav {
-  display: flex;
-  width: min(1280px, calc(100vw - 80px));
-  min-height: 85px;
-  align-items: center;
-  justify-content: space-between;
-  gap: clamp(24px, 7vw, 252px);
-  margin: 24px auto 32px;
-  padding: 10px;
-  border: 1px solid rgba(31, 163, 201, 0.18);
-  border-radius: 100px;
-  background: rgba(0, 0, 0, 0.06);
-}
-
-.logo {
-  display: flex;
-  min-width: 270px;
-  height: 64px;
-  align-items: center;
-}
-
-.logo img {
-  width: 270px;
-  height: 56px;
-  object-fit: contain;
-}
-
-.links {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  overflow-x: auto;
-  padding: 10px;
-  scrollbar-width: none;
-}
-
-.links::-webkit-scrollbar { display: none; }
-
-.links a {
-  padding: 10px 12px;
-  border-radius: 35px;
-  color: #1fa3c9;
-  font-size: 15px;
-  line-height: 1;
-  white-space: nowrap;
-  transition: color 180ms ease, transform 180ms ease;
-}
-
-.links a:hover,
-.links a.active {
-  color: #7ddcff;
-  transform: translateY(-1px);
 }
 
 .hero {
@@ -486,19 +432,12 @@
 @keyframes popoverIn { from { opacity: 0; transform: scale(.9) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
 
 @media (max-width: 1050px) {
-  .nav { width: calc(100vw - 40px); flex-direction: column; align-items: flex-start; gap: 6px; border-radius: 28px; }
-  .links { width: 100%; gap: 8px; }
   .scenarioCard { right: 120px; }
   .researchGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .analytics { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 760px) {
-  .nav { width: calc(100vw - 24px); margin: 12px auto 22px; padding: 8px 10px; }
-  .logo { min-width: 220px; height: 52px; }
-  .logo img { width: 220px; height: 46px; }
-  .links { padding: 4px 0 8px; }
-  .links a { padding: 8px 7px; font-size: 13px; }
   .hero,
   .heroContent { min-height: 640px; border-radius: 0; }
   .heroContent { padding: 32px 20px; }
