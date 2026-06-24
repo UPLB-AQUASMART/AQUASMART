@@ -554,14 +554,13 @@
 }
 
 @media (max-width: 1100px) {
-
   .weather-layout {
     grid-template-columns: 1fr;
     flex-direction: column;
   }
 
   .weather-layout,
-.week-card {
+  .week-card {
     width: 100%;
   }
 
@@ -598,7 +597,6 @@
 }
 
 @media (max-width: 720px) {
-
   .weather-section {
     padding-right: 24px;
     padding-left: 24px;
@@ -691,7 +689,6 @@
 }
 
 @media (max-width: 900px) {
-
   .weather-copy h2 {
     overflow-wrap: anywhere;
     text-wrap: balance;
@@ -721,7 +718,6 @@
 }
 
 @media (max-width: 520px) {
-
   .weather-section {
     padding-right: 16px;
     padding-left: 16px;
@@ -762,7 +758,6 @@
 }
 
 @media (max-width: 900px) {
-
   .weather-copy {
     min-width: 0;
   }
@@ -774,8 +769,9 @@
   }
 
   .weather-copy li,
-.weather-recommendation {
-    overflow-wrap: break-word;
+  .weather-recommendation {
+    /* overflow-wrap: break-word; */
+    font-size: clamp(8px, 7vw, 2px);
   }
 
   .weather-section {
@@ -808,7 +804,6 @@
 }
 
 @media (max-width: 640px) {
-
   .weather-section {
     min-height: auto;
     padding-top: 58px;
@@ -832,6 +827,7 @@
 
   .weather-copy-panel {
     min-height: 0;
+    font-size: clamp(14px, 9vw, 17px);
   }
 
   .weather-meta {
@@ -842,11 +838,11 @@
 
   .weather-copy h2 {
     max-width: calc(100% - 82px);
-    font-size: clamp(28px, 9vw, 40px);
+    font-size: clamp(20px, 9vw, 32px);
   }
 
   .weather-copy h2 span {
-    font-size: clamp(22px, 7vw, 30px);
+    font-size: clamp(14px, 7vw, 20px);
   }
 
   .weather-copy ul {
@@ -917,7 +913,7 @@
   }
 
   .forecast-detail-list div,
-.forecast-eto-row {
+  .forecast-eto-row {
     min-height: 44px;
     border-radius: 15px;
     padding: 8px 10px;
@@ -929,7 +925,6 @@
 }
 
 @media (max-width: 420px) {
-
   .weather-copy h2 {
     max-width: 100%;
     padding-right: 72px;
