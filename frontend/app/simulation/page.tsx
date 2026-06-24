@@ -1,17 +1,6 @@
-import Link from "next/link";
-
 import { SiteFooter } from "@/app/components/home/SiteFooter";
+import { SiteNav } from "@/app/components/home/SiteNav";
 import styles from "./page.module.css";
-
-const navLinks = [
-  { label: "Home", href: "/#home" },
-  { label: "About", href: "/#about" },
-  { label: "Simulation", href: "/#simulations", active: true },
-  { label: "Weather", href: "/#weather" },
-  { label: "Team", href: "/team" },
-  { label: "Contact", href: "/#contact" },
-  { label: "Partners", href: "/#partners" },
-];
 
 const heroCopy =
   "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad mini...";
@@ -25,27 +14,10 @@ const longCopy =
 const drawdownCopy =
   "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum";
 
-function IdwNav() {
-  return (
-    <header className={styles["idw-nav"]} aria-label="AQUASMART Mini navigation">
-      <Link className={styles["idw-nav-logo"]} href="/#home" aria-label="AQUASMART Mini home">
-        <img src="/assets/logo_2.png" alt="AQUASMART Mini" />
-      </Link>
-      <nav className={styles["idw-nav-links"]} aria-label="Primary navigation">
-        {navLinks.map((link) => (
-          <Link className={link.active ? styles.active : undefined} href={link.href} key={link.label}>
-            {link.label}
-          </Link>
-        ))}
-      </nav>
-    </header>
-  );
-}
-
 export default function SimulationPage() {
   return (
     <main className={styles["idw-page"]}>
-      <IdwNav />
+      <SiteNav activeLabel="Simulation" />
 
       <section className={styles["idw-map-hero"]}>
         <img className={styles["idw-map-image"]} src="/figma/idw-map.png" alt="" />

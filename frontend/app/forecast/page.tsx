@@ -15,7 +15,7 @@ import {
   Wind,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { Header } from "../components/Header";
+import { SiteNav } from "../components/home/SiteNav";
 import { PageIntro } from "../components/PageIntro";
 
 type Coordinates = {
@@ -371,8 +371,8 @@ export default function ForecastPage() {
   const outlook = useMemo(() => (current ? getIrrigationOutlook(current) : ""), [current]);
 
   return (
-    <main>
-      <Header />
+    <main className="forecast-page">
+      <SiteNav activeLabel="Weather" />
       <PageIntro title="Weather Forecast" />
       <section className="forecast-band">
         <div className="forecast-grid">

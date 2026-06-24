@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 
+import { AquaWebGLBackground } from "@/app/components/effects/AquaWebGLBackground";
 import { SiteFooter } from "@/app/components/home/SiteFooter";
 import { SiteNav } from "@/app/components/home/SiteNav";
 import styles from "./page.module.css";
@@ -91,16 +92,23 @@ export default function TeamPage() {
       <section className={styles.hero} aria-labelledby="team-page-title">
         <div className={styles["hero-orb-one"]} aria-hidden="true" />
         <div className={styles["hero-orb-two"]} aria-hidden="true" />
-        <div className={styles["hero-content"]}>
-          <span className={styles.eyebrow}>People behind the platform</span>
-          <h1 id="team-page-title">
-            Meet the <span>AQUASMART Team</span>
-          </h1>
-          <p>
-            A multidisciplinary group working together to make groundwater
-            monitoring and smarter irrigation more practical, accessible, and
-            sustainable.
-          </p>
+        <div className={styles["hero-layout"]}>
+          <div className={styles["hero-content"]}>
+            <span className={styles.eyebrow}>People behind the platform</span>
+            <h1 id="team-page-title">
+              Meet the <span>AQUASMART Team</span>
+            </h1>
+            <p>
+              A multidisciplinary group working together to make groundwater
+              monitoring and smarter irrigation more practical, accessible, and
+              sustainable.
+            </p>
+          </div>
+          <div className={styles["hero-visual"]} aria-hidden="true">
+            <AquaWebGLBackground className={styles["hero-canvas"]} />
+            <span className={styles["visual-label"]}>Living water intelligence</span>
+            <span className={styles["visual-caption"]}>AQUASMART / WebGL2</span>
+          </div>
         </div>
       </section>
 

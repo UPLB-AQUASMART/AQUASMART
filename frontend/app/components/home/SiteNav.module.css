@@ -2,7 +2,7 @@
 
 .site-nav {
   position: sticky;
-  z-index: 20;
+  z-index: 100;
   top: clamp(12px, 2vw, 28px);
   display: grid;
   width: min(1120px, calc(100vw - 96px));
@@ -11,20 +11,27 @@
   grid-template-columns: minmax(190px, 1fr) auto auto;
   gap: clamp(18px, 4vw, 72px);
   margin: clamp(24px, 2.2vw, 34px) auto clamp(-96px, -6.2vw, -82px);
-  border: 1px solid rgba(255, 255, 255, 0.64);
+  border: 0.2px solid rgba(255, 255, 255, 0.72);
   border-radius: 100px;
   background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.72) 0%,
-    rgba(232, 244, 255, 0.34) 48%,
-    rgba(114, 180, 238, 0.2) 100%
+    135deg,
+    rgba(255, 255, 255, 0.72),
+    rgba(222, 236, 247, 0.58)
   );
   box-shadow:
-    0 18px 44px rgba(15, 40, 72, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.54),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.26);
+    0 18px 44px rgba(15, 40, 72, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.84),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.24);
   padding: 7px clamp(22px, 3vw, 34px) 7px clamp(18px, 2vw, 24px);
-  backdrop-filter: blur(18px) saturate(130%);
+  backdrop-filter: blur(36px) saturate(135%);
+  -webkit-backdrop-filter: blur(36px) saturate(135%);
+}
+
+.nav-logo,
+.nav-links,
+.nav-menu-toggle {
+  position: relative;
+  z-index: 1;
 }
 
 .nav-logo {
@@ -56,7 +63,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 999px;
-  color: var(--navy);
+  color: rgba(11, 31, 58, 0.76);
   font-size: clamp(11px, 0.85vw, 13px);
   font-weight: 500;
   line-height: 1;
@@ -168,7 +175,7 @@
   }
 
   .nav-menu-toggle:hover,
-.nav-menu-toggle:focus-visible {
+  .nav-menu-toggle:focus-visible {
     background: #1fa3c9;
     transform: translateY(-1px);
   }
@@ -186,12 +193,13 @@
     display: grid;
     gap: 4px;
     padding: 10px;
-    border: 1px solid rgba(11, 31, 58, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.64);
     border-radius: 24px;
-    background: rgba(255, 255, 255, 0.96);
+    z-index: 2;
+    background: rgba(241, 247, 251, 0.78);
     box-shadow:
-      0 24px 52px rgba(11, 31, 58, 0.18),
-      inset 0 1px 0 rgba(255, 255, 255, 0.78);
+      0 24px 52px rgba(11, 31, 58, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.72);
     opacity: 0;
     pointer-events: none;
     transform: translateY(-8px) scale(0.98);
@@ -201,7 +209,8 @@
       transform 180ms ease,
       visibility 180ms ease;
     visibility: hidden;
-    backdrop-filter: blur(18px) saturate(130%);
+    backdrop-filter: blur(24px) saturate(145%);
+    -webkit-backdrop-filter: blur(24px) saturate(145%);
   }
 
   .site-nav.menu-open .mobile-nav-panel {
@@ -228,8 +237,8 @@
   }
 
   .mobile-nav-panel a.active,
-.mobile-nav-panel a:hover {
-    background: #dff6fd;
+  .mobile-nav-panel a:hover {
+    background: rgba(223, 246, 253, 0.72);
     color: var(--aqua);
   }
 
@@ -238,8 +247,16 @@
   }
 }
 
-@media (max-width: 520px) {
+@supports not (
+  (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+) {
+  .site-nav,
+  .mobile-nav-panel {
+    background: rgba(241, 247, 251, 0.96);
+  }
+}
 
+@media (max-width: 520px) {
   .site-nav {
     width: calc(100vw - 20px);
     margin-top: 10px;
@@ -261,7 +278,6 @@
 }
 
 @media (max-width: 900px) {
-
   .site-nav {
     z-index: 20;
   }

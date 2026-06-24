@@ -6,11 +6,9 @@
 
 .hero {
   position: relative;
-  display: grid;
-  min-height: 540px;
-  place-items: center;
+  min-height: 680px;
   overflow: hidden;
-  padding: 170px 24px 92px;
+  padding: 148px clamp(24px, 5vw, 76px) 108px;
   background:
     radial-gradient(circle at 8% 16%, rgba(31, 163, 201, 0.14), transparent 28%),
     radial-gradient(circle at 88% 88%, rgba(34, 197, 94, 0.11), transparent 24%),
@@ -52,8 +50,18 @@
 .hero-content {
   position: relative;
   z-index: 1;
-  width: min(830px, 100%);
-  text-align: center;
+  min-width: 0;
+}
+
+.hero-layout {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: min(1210px, 100%);
+  align-items: center;
+  grid-template-columns: minmax(0, 0.94fr) minmax(370px, 0.78fr);
+  gap: clamp(42px, 6vw, 84px);
+  margin: 0 auto;
 }
 
 .eyebrow,
@@ -73,8 +81,8 @@
 }
 
 .hero h1 {
-  max-width: 800px;
-  margin: 25px auto 20px;
+  max-width: 680px;
+  margin: 25px 0 20px;
   font-family: "Sora", sans-serif;
   font-size: clamp(42px, 6vw, 76px);
   font-weight: 800;
@@ -87,11 +95,74 @@
 }
 
 .hero p {
-  max-width: 690px;
-  margin: 0 auto;
+  max-width: 610px;
+  margin: 0;
   color: #52667b;
   font-size: clamp(16px, 1.7vw, 20px);
   line-height: 1.75;
+}
+
+.hero-visual {
+  position: relative;
+  height: clamp(390px, 39vw, 510px);
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.82);
+  border-radius: 44px;
+  background:
+    radial-gradient(circle at 30% 30%, #dff6fd, transparent 48%),
+    linear-gradient(145deg, #1fa3c9, #0b1f3a);
+  box-shadow:
+    0 34px 75px rgba(11, 31, 58, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  isolation: isolate;
+}
+
+.hero-visual::after {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: inherit;
+  box-shadow: inset 0 0 80px rgba(255, 255, 255, 0.08);
+  content: "";
+  pointer-events: none;
+}
+
+.hero-canvas {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  inset: 0;
+}
+
+.visual-label,
+.visual-caption {
+  position: absolute;
+  z-index: 2;
+  display: inline-flex;
+  border: 1px solid rgba(255, 255, 255, 0.52);
+  border-radius: 999px;
+  color: #ffffff;
+  background: rgba(11, 31, 58, 0.62);
+  box-shadow: 0 8px 24px rgba(11, 31, 58, 0.14);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  padding: 10px 13px;
+  text-transform: uppercase;
+  backdrop-filter: blur(12px);
+}
+
+.visual-label {
+  top: 22px;
+  left: 22px;
+}
+
+.visual-caption {
+  right: 22px;
+  bottom: 22px;
 }
 
 .core-section,
@@ -358,6 +429,15 @@
 }
 
 @media (max-width: 1050px) {
+  .hero-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(330px, 0.78fr);
+    gap: 38px;
+  }
+
+  .hero h1 {
+    font-size: clamp(42px, 6.3vw, 66px);
+  }
+
   .team-grid,
   .intern-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -369,10 +449,38 @@
   }
 }
 
+@media (max-width: 900px) {
+  .hero {
+    padding-top: 140px;
+  }
+
+  .hero-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-content {
+    max-width: 720px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .hero h1,
+  .hero p {
+    margin-right: auto;
+    margin-left: auto;
+  }
+
+  .hero-visual {
+    width: min(610px, 100%);
+    height: 410px;
+    margin: 0 auto;
+  }
+}
+
 @media (max-width: 720px) {
   .hero {
-    min-height: 520px;
-    padding: 145px 22px 84px;
+    min-height: 0;
+    padding: 128px 20px 76px;
   }
 
   .hero::after {
@@ -381,6 +489,11 @@
 
   .hero h1 {
     font-size: clamp(38px, 11vw, 56px);
+  }
+
+  .hero-visual {
+    height: min(92vw, 380px);
+    border-radius: 30px;
   }
 
   .core-section,
@@ -418,8 +531,7 @@
 
 @media (max-width: 420px) {
   .hero {
-    min-height: 500px;
-    padding-top: 130px;
+    padding-top: 116px;
   }
 
   .eyebrow,
@@ -441,6 +553,22 @@
   .portrait {
     width: 142px;
     height: 142px;
+  }
+
+  .visual-label,
+  .visual-caption {
+    font-size: 8px;
+    padding: 8px 10px;
+  }
+
+  .visual-label {
+    top: 14px;
+    left: 14px;
+  }
+
+  .visual-caption {
+    right: 14px;
+    bottom: 14px;
   }
 }
 
