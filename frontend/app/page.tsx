@@ -8,7 +8,7 @@ import { SimulationsSection } from "@/app/components/home/SimulationsSection";
 import { SiteFooter } from "@/app/components/home/SiteFooter";
 import { SiteNav } from "@/app/components/home/SiteNav";
 import { TaglineSection } from "@/app/components/home/TaglineSection";
-import { WeatherSection } from "@/app/components/home/WeatherSection";
+import { WeatherPreviewSection } from "@/app/components/home/WeatherPreviewSection";
 import styles from "./Home.module.css";
 
 export default function Home() {
@@ -22,7 +22,7 @@ export default function Home() {
       <AboutMiniSection />
       <ParametersSection />
       <SimulationsSection />
-      <WeatherSection />
+      <WeatherPreviewSection />
       <PartnersSection />
       <SiteFooter reveal />
     </main>

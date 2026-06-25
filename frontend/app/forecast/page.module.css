@@ -1,7 +1,7 @@
 .weather-page {
   min-height: 100vh;
-  overflow: hidden;
-  background: #253947;
+  overflow-x: hidden;
+  background: #f5fafc;
   color: #ffffff;
 }
 
