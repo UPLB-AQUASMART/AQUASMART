@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { forecast, type ForecastIcon } from "@/app/data/home";
 
@@ -180,15 +180,61 @@ function WeatherIcon({ type }: { type: ForecastIcon }) {
 export function WeatherSection() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [isWeatherLoading, setIsWeatherLoading] = useState(false);
   const [slideDirection, setSlideDirection] = useState<"forward" | "back">("forward");
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const shouldAnchorAfterLoadRef = useRef(false);
+  const loadingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const activeForecast = forecast[activeIndex];
   const activeDetail = forecastDetails[activeIndex] ?? forecastDetails[0];
   const isRainy = activeForecast.icon === "rain";
 
+  const anchorWeatherSection = useCallback(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const navOffset = window.matchMedia("(max-width: 720px)").matches ? 72 : 96;
+    const sectionTop = section.getBoundingClientRect().top + window.scrollY - navOffset;
+    window.scrollTo({ top: Math.max(sectionTop, 0), behavior: "auto" });
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (loadingTimerRef.current) {
+        clearTimeout(loadingTimerRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!shouldAnchorAfterLoadRef.current || isWeatherLoading) return;
+
+    shouldAnchorAfterLoadRef.current = false;
+    window.requestAnimationFrame(() => {
+      anchorWeatherSection();
+    });
+  }, [activeIndex, anchorWeatherSection, isWeatherLoading]);
+
   const handleSelectDay = (index: number) => {
+    if (index === activeIndex || isWeatherLoading) return;
+
+    if (loadingTimerRef.current) {
+      clearTimeout(loadingTimerRef.current);
+    }
+
     setSlideDirection(index >= activeIndex ? "forward" : "back");
-    setActiveIndex(index);
     setDetailsOpen(false);
+    setIsWeatherLoading(true);
+    shouldAnchorAfterLoadRef.current = true;
+    window.requestAnimationFrame(() => {
+      anchorWeatherSection();
+    });
+
+    loadingTimerRef.current = setTimeout(() => {
+      setActiveIndex(index);
+      setIsWeatherLoading(false);
+      loadingTimerRef.current = null;
+    }, 620);
   };
 
   const weatherClassName = [
@@ -201,12 +247,20 @@ export function WeatherSection() {
     .join(" ");
 
   return (
-    <section className={weatherClassName} id="weather">
+    <section className={weatherClassName} id="weather" ref={sectionRef}>
       <div
         className={`${styles["weather-sun"]}${activeForecast.icon === "sun" ? "" : ` ${styles[`weather-sun-${activeForecast.icon}`]}`}`}
         aria-hidden="true"
       />
+      <div className={styles["weather-cloud-hero"]} aria-hidden="true" />
       <div className={styles["weather-layout"]}>
+        {isWeatherLoading ? (
+          <div className={styles["weather-loading"]} role="status" aria-live="polite">
+            <span />
+            <strong>Loading forecast</strong>
+            <small>Preparing the selected weather frame...</small>
+          </div>
+        ) : null}
         <div className={styles["weather-copy"]}>
           <div className={styles["weather-copy-panel"]} key={activeIndex}>
             <SectionPill className={styles["section-pill"]}>Weather Forecast</SectionPill>

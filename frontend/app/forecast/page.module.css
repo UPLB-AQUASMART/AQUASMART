@@ -1,0 +1,417 @@
+.weather-page {
+  min-height: 100vh;
+  overflow: hidden;
+  background: #253947;
+  color: #ffffff;
+}
+
+.weather-frame {
+  position: relative;
+  display: grid;
+  min-height: min(100vh, 810px);
+  grid-template-columns: minmax(0, 1fr) minmax(270px, 370px);
+  column-gap: clamp(36px, 5vw, 86px);
+  overflow: hidden;
+  padding: clamp(146px, 11vw, 172px) clamp(56px, 5.6vw, 82px) clamp(44px, 5vw, 74px);
+  background:
+    linear-gradient(105deg, rgba(24, 28, 30, 0.8) 0%, rgba(50, 77, 93, 0.72) 43%, rgba(69, 113, 143, 0.7) 100%),
+    url("/assets/rain.png") center / cover no-repeat;
+  isolation: isolate;
+}
+
+.weather-frame::before {
+  position: absolute;
+  inset: 0;
+  z-index: -3;
+  background:
+    linear-gradient(180deg, rgba(10, 16, 19, 0.18), rgba(31, 81, 112, 0.24)),
+    url("/assets/rain.png") center / cover no-repeat;
+  content: "";
+  opacity: 0.9;
+}
+
+.background-clouds {
+  position: absolute;
+  inset: auto -6% -7% -5%;
+  z-index: -2;
+  height: 48%;
+  background: url("/assets/weather-clouds.png") center bottom / cover no-repeat;
+  opacity: 0.28;
+  filter: saturate(0.8) contrast(0.96);
+}
+
+.light-rain-layer {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: url("/assets/light-rain.png") center / cover no-repeat;
+  mix-blend-mode: screen;
+  opacity: 0.12;
+  pointer-events: none;
+}
+
+.radar-rings {
+  position: absolute;
+  top: -35%;
+  left: 21%;
+  width: min(72vw, 980px);
+  aspect-ratio: 1;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 50%;
+  opacity: 0.95;
+  pointer-events: none;
+}
+
+.radar-rings::before,
+.radar-rings::after {
+  position: absolute;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: inherit;
+  content: "";
+}
+
+.radar-rings::before {
+  inset: 18%;
+}
+
+.radar-rings::after {
+  inset: 35%;
+}
+
+.hero-cloud {
+  position: absolute;
+  z-index: 1;
+  top: clamp(172px, 18vw, 238px);
+  left: 48.5%;
+  width: clamp(330px, 35vw, 558px);
+  opacity: 0.88;
+  transform: translateX(-50%);
+  filter: saturate(0.42) brightness(1.12) contrast(0.88) drop-shadow(0 24px 34px rgba(4, 18, 27, 0.2));
+  pointer-events: none;
+}
+
+.hero-cloud img {
+  width: 100%;
+}
+
+.forecast-copy {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  max-width: 650px;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+  grid-column: 1;
+  margin-top: clamp(26px, 3.1vw, 44px);
+}
+
+.eyebrow {
+  display: inline-flex;
+  min-width: clamp(235px, 21vw, 270px);
+  min-height: clamp(54px, 5vw, 65px);
+  align-items: center;
+  justify-content: center;
+  margin: 0 0 clamp(22px, 2.4vw, 34px);
+  border-radius: 999px;
+  background: #dff6fd;
+  color: #31a9cf;
+  font-size: clamp(18px, 1.45vw, 24px);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.date-row {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: clamp(18px, 1.5vw, 24px);
+  line-height: 1.2;
+}
+
+.date-row strong {
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.date-row span {
+  color: rgba(255, 255, 255, 0.72);
+  font-weight: 700;
+}
+
+.forecast-copy h1 {
+  max-width: 620px;
+  margin: 0;
+  color: #ffffff;
+  font-family: "Rubik", "Inter", sans-serif;
+  font-size: clamp(52px, 5.8vw, 88px);
+  font-weight: 400;
+  letter-spacing: -0.016em;
+  line-height: 1.07;
+}
+
+.forecast-copy h1 span {
+  display: block;
+  margin-top: 10px;
+  font-family: "Sora", "Inter", sans-serif;
+  font-size: clamp(38px, 4.1vw, 64px);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.forecast-copy ul {
+  max-width: 650px;
+  margin: clamp(34px, 4vw, 58px) 0 0;
+  padding-left: 27px;
+  color: rgba(255, 255, 255, 0.94);
+  font-size: clamp(16px, 1.3vw, 20px);
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+
+.recommendation {
+  margin: auto 0 0;
+  color: rgba(255, 255, 255, 0.94);
+  font-size: clamp(18px, 1.55vw, 24px);
+  font-style: italic;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+}
+
+.recommendation span {
+  display: block;
+}
+
+.weekly-card {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  width: min(100%, 370px);
+  max-height: 650px;
+  flex-direction: column;
+  align-self: end;
+  grid-column: 2;
+  margin-top: clamp(12px, 2vw, 28px);
+  border: 1px solid rgba(255, 255, 255, 0.46);
+  border-radius: 26px;
+  background: rgba(244, 250, 254, 0.78);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    0 24px 48px rgba(10, 29, 43, 0.16);
+  padding: 22px 18px 16px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.weekly-title {
+  margin: 0 0 16px 8px;
+  color: rgba(72, 89, 101, 0.52);
+  font-family: "Rubik", "Inter", sans-serif;
+  font-size: 15px;
+}
+
+.weekly-list {
+  display: grid;
+  gap: 15px;
+}
+
+.forecast-row {
+  display: grid;
+  align-items: center;
+  grid-template-columns: 58px minmax(0, 1fr);
+  gap: 14px;
+}
+
+.icon-bubble {
+  display: inline-flex;
+  width: 58px;
+  height: 58px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #dff0ff 0%, #fbfdff 100%);
+  color: #5aaeed;
+  filter: drop-shadow(0 10px 14px rgba(81, 120, 148, 0.08));
+}
+
+.forecast-row:first-child .icon-bubble {
+  color: #f0a12f;
+}
+
+.day-pill {
+  display: grid;
+  height: 64px;
+  align-items: center;
+  grid-template-columns: 54px minmax(0, 1fr);
+  border: 1px solid rgba(255, 255, 255, 0.86);
+  border-radius: 999px;
+  padding: 0 18px;
+  color: #8e8e8e;
+}
+
+.selected .day-pill {
+  border-color: #1fa3c9;
+}
+
+.day-pill strong {
+  color: #494a4b;
+  font-family: "Rubik", "Inter", sans-serif;
+  font-size: clamp(19px, 1.7vw, 24px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.day-pill span {
+  overflow: hidden;
+  color: #8e8e8e;
+  font-family: "Rubik", "Inter", sans-serif;
+  font-size: clamp(13px, 1.15vw, 17px);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pager-dots {
+  display: none;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 10px;
+}
+
+.pager-dots span {
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(126, 140, 151, 0.36);
+}
+
+.pager-dots span:first-child {
+  background: #ffffff;
+}
+
+@media (max-width: 1180px) {
+  .weather-frame {
+    grid-template-columns: minmax(0, 1fr) minmax(250px, 325px);
+    column-gap: 34px;
+    padding-inline: 42px;
+  }
+
+  .hero-cloud {
+    left: 47%;
+    width: 430px;
+  }
+
+  .weekly-card {
+    width: 325px;
+  }
+}
+
+@media (max-width: 940px) {
+  .weather-frame {
+    min-height: auto;
+    grid-template-columns: 1fr;
+    row-gap: 34px;
+    padding: 120px 24px 42px;
+  }
+
+  .hero-cloud {
+    top: 175px;
+    right: -4vw;
+    left: auto;
+    width: min(48vw, 360px);
+    transform: none;
+  }
+
+  .forecast-copy {
+    margin-top: 18px;
+  }
+
+  .weekly-card {
+    width: min(100%, 520px);
+    max-height: none;
+    align-self: center;
+    grid-column: 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .weather-frame {
+    padding: 102px 14px 34px;
+  }
+
+  .hero-cloud {
+    position: relative;
+    top: auto;
+    right: auto;
+    order: 2;
+    width: min(84vw, 380px);
+    margin: -12px auto -24px;
+  }
+
+  .forecast-copy {
+    max-width: none;
+    align-items: flex-start;
+  }
+
+  .eyebrow {
+    min-width: 210px;
+    min-height: 52px;
+    font-size: 18px;
+  }
+
+  .date-row {
+    gap: 12px;
+  }
+
+  .forecast-copy ul {
+    padding-left: 22px;
+  }
+
+  .recommendation {
+    margin-top: 70px;
+  }
+
+  .weekly-card {
+    padding: 18px 14px 14px;
+    border-radius: 24px;
+  }
+
+  .weekly-list {
+    gap: 12px;
+  }
+
+  .forecast-row {
+    grid-template-columns: 50px minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .icon-bubble {
+    width: 50px;
+    height: 50px;
+  }
+
+  .day-pill {
+    height: 56px;
+    grid-template-columns: 48px minmax(0, 1fr);
+    padding-inline: 15px;
+  }
+}
+
+@media (max-width: 420px) {
+  .weather-frame {
+    padding-inline: 10px;
+  }
+
+  .forecast-copy h1 {
+    font-size: 44px;
+  }
+
+  .forecast-copy h1 span {
+    font-size: 31px;
+  }
+
+  .day-pill span {
+    font-size: 12px;
+  }
+}
