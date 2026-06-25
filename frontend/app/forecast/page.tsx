@@ -1,16 +1,46 @@
 "use client";
 
-import { CloudRain, CloudSun, Sun } from "lucide-react";
+// import { CloudRain, CloudSun, Sun } from "lucide-react";
 import Image from "next/image";
 
 import { SiteNav } from "@/app/components/home/SiteNav";
 import { forecast } from "@/app/data/home";
 import styles from "./page.module.css";
 
+// function ForecastIcon({ icon }: { icon: "sun" | "rain" | "cloud" }) {
+//   const iconMap = {
+//     sun: "/assets/weather/sun.png",
+//     rain: "/assets/weather/rain.png",
+//     cloud: "/assets/weather/cloud.png",
+//   };
+
+//   return (
+//     <Image
+//       src={iconMap[icon]}
+//       alt=""
+//       width={40}
+//       height={40}
+//       aria-hidden="true"
+//     />
+//   );
+// }
+
 function ForecastIcon({ icon }: { icon: "sun" | "rain" | "cloud" }) {
-  if (icon === "sun") return <Sun aria-hidden="true" size={22} strokeWidth={1.7} />;
-  if (icon === "cloud") return <CloudSun aria-hidden="true" size={24} strokeWidth={1.65} />;
-  return <CloudRain aria-hidden="true" size={24} strokeWidth={1.65} />;
+  const iconMap = {
+    sun: "/assets/weather/sunny-icon.svg",
+    rain: "/assets/weather/rainy-icon.svg",
+    cloud: "/assets/weather/cloudy-sunny-icon.svg",
+  };
+
+  return (
+    <Image
+      src={iconMap[icon]}
+      alt=""
+      width={40}
+      height={40}
+      aria-hidden="true"
+    />
+  );
 }
 
 export default function ForecastPage() {
