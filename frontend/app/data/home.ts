@@ -1,4 +1,9 @@
-export type GoalIcon = "soil" | "weather" | "water" | "monitoring" | "notifications";
+export type GoalIcon =
+  | "soil"
+  | "weather"
+  | "water"
+  | "monitoring"
+  | "notifications";
 
 export type GoalItem = {
   icon: GoalIcon;
@@ -19,6 +24,7 @@ export const navItems = [
   { label: "Home", href: "/#home" },
   { label: "About", href: "/#about" },
   { label: "Simulation", href: "/#simulations" },
+  { label: "Modules", href: "/#partners" },
   { label: "Weather", href: "/#weather" },
   { label: "Team", href: "/team" },
   { label: "Contact", href: "/#contact" },
@@ -63,7 +69,7 @@ export const parameterNames = [
   "Temperature",
   "Salinity",
   "Electrical Conductivity",
-  "Turbidity",
+  "TDS",
 ];
 
 export const parameterCards = [
@@ -92,10 +98,10 @@ export const parameterCards = [
       "Electrical Conductivity: Estimates ion concentration to help identify water quality shifts",
   },
   {
-    active: "Turbidity",
+    active: "TDS",
     image: "/assets/5.gif",
     description:
-      "Turbidity: Monitors suspended particles that affect clarity, flow, and irrigation quality",
+      "TDS: Monitors suspended particles that affect clarity, flow, and irrigation quality",
   },
 ];
 

@@ -20,6 +20,7 @@ const coreTeam = [
     bio: "Leads the technical architecture and project management for the AQUASMART platform, including sensor-network deployment and system integration.",
     tags: ["Systems Engineering", "Leadership", "IoT"],
     lead: true,
+    linkedin: "https://www.linkedin.com/in/lmbuela/?skipRedirect=true",
   },
   {
     name: "Jastine Mae J. Galang",
@@ -27,6 +28,7 @@ const coreTeam = [
     image: "/assets/team/team-galang.png",
     bio: "Manages on-site sensor deployment and maintenance, coordinates field operations, and bridges technical infrastructure with farm implementation.",
     tags: ["Field Operations", "Technology", "Sensors"],
+    linkedin: "https://www.linkedin.com/in/jastine-mae-galang-397b4a188/",
   },
   {
     name: "Alea Fate E. Borlaza",
@@ -34,6 +36,7 @@ const coreTeam = [
     image: "/assets/team/team-borlaza.png",
     bio: "Manages partner communications and leads irrigation scheduling, translating field data into clear and actionable recommendations.",
     tags: ["Communications", "Irrigation", "Stakeholders"],
+    linkedin: "linkedin.com/in/aleafateborlaza/?skipRedirect=true",
   },
   {
     name: "Jerome G. Perez",
@@ -41,6 +44,7 @@ const coreTeam = [
     image: "/assets/team/team-perez.png",
     bio: "Coordinates project logistics and manages the data-processing pipeline, helping the research team receive accurate and timely insights.",
     tags: ["Data Analysis", "Coordination", "GIS"],
+    linkedin: "linkedin.com/in/jerome-perez-990163322/?skipRedirect=true",
   },
   {
     name: "Grace C. Maligaya",
@@ -48,7 +52,27 @@ const coreTeam = [
     image: "/assets/team/team-maligaya.png",
     bio: "Leads community outreach initiatives and conducts water-quality analysis across monitoring zones to support reliable field decisions.",
     tags: ["Outreach", "Water Quality", "Community"],
+    linkedin: "https://www.linkedin.com/in/grace-maligaya-a6b110318/",
   },
+];
+
+const researchers = [
+  {
+    name: "Sample",
+    focus: "Sample",
+    bio: "Sample",
+    linkedin: "Sample",
+  }
+
+];
+
+const mentors = [
+  {
+    name: "",
+    focus: "",
+    bio: "",
+    linkedin: "",
+  }
 ];
 
 const interns = [
@@ -56,21 +80,25 @@ const interns = [
     name: "Daphne Canape",
     focus: "Designer & Developer",
     bio: "Supports the AQUASMART team through research assistance, documentation, and collaborative project work.",
+    linkedin: "",
   },
   {
     name: "Quevin James Custodio",
     focus: "Model Developer",
     bio: "Assists with field activities, data organization, and day-to-day coordination across project tasks.",
+    linkedin: "",
   },
   {
     name: "Jhulianah Cariño",
     focus: "Sensor Development",
     bio: "Contributes to project communications, research materials, and community-focused AQUASMART initiatives.",
+    linkedin: "",
   },
   {
     name: "Marzell Jhake Llamas",
     focus: "Sensor Development",
     bio: "Provides general project support and assists the team with research, documentation, and field preparation.",
+    linkedin: "",
   },
 ];
 
@@ -150,7 +178,7 @@ export default function TeamPage() {
               <p className={styles.bio}>{member.bio}</p>
               <a
                 className={styles["card-link"]}
-                href="https://www.linkedin.com/company/aquasmartph/"
+                href={member.linkedin}
                 rel="noreferrer"
                 target="_blank"
               >
@@ -160,6 +188,66 @@ export default function TeamPage() {
           ))}
         </div>
       </section>
+
+      <section className={styles["researchers-section"]} aria-labelledby="researchers-team-title">
+        <div className={styles["section-heading"]}>
+          <span>Project Researchers</span>
+          <h2 id="researchers-team-title">Supporting the mission</h2>
+          <p>
+            Our interns contribute across research, fieldwork, communication, and
+            project coordination.
+          </p>
+        </div>
+
+        <div className={`${styles["team-grid"]} ${styles["intern-grid"]}`}>
+          {researchers.map((researchers) => (
+            <article className={`${styles.card} ${styles["intern-card"]}`} key={researchers.name}>
+              <div className={styles["initials-avatar"]} aria-hidden="true">
+                {getInitials(researchers.name)}
+              </div>
+              <span className={styles["intern-label"]}>AQUASMART Intern</span>
+              <h3>{researchers.name}</h3>
+              <p className={styles.role}>{researchers.focus}</p>
+              <div className={styles.tags}>
+                <span>Collaboration</span>
+                <span>Research</span>
+              </div>
+              <p className={styles.bio}>{researchers.bio}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+
+<section className={styles["intern-section"]} aria-labelledby="intern-team-title">
+        <div className={styles["section-heading"]}>
+          <span>Project interns</span>
+          <h2 id="intern-team-title">Supporting the mission</h2>
+          <p>
+            Our interns contribute across research, fieldwork, communication, and
+            project coordination.
+          </p>
+        </div>
+
+        <div className={`${styles["team-grid"]} ${styles["intern-grid"]}`}>
+          {interns.map((intern) => (
+            <article className={`${styles.card} ${styles["intern-card"]}`} key={intern.name}>
+              <div className={styles["initials-avatar"]} aria-hidden="true">
+                {getInitials(intern.name)}
+              </div>
+              <span className={styles["intern-label"]}>AQUASMART Intern</span>
+              <h3>{intern.name}</h3>
+              <p className={styles.role}>{intern.focus}</p>
+              <div className={styles.tags}>
+                <span>Collaboration</span>
+                <span>Research</span>
+              </div>
+              <p className={styles.bio}>{intern.bio}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
 
       <section className={styles["intern-section"]} aria-labelledby="intern-team-title">
         <div className={styles["section-heading"]}>

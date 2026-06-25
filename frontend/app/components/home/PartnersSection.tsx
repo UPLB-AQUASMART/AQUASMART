@@ -53,9 +53,9 @@ const partnerLogos = [
   "/assets/partners/partner-7.png",
   "/assets/partners/partner-6.png",
   "/assets/partners/partner-5.png",
-  "/assets/partners/partner-4.png",
-  "/assets/partners/partner-3.png",
-  "/assets/partners/partner-2.png",
+  // "/assets/partners/partner-4.png",
+  // "/assets/partners/partner-3.png",
+  // "/assets/partners/partner-2.png",
   "/assets/partners/partner-1.png",
 ];
 
@@ -133,7 +133,7 @@ export function PartnersSection() {
       <section className={`${styles["team-section"]} ${revealStyles["scroll-reveal"]}`} id="team">
         <div className={styles["team-header-group"]}>
           <div className={styles["team-tag"]}>Meet the team</div>
-          <h2>The Experts Behind AquaSmart</h2>
+          <h2>The Experts Behind AQUASMART</h2>
         </div>
 
         <div className={styles["team-carousel-viewport"]} aria-label="AQUASMART team members">
@@ -185,7 +185,7 @@ export function PartnersSection() {
 
       <section className={`${styles["partners-section"]} ${revealStyles["scroll-reveal"]}`} id="partners">
         <div className={styles["partners-header"]}>
-          <h2>Research &amp; Institutional Partners</h2>
+          <h2>Supported By</h2>
         </div>
         <div className={styles["partners-marquee-viewport"]} aria-label="Research and institutional partner logos">
           <div className={`${styles["partners-marquee-track"]} ${styles["partners-row-left"]}`}>
