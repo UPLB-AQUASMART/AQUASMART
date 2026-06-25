@@ -54,13 +54,14 @@ type Well = {
 ChartJS.register(ArcElement, CategoryScale, Filler, Legend, LinearScale, LineElement, PointElement, Tooltip);
 
 const navLinks = [
-  { label: "Home", href: "/#home" },
-  { label: "About", href: "/#about" },
-  { label: "Simulation", href: "/#simulations", active: true },
-  { label: "Weather", href: "/#weather" },
+  { label: "Home", href: "/home" },
+  { label: "About", href: "/about" },
+  { label: "Simulation", href: "/simulations", active: true },
+  { label: "Weather", href: "/weather" },
   { label: "Team", href: "/team" },
-  { label: "Contact", href: "/#contact" },
-  { label: "Partners", href: "/#partners" },
+  { label: "Contact", href: "/contact" },
+  { label: "Partners", href: "/partners" },
+  { label: "Modules", href: "/partners" },
 ];
 
 const researchCards = [

@@ -56,6 +56,25 @@ const coreTeam = [
   },
 ];
 
+const researchers = [
+  {
+    name: "Sample",
+    focus: "Sample",
+    bio: "Sample",
+    linkedin: "Sample",
+  }
+
+];
+
+const mentors = [
+  {
+    name: "",
+    focus: "",
+    bio: "",
+    linkedin: "",
+  }
+];
+
 const interns = [
   {
     name: "Daphne Canape",
@@ -169,6 +188,66 @@ export default function TeamPage() {
           ))}
         </div>
       </section>
+
+      <section className={styles["researchers-section"]} aria-labelledby="researchers-team-title">
+        <div className={styles["section-heading"]}>
+          <span>Project Researchers</span>
+          <h2 id="researchers-team-title">Supporting the mission</h2>
+          <p>
+            Our interns contribute across research, fieldwork, communication, and
+            project coordination.
+          </p>
+        </div>
+
+        <div className={`${styles["team-grid"]} ${styles["intern-grid"]}`}>
+          {researchers.map((researchers) => (
+            <article className={`${styles.card} ${styles["intern-card"]}`} key={researchers.name}>
+              <div className={styles["initials-avatar"]} aria-hidden="true">
+                {getInitials(researchers.name)}
+              </div>
+              <span className={styles["intern-label"]}>AQUASMART Intern</span>
+              <h3>{researchers.name}</h3>
+              <p className={styles.role}>{researchers.focus}</p>
+              <div className={styles.tags}>
+                <span>Collaboration</span>
+                <span>Research</span>
+              </div>
+              <p className={styles.bio}>{researchers.bio}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+
+<section className={styles["intern-section"]} aria-labelledby="intern-team-title">
+        <div className={styles["section-heading"]}>
+          <span>Project interns</span>
+          <h2 id="intern-team-title">Supporting the mission</h2>
+          <p>
+            Our interns contribute across research, fieldwork, communication, and
+            project coordination.
+          </p>
+        </div>
+
+        <div className={`${styles["team-grid"]} ${styles["intern-grid"]}`}>
+          {interns.map((intern) => (
+            <article className={`${styles.card} ${styles["intern-card"]}`} key={intern.name}>
+              <div className={styles["initials-avatar"]} aria-hidden="true">
+                {getInitials(intern.name)}
+              </div>
+              <span className={styles["intern-label"]}>AQUASMART Intern</span>
+              <h3>{intern.name}</h3>
+              <p className={styles.role}>{intern.focus}</p>
+              <div className={styles.tags}>
+                <span>Collaboration</span>
+                <span>Research</span>
+              </div>
+              <p className={styles.bio}>{intern.bio}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
 
       <section className={styles["intern-section"]} aria-labelledby="intern-team-title">
         <div className={styles["section-heading"]}>
