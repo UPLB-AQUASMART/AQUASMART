@@ -1,103 +1,14 @@
-"use client";
-
-// import { CloudRain, CloudSun, Sun } from "lucide-react";
-import Image from "next/image";
-
+import { ScrollRevealInit } from "@/app/components/home/ScrollRevealInit";
 import { SiteNav } from "@/app/components/home/SiteNav";
-import { forecast } from "@/app/data/home";
+import { WeatherSection } from "@/app/components/home/WeatherSection";
 import styles from "./page.module.css";
-
-// function ForecastIcon({ icon }: { icon: "sun" | "rain" | "cloud" }) {
-//   const iconMap = {
-//     sun: "/assets/weather/sun.png",
-//     rain: "/assets/weather/rain.png",
-//     cloud: "/assets/weather/cloud.png",
-//   };
-
-//   return (
-//     <Image
-//       src={iconMap[icon]}
-//       alt=""
-//       width={40}
-//       height={40}
-//       aria-hidden="true"
-//     />
-//   );
-// }
-
-function ForecastIcon({ icon }: { icon: "sun" | "rain" | "cloud" }) {
-  const iconMap = {
-    sun: "/assets/weather/sunny-icon.svg",
-    rain: "/assets/weather/rainy-icon.svg",
-    cloud: "/assets/weather/cloudy-sunny-icon.svg",
-  };
-
-  return (
-    <Image
-      src={iconMap[icon]}
-      alt=""
-      width={40}
-      height={40}
-      aria-hidden="true"
-    />
-  );
-}
 
 export default function ForecastPage() {
   return (
     <main className={styles["weather-page"]}>
+      <ScrollRevealInit />
       <SiteNav activeLabel="Weather" />
-      <section className={styles["weather-frame"]} aria-label="AQUASMART weather forecast">
-        <div className={styles["background-clouds"]} aria-hidden="true" />
-        <div className={styles["light-rain-layer"]} aria-hidden="true" />
-        <div className={styles["radar-rings"]} aria-hidden="true" />
-
-        <div className={styles["hero-cloud"]} aria-hidden="true">
-          <Image src="/assets/weather-cloud-icon.png" alt="" width={558} height={310} priority />
-        </div>
-
-        <section className={styles["forecast-copy"]}>
-          <p className={styles["eyebrow"]}>Weather Forecast</p>
-          <div className={styles["date-row"]}>
-            <strong>Today, June 16</strong>
-            <span>2:34 pm</span>
-          </div>
-          <h1>
-            Heavy Rainfall
-            <span>with 87% chance of rain</span>
-          </h1>
-          <ul>
-            <li>There is a high chance of heavy rainfall, est. 5 mm</li>
-            <li>Water Salinity of 5.6 is optimal for Rice and Corn irrigation</li>
-            <li>pH level of 5 is optimal for irrigation of all crops</li>
-          </ul>
-          <p className={styles.recommendation}>
-            We recommend you to irrigate your crops in 3-4 days
-            <span>...</span>
-          </p>
-        </section>
-
-        <aside className={styles["weekly-card"]} aria-label="This week forecast">
-          <p className={styles["weekly-title"]}>This Week</p>
-          <div className={styles["weekly-list"]}>
-            {forecast.map((item, index) => (
-              <article className={index === 0 ? `${styles["forecast-row"]} ${styles.selected}` : styles["forecast-row"]} key={`${item.day}-${item.temp}`}>
-                <span className={styles["icon-bubble"]}>
-                  <ForecastIcon icon={item.icon} />
-                </span>
-                <div className={styles["day-pill"]}>
-                  <strong>{item.temp}</strong>
-                  <span>{item.day}</span>
-                </div>
-              </article>
-            ))}
-          </div>
-          <div className={styles["pager-dots"]} aria-hidden="true">
-            <span />
-            <span />
-          </div>
-        </aside>
-      </section>
+      <WeatherSection />
     </main>
   );
 }

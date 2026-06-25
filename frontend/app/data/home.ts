@@ -25,7 +25,7 @@ export const navItems = [
   { label: "About", href: "/#about" },
   { label: "Simulation", href: "/#simulations" },
   { label: "Modules", href: "/#partners" },
-  { label: "Weather", href: "/#weather" },
+  { label: "Weather", href: "/forecast" },
   { label: "Team", href: "/team" },
   { label: "Contact", href: "/#contact" },
   { label: "Partners", href: "/#partners" },
