@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -166,16 +167,39 @@ const forecastDetails = [
   },
 ];
 
-function WeatherIcon({ type }: { type: ForecastIcon }) {
+
+function WeatherIcon({
+  type,
+}: {
+  type: "sun" | "rain" | "cloud";
+}) {
+  const iconMap = {
+    sun: "/assets/weather/sunny-icon.svg",
+    rain: "/assets/weather/rainy-icon.svg",
+    cloud: "/assets/weather/cloudy-sunny-icon.svg",
+  };
+
   return (
-    <span
-      className={`${styles["weather-icon"]}${type === "sun" ? "" : ` ${styles[type]}`}`}
+    <Image
+      src={iconMap[type]}
+      height={48}
+      alt=""
+      width={48}
       aria-hidden="true"
-    >
-      <span />
-    </span>
+    />
   );
 }
+
+// function WeatherIcon({ type }: { type: ForecastIcon }) {
+//   return (
+//     <span
+//       className={`${styles["weather-icon"]}${type === "sun" ? "" : ` ${styles[type]}`}`}
+//       aria-hidden="true"
+//     >
+//       <span />
+//     </span>
+//   );
+// }
 
 export function WeatherSection() {
   const [activeIndex, setActiveIndex] = useState(0);
