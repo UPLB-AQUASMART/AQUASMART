@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import type { MouseEvent } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { simulations } from "@/app/data/home";
 
@@ -11,7 +12,13 @@ import styles from "./SimulationsSection.module.css";
 
 type Simulation = (typeof simulations)[number];
 
-function SimulationCard({ simulation, delay }: { simulation: Simulation; delay: number }) {
+function SimulationCard({
+  delay,
+  simulation,
+}: {
+  delay: number;
+  simulation: Simulation;
+}) {
   const [activeState, setActiveState] = useState(0);
 
   useEffect(() => {
@@ -34,7 +41,10 @@ function SimulationCard({ simulation, delay }: { simulation: Simulation; delay: 
   const currentState = simulation.states[activeState];
 
   return (
-    <a className={`${styles["simulation-card"]} ${revealStyles["simulation-card"]}`} href={simulation.href}>
+    <a
+      className={`${styles["simulation-card"]} ${revealStyles["simulation-card"]}`}
+      href={simulation.href}
+    >
       <h3>
         {simulation.title} <span>{simulation.highlight}</span>
       </h3>
@@ -63,10 +73,42 @@ function SimulationCard({ simulation, delay }: { simulation: Simulation; delay: 
 }
 
 export function SimulationsSection() {
+  const cursorDotRef = useRef<HTMLDivElement | null>(null);
+  const cursorOutlineRef = useRef<HTMLDivElement | null>(null);
+  const [isCursorVisible, setIsCursorVisible] = useState(false);
+
+  const moveCursor = (event: MouseEvent<HTMLElement>) => {
+    const transform = `translate3d(${event.clientX}px, ${event.clientY}px, 0) translate(-50%, -50%)`;
+
+    if (cursorDotRef.current) {
+      cursorDotRef.current.style.transform = transform;
+    }
+
+    if (cursorOutlineRef.current) {
+      cursorOutlineRef.current.style.transform = transform;
+    }
+  };
+
+  const showCursor = (event: MouseEvent<HTMLElement>) => {
+    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+
+    moveCursor(event);
+    setIsCursorVisible(true);
+  };
+
+  const hideCursor = () => {
+    setIsCursorVisible(false);
+  };
+
   return (
     <section className={`${styles["simulations-section"]} ${revealStyles["scroll-reveal"]}`} id="simulations">
       <SectionPill>All Simulations</SectionPill>
-      <div className={`${frameStyles["dark-frame"]} ${frameStyles["simulations-frame"]}`}>
+      <div
+        className={`${frameStyles["dark-frame"]} ${frameStyles["simulations-frame"]} ${styles["custom-cursor-area"]}`}
+        onMouseEnter={showCursor}
+        onMouseLeave={hideCursor}
+        onMouseMove={moveCursor}
+      >
         <img className={frameStyles["frame-bg"]} src="/figma/simulations-bg.png" alt="" />
         <div className={`${frameStyles["frame-copy"]} ${revealStyles["frame-copy"]}`}>
           <h2>Simulate How We Operate</h2>
@@ -78,10 +120,28 @@ export function SimulationsSection() {
         </div>
         <div className={styles["simulation-grid"]}>
           {simulations.map((simulation, index) => (
-            <SimulationCard simulation={simulation} delay={index === 0 ? 2600 : 3400} key={simulation.title} />
+            <SimulationCard
+              delay={index === 0 ? 2600 : 3400}
+              key={simulation.title}
+              simulation={simulation}
+            />
           ))}
         </div>
       </div>
+      <div
+        aria-hidden="true"
+        className={`${styles["cursor-dot"]}${
+          isCursorVisible ? ` ${styles.visible}` : ""
+        }`}
+        ref={cursorDotRef}
+      />
+      <div
+        aria-hidden="true"
+        className={`${styles["cursor-dot-outline"]}${
+          isCursorVisible ? ` ${styles.visible}` : ""
+        }`}
+        ref={cursorOutlineRef}
+      />
     </section>
   );
 }
