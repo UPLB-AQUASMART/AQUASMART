@@ -20,11 +20,18 @@ export type ForecastItem = {
   icon: ForecastIcon;
 };
 
+export type LearningModule = {
+  code: string;
+  title: string;
+  description: string;
+  image: string;
+};
+
 export const navItems = [
   { label: "Home", href: "/#home" },
   { label: "About", href: "/#about" },
   { label: "Simulation", href: "/#simulations" },
-  { label: "Modules", href: "/#partners" },
+  { label: "Modules", href: "/modules" },
   { label: "Weather", href: "/forecast" },
   { label: "Team", href: "/team" },
   { label: "Contact", href: "/#contact" },
@@ -147,6 +154,51 @@ export const simulations = [
   },
 ];
 
+export const learningModules: LearningModule[] = [
+  {
+    code: "AQS 101",
+    title: "Groundwater Monitoring",
+    description:
+      "Understand how groundwater levels are measured, interpreted, and translated into practical irrigation insights.",
+    image: "/figma/drawdown-state-head.png",
+  },
+  {
+    code: "AQS 102",
+    title: "Smart Sensor Networks",
+    description:
+      "Learn how field sensors collect pH, salinity, temperature, EC, and TDS data for real-time farm decisions.",
+    image: "/figma/drawdown-card.png",
+  },
+  {
+    code: "AQS 103",
+    title: "Weather Forecasting",
+    description:
+      "Explore how rainfall and evapotranspiration forecasts support climate-responsive water management.",
+    image: "/assets/weather-preview-light-rain.png",
+  },
+  {
+    code: "AQS 104",
+    title: "Irrigation Planning",
+    description:
+      "Study how pump-to-crop water movement, soil moisture, and crop needs shape irrigation recommendations.",
+    image: "/assets/field.png",
+  },
+  {
+    code: "AQS 105",
+    title: "Water Quality Basics",
+    description:
+      "Review key water-quality indicators and how they affect crop health, salinity risk, and sustainable use.",
+    image: "/assets/weather-clouds.png",
+  },
+  {
+    code: "AQS 106",
+    title: "Decision Dashboards",
+    description:
+      "See how monitoring data, model outputs, and alerts come together in clear dashboards for farm action.",
+    image: "/assets/field.png",
+  },
+];
+
 export const forecast: ForecastItem[] = [
   { temp: "22\u00b0", day: "Friday, 1 Nov", icon: "sun" },
   { temp: "19\u00b0", day: "Sunday, 3 Nov", icon: "rain" },
@@ -177,12 +229,13 @@ export const footerColumns = [
     ],
   },
   {
-    title: "Monitoring",
+    title: "Modules",
     links: [
-      { label: "Live Monitoring", href: "/#about" },
-      { label: "Updates", href: "/#weather" },
-      { label: "AI Insights", href: "/#weather" },
-      { label: "Data Portal", href: "/#simulations" },
+      { label: "Groundwater", href: "/modules" },
+      { label: "Aquifer", href: "/modules" },
+      { label: "FloPy", href: "/modules" },
+      { label: "MODFLOW", href: "/modules" },
+      { label: "Add Module +", href: "/modules" },
     ],
   },
   {
