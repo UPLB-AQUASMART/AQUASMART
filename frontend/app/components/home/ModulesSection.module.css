@@ -155,16 +155,6 @@
   width: max-content;
   gap: 48px;
   padding: 10px 0 24px;
-  animation: modulesCarousel 34s linear infinite;
-  animation-play-state: paused;
-}
-
-.carousel-running {
-  animation-play-state: running;
-}
-
-.carousel-shell:hover .carousel-track {
-  animation-play-state: paused;
 }
 
 .collapse-button {
@@ -291,16 +281,6 @@
   transform: translateX(3px);
 }
 
-@keyframes modulesCarousel {
-  from {
-    transform: translateX(-220px);
-  }
-
-  to {
-    transform: translateX(calc(-50% - 244px));
-  }
-}
-
 @media (max-width: 900px) {
   .modules-section {
     padding: 88px 22px 56px;
@@ -376,7 +356,4 @@
     transition: none;
   }
 
-  .carousel-track {
-    animation: none;
-  }
 }
