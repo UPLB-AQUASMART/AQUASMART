@@ -15,12 +15,11 @@
 }
 
 @media (max-width: 900px) {
-
   .section-pill {
     max-width: 100%;
     min-height: 44px;
     padding: 12px 24px;
-    font-size: clamp(14px, 4vw, 18px);
+    font-size: clamp(10px, 4vw, 17px);
     line-height: 1.15;
     text-align: center;
     white-space: normal;
@@ -28,7 +27,6 @@
 }
 
 @media (max-width: 520px) {
-
   .section-pill {
     width: fit-content;
     max-width: 100%;
@@ -38,7 +36,6 @@
 }
 
 @media (max-width: 420px) {
-
   .section-pill {
     min-height: 40px;
     padding: 10px 16px;

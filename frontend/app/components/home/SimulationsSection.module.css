@@ -9,23 +9,22 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-
   .simulation-card,
-.simulation-card::after,
-.simulation-card h3,
-.simulation-card img,
-.simulation-card p {
+  .simulation-card::after,
+  .simulation-card h3,
+  .simulation-card img,
+  .simulation-card p {
     transition: none;
   }
 
   .simulation-card:hover,
-.simulation-card:focus-visible,
-.simulation-card:hover h3,
-.simulation-card:focus-visible h3,
-.simulation-card:hover img,
-.simulation-card:focus-visible img,
-.simulation-card:hover p,
-.simulation-card:focus-visible p {
+  .simulation-card:focus-visible,
+  .simulation-card:hover h3,
+  .simulation-card:focus-visible h3,
+  .simulation-card:hover img,
+  .simulation-card:focus-visible img,
+  .simulation-card:hover p,
+  .simulation-card:focus-visible p {
     transform: none;
   }
 }
@@ -170,7 +169,9 @@
   height: 6px;
   border-radius: 50%;
   background: #cbd5e1;
-  transition: width 420ms ease, background-color 420ms ease;
+  transition:
+    width 420ms ease,
+    background-color 420ms ease;
 }
 
 .simulation-state-heading i.active {
@@ -208,12 +209,17 @@
 }
 
 @keyframes simulation-copy-in {
-  from { opacity: 0; transform: translateY(5px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (max-width: 1100px) {
-
   .simulation-grid {
     grid-template-columns: 1fr;
     flex-direction: column;
@@ -221,7 +227,6 @@
 }
 
 @media (max-width: 720px) {
-
   .simulations-section {
     padding: 80px 20px;
   }
@@ -233,7 +238,6 @@
 }
 
 @media (max-width: 900px) {
-
   .simulations-section {
     padding-right: clamp(20px, 5vw, 40px);
     padding-left: clamp(20px, 5vw, 40px);
@@ -267,7 +271,6 @@
 }
 
 @media (max-width: 520px) {
-
   .simulations-section {
     padding: 64px 16px;
   }
@@ -288,7 +291,6 @@
 }
 
 @media (max-width: 900px) {
-
   .simulation-card p {
     overflow-wrap: break-word;
   }
@@ -303,7 +305,6 @@
 }
 
 @media (max-width: 640px) {
-
   .simulations-section {
     padding-top: 56px;
     padding-bottom: 56px;
@@ -319,7 +320,6 @@
 }
 
 @media (max-width: 420px) {
-
   .simulation-card h3 {
     font-size: 22px;
   }

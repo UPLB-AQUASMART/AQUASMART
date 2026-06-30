@@ -2,6 +2,7 @@
 
 import gsap from "gsap";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { learningModules } from "@/app/data/home";
@@ -11,58 +12,137 @@ import styles from "./ModulesSection.module.css";
 
 export function ModulesSection() {
   const [isRevealed, setIsRevealed] = useState(false);
-  const cardRefs = useRef<Array<HTMLElement | null>>([]);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [isCarouselRunning, setIsCarouselRunning] = useState(false);
+  const deckCardRefs = useRef<Array<HTMLElement | null>>([]);
   const carouselRef = useRef<HTMLDivElement | null>(null);
-  const loopModules = useMemo(
-    () => [...learningModules, ...learningModules],
-    [],
-  );
+  const router = useRouter();
+  const loopModules = useMemo(() => [...learningModules, ...learningModules], []);
 
-  useEffect(() => {
-    if (isRevealed) return;
+  const setDeckStack = () => {
+    const cards = deckCardRefs.current.filter(Boolean);
 
-    const cards = cardRefs.current.filter(Boolean);
     gsap.set(cards, {
+      autoAlpha: 1,
       x: (index) => (index - 1) * 12,
       y: (index) => index * 8,
       rotate: (index) => [-5, 0, 5, -2, 3, -4][index] ?? 0,
       scale: (index) => 1 - index * 0.018,
       zIndex: (index) => learningModules.length - index,
     });
-  }, [isRevealed]);
+  };
 
   useEffect(() => {
-    if (!isRevealed || !carouselRef.current) return;
+    setDeckStack();
 
-    const cards = cardRefs.current.filter(Boolean);
-    gsap.fromTo(
-      cards,
-      { opacity: 0, y: 32, scale: 0.96 },
-      {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        duration: 0.62,
-        ease: "power3.out",
-        stagger: 0.045,
-      },
-    );
-  }, [isRevealed]);
+    if (carouselRef.current) {
+      gsap.set(carouselRef.current, { autoAlpha: 0, y: 24 });
+    }
+  }, []);
+
+  const getSpreadOffset = (index: number) => {
+    const isMobile = window.matchMedia("(max-width: 720px)").matches;
+    const cardWidth = isMobile ? 260 : 388;
+    const gap = isMobile ? 20 : 48;
+    const centerIndex = (learningModules.length - 1) / 2;
+
+    return (index - centerIndex) * (cardWidth + gap);
+  };
 
   const revealDeck = () => {
-    if (isRevealed) return;
+    if (isRevealed || isAnimating) return;
 
-    const cards = cardRefs.current.filter(Boolean);
-    gsap.to(cards, {
-      x: (index) => (index - 2.5) * 82,
-      y: (index) => Math.abs(index - 2.5) * 10,
-      rotate: 0,
-      scale: 0.98,
-      duration: 0.42,
-      ease: "power2.out",
-      stagger: 0.025,
-      onComplete: () => setIsRevealed(true),
+    setIsAnimating(true);
+    setIsRevealed(true);
+    setIsCarouselRunning(false);
+
+    const cards = deckCardRefs.current.filter(Boolean);
+    const timeline = gsap.timeline({
+      defaults: { ease: "power4.out" },
+      onComplete: () => setIsAnimating(false),
     });
+
+    timeline
+      .to(cards, {
+        autoAlpha: 1,
+        x: (index) => getSpreadOffset(index),
+        y: 0,
+        rotate: 0,
+        scale: 1,
+        duration: 0.86,
+        stagger: 0.075,
+      })
+      .to({}, { duration: 0.18 })
+      .to(
+        carouselRef.current,
+        {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.36,
+        },
+        "-=0.02",
+      )
+      .call(() => setIsCarouselRunning(true))
+      .to(
+        cards,
+        {
+          autoAlpha: 0,
+          duration: 0.24,
+          stagger: 0.02,
+        },
+        "-=0.18",
+      );
+  };
+
+  const collapseDeck = () => {
+    if (!isRevealed || isAnimating) return;
+
+    setIsAnimating(true);
+    setIsCarouselRunning(false);
+
+    const cards = deckCardRefs.current.filter(Boolean);
+    const timeline = gsap.timeline({
+      defaults: { ease: "power3.out" },
+      onComplete: () => {
+        setIsRevealed(false);
+        setIsAnimating(false);
+      },
+    });
+
+    timeline
+      .to(carouselRef.current, {
+        autoAlpha: 0,
+        y: 24,
+        duration: 0.28,
+      })
+      .set(cards, {
+        autoAlpha: 1,
+        x: (index) => getSpreadOffset(index),
+        y: 0,
+        rotate: 0,
+        scale: 1,
+      })
+      .to(
+        cards,
+        {
+          x: (index) => (index - 1) * 12,
+          y: (index) => index * 8,
+          rotate: (index) => [-5, 0, 5, -2, 3, -4][index] ?? 0,
+          scale: (index) => 1 - index * 0.018,
+          duration: 0.62,
+          stagger: 0.055,
+          zIndex: (index) => learningModules.length - index,
+        },
+        "-=0.06",
+      );
+  };
+
+  const handleCollapsedCardClick = () => {
+    revealDeck();
+  };
+
+  const openModulesPage = () => {
+    router.push("/modules");
   };
 
   return (
@@ -85,48 +165,69 @@ export function ModulesSection() {
       </div>
 
       <div className={styles.wrapper}>
-        {!isRevealed ? (
-          <button
-            className={styles.deck}
-            onClick={revealDeck}
-            type="button"
-            aria-label="Open learning modules carousel"
+        <div
+          aria-label="Open learning modules carousel"
+          className={`${styles.deck}${isRevealed ? ` ${styles["deck-unpacked"]}` : ""}`}
+          onClick={handleCollapsedCardClick}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              handleCollapsedCardClick();
+            }
+          }}
+          role="button"
+          tabIndex={isRevealed ? -1 : 0}
+        >
+          {learningModules.map((module, index) => (
+            <ModuleCard
+              cardRef={(node) => {
+                deckCardRefs.current[index] = node;
+              }}
+              key={module.code}
+              module={module}
+              onClick={handleCollapsedCardClick}
+            />
+          ))}
+        </div>
+
+        <div className={styles["carousel-shell"]} ref={carouselRef}>
+          <div
+            className={`${styles["carousel-track"]}${
+              isCarouselRunning ? ` ${styles["carousel-running"]}` : ""
+            }`}
           >
-            {learningModules.map((module, index) => (
+            {loopModules.map((module, index) => (
               <ModuleCard
-                cardRef={(node) => {
-                  cardRefs.current[index] = node;
-                }}
-                key={module.code}
+                isRevealed
+                key={`${module.code}-${index}`}
                 module={module}
+                onClick={openModulesPage}
               />
             ))}
-          </button>
-        ) : (
-          <div className={styles["carousel-shell"]} ref={carouselRef}>
-            <div className={styles["carousel-track"]}>
-              {loopModules.map((module, index) => (
-                <ModuleCard
-                  cardRef={(node) => {
-                    cardRefs.current[index] = node;
-                  }}
-                  isRevealed
-                  key={`${module.code}-${index}`}
-                  module={module}
-                />
-              ))}
-            </div>
           </div>
-        )}
+        </div>
+
+        {isRevealed ? (
+          <button
+            className={styles["collapse-button"]}
+            disabled={isAnimating}
+            onClick={collapseDeck}
+            type="button"
+          >
+            Collapse deck
+          </button>
+        ) : null}
 
         <p className={styles.hint}>
-          {isRevealed ? "Hover on card to focus" : "Click the deck to browse modules"}
+          {isRevealed
+            ? "Hover on a card to focus"
+            : "Click the deck to browse modules"}
         </p>
       </div>
 
-      <a className={styles["see-all"]} href="modules">
+      {/* <a className={styles["see-all"]} href="/modules">
         See All Materials <span aria-hidden="true">→</span>
-      </a>
+      </a> */}
     </section>
   );
 }
@@ -135,18 +236,33 @@ function ModuleCard({
   cardRef,
   isRevealed = false,
   module,
+  onClick,
 }: {
-  cardRef: (node: HTMLElement | null) => void;
+  cardRef?: (node: HTMLElement | null) => void;
   isRevealed?: boolean;
   module: (typeof learningModules)[number];
+  onClick?: () => void;
 }) {
   return (
     <article
       className={`${styles.card}${isRevealed ? ` ${styles.cardRevealed}` : ""}`}
+      onClick={(event) => {
+        event.stopPropagation();
+        onClick?.();
+      }}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          event.stopPropagation();
+          onClick?.();
+        }
+      }}
       ref={cardRef}
+      role="button"
+      tabIndex={0}
     >
       <div className={styles.photo}>
-        <Image src={module.image} alt="" fill sizes="320px" />
+        <Image src={module.image} alt="" fill sizes="388px" />
       </div>
       <div className={styles.desc}>
         <div className={styles["module-title-row"]}>
