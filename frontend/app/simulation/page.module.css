@@ -27,6 +27,15 @@
   pointer-events: none;
 }
 
+.idw-map-hero-entering .idw-map-image {
+  opacity: 0.86;
+  transform: scale(1.08) translate3d(-2%, -2%, 0);
+}
+
+.idw-map-hero-entering::after {
+  background: rgba(45, 66, 86, 0.02);
+}
+
 .idw-map-image {
   position: absolute;
   inset: 0;
@@ -36,6 +45,9 @@
   object-fit: cover;
   object-position: left 22%;
   opacity: 0.52;
+  transition:
+    opacity 560ms ease,
+    transform 560ms cubic-bezier(0.2, 0.75, 0.25, 1);
 }
 
 .idw-map-content {
@@ -84,29 +96,25 @@
   height: 67px;
   flex: 0 0 auto;
   place-items: center;
+  border: 0;
   border-radius: 50%;
   background: #dff6fd;
+  color: #1fa3c9;
+  cursor: pointer;
   box-shadow: 0 14px 26px rgba(11, 31, 58, 0.16);
+  transition:
+    box-shadow 180ms ease,
+    transform 180ms ease;
 }
 
-.idw-view-button::before,
-.idw-view-button::after {
-  position: absolute;
-  content: "";
+.idw-view-button:hover {
+  box-shadow: 0 18px 30px rgba(11, 31, 58, 0.22);
+  transform: translateY(-2px) scale(1.03);
 }
 
-.idw-view-button::before {
-  width: 30px;
-  height: 18px;
-  border: 3px solid #1fa3c9;
-  border-radius: 50%;
-}
-
-.idw-view-button::after {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #1fa3c9;
+.idw-view-button:disabled {
+  cursor: progress;
+  transform: none;
 }
 
 .idw-info-section,

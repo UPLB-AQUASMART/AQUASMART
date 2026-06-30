@@ -1,5 +1,5 @@
 "use client";
-
+import { SiteFooter } from "@/app/components/home/SiteFooter";
 import {
   ChartNoAxesCombined,
   Download,
@@ -989,45 +989,7 @@ export default function GroundwaterSimulationPage() {
         </div>
       </section>
 
-      <section className={styles.research}>
-        <div className={styles.researchHeading}>
-          <p>Research Institutions/Partners</p>
-        </div>
-        <div className={styles.researchGrid}>
-          {researchCards.map((image, index) => (
-            <article className={styles.researchCard} key={image}>
-              <img src={image} alt="" />
-              <div>
-                <h3>Partner Research {index + 1}</h3>
-                <p>
-                  Groundwater data, field observations, and irrigation planning
-                  references.
-                </p>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <footer className={styles.footer}>
-        <div className={styles.footerBrand}>
-          <img src="/figma/groundwater-footer-mark.png" alt="" />
-          <div>
-            <p>AQUASMART mini</p>
-            <span>
-              Groundwater simulation and water-quality monitoring for field
-              decisions.
-            </span>
-          </div>
-        </div>
-        <div className={styles.footerLinks}>
-          {navLinks.map((link) => (
-            <Link href={link.href} key={link.label}>
-              {link.label}
-            </Link>
-          ))}
-        </div>
-      </footer>
+      <SiteFooter reveal />
     </main>
   );
 }

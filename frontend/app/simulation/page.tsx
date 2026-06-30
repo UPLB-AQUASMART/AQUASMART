@@ -1,5 +1,6 @@
 import { SiteFooter } from "@/app/components/home/SiteFooter";
 import { SiteNav } from "@/app/components/home/SiteNav";
+import { SimulationModelEntry } from "./components/SimulationModelEntry";
 import styles from "./page.module.css";
 
 const heroCopy =
@@ -19,21 +20,7 @@ export default function SimulationPage() {
     <main className={styles["idw-page"]}>
       <SiteNav activeLabel="Simulation" />
 
-      <section className={styles["idw-map-hero"]}>
-        <img className={styles["idw-map-image"]} src="/figma/idw-map.png" alt="" />
-        <div className={styles["idw-map-content"]}>
-          <h1>
-            Spatial Drawdown
-            <span>Map</span>
-          </h1>
-          <div className={styles["idw-map-bottom"]}>
-            <p>{heroCopy}</p>
-            <a className={styles["idw-view-button"]} href="#idw-info" aria-label="View IDW explanation">
-              <span aria-hidden="true" />
-            </a>
-          </div>
-        </div>
-      </section>
+      <SimulationModelEntry heroCopy={heroCopy} styles={styles} />
 
       <section className={styles["idw-info-section"]} id="idw-info">
         <h2>What is Inverse Distance Weighting?</h2>
