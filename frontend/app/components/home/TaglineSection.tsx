@@ -33,12 +33,15 @@ export function TaglineSection() {
 
     const context = gsap.context(() => {
       const timeline = gsap.timeline({
-        defaults: { ease: "none" },
+        defaults: { ease: "sine.inOut" },
         scrollTrigger: {
           trigger: section,
           start: "top top",
           end: () => `+=${Math.max(1, section.offsetHeight - window.innerHeight)}`,
-          scrub: true,
+          // A numeric scrub value (seconds) makes the timeline "catch up" to
+          // the scrollbar with a short lag instead of snapping to it exactly
+          // every frame — this is most of what reads as "smoothness".
+          scrub: 1.1,
           pin: sticky,
           pinSpacing: false,
           anticipatePin: 1,
@@ -49,7 +52,11 @@ export function TaglineSection() {
       timeline
         .to(
           section,
-          { "--tagline-farm-clip": "0%", duration: FARM_FILL_DURATION },
+          {
+            "--tagline-farm-clip": "0%",
+            duration: FARM_FILL_DURATION,
+            ease: "power1.inOut",
+          },
           FARM_FILL_START,
         )
         .to(
@@ -57,12 +64,17 @@ export function TaglineSection() {
           {
             "--tagline-environment-clip": "0%",
             duration: ENVIRONMENT_FILL_DURATION,
+            ease: "power1.inOut",
           },
           ENVIRONMENT_FILL_START,
         )
         .to(
           section,
-          { "--tagline-bg": 1, duration: BACKGROUND_DURATION },
+          {
+            "--tagline-bg": 1,
+            duration: BACKGROUND_DURATION,
+            ease: "sine.inOut",
+          },
           BACKGROUND_START,
         )
         .to(
@@ -74,6 +86,7 @@ export function TaglineSection() {
             "--tagline-y": () =>
               `${window.innerWidth < 720 ? -20 : window.innerWidth < 1100 ? -24 : -28}vh`,
             duration: ZOOM_DURATION,
+            ease: "power2.inOut",
           },
           ZOOM_START,
         )
@@ -83,6 +96,7 @@ export function TaglineSection() {
             "--tagline-text-opacity": 0,
             "--tagline-blur": "4px",
             duration: VANISH_DURATION,
+            ease: "power1.in",
           },
           VANISH_START,
         );

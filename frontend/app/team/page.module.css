@@ -166,17 +166,22 @@
 }
 
 .core-section,
+.researchers-section,
 .intern-section {
-  padding: 78px clamp(24px, 6vw, 86px) 96px;
+  padding: 80px clamp(24px, 5vw, 86px);
 }
 
 .core-section {
-  background: #ffffff;
+  background: #dde7ee;
+}
+
+.researchers-section {
+  background: #f5fafc;
 }
 
 .intern-section {
   border-top: 1px solid #e4edf3;
-  background: #f5fafc;
+  background: #dde7ee;
 }
 
 .section-heading {
@@ -204,25 +209,27 @@
 }
 
 .team-grid {
-  display: grid;
+  display: flex;
   max-width: 1180px;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 26px;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 25px;
   margin: 0 auto;
 }
 
 .card {
   position: relative;
   display: flex;
-  min-width: 0;
-  min-height: 492px;
+  min-width: 340px;
+  min-height: 560px;
+  flex: 0 1 calc(33.333% - 20px);
   align-items: center;
   flex-direction: column;
-  border: 1px solid #dfe9ef;
-  border-radius: 28px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 24px;
   background: #ffffff;
-  box-shadow: 0 15px 45px rgba(11, 31, 58, 0.08);
-  padding: 34px 30px 30px;
+  box-shadow: none;
+  padding: 50px 30px 40px;
   text-align: center;
   transition:
     border-color 220ms ease,
@@ -232,33 +239,28 @@
 
 .card:hover {
   border-color: rgba(31, 163, 201, 0.48);
-  box-shadow: 0 23px 58px rgba(11, 31, 58, 0.13);
-  transform: translateY(-6px);
+  box-shadow: 0 24px 58px rgba(11, 31, 58, 0.11);
+  transform: translateY(-8px);
 }
 
-.portrait-wrap {
+.portrait-wrap,
+.avatar-wrap {
   position: relative;
-  width: 170px;
-  height: 170px;
-  margin-bottom: 23px;
-}
-
-.portrait-ring {
-  position: absolute;
-  inset: 1px;
-  border: 1px solid rgba(31, 163, 201, 0.28);
+  display: flex;
+  width: 130px;
+  height: 130px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 25px;
+  padding: 4px;
   border-radius: 50%;
-  background: linear-gradient(145deg, #e5f7fc, #f3fbf7);
+  background: #ffffff;
+  box-shadow: 0 10px 25px rgba(11, 31, 58, 0.15);
 }
 
 .portrait {
-  position: absolute;
-  z-index: 1;
-  right: 4px;
-  bottom: 4px;
-  width: 162px;
-  height: 162px;
-  border: 5px solid #ffffff;
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
   object-fit: cover;
   object-position: top center;
@@ -267,16 +269,16 @@
 .lead-mark {
   position: absolute;
   z-index: 2;
-  right: 1px;
-  bottom: 15px;
+  top: 5px;
+  right: 5px;
   display: grid;
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
   place-items: center;
-  border: 4px solid #ffffff;
+  border: 3px solid #ffffff;
   border-radius: 50%;
   color: #ffffff;
-  background: var(--aqua);
+  background: #f6c344;
   font-size: 14px;
 }
 
@@ -290,97 +292,103 @@
 }
 
 .role {
-  min-height: 44px;
-  margin: 8px 0 18px;
-  color: #168caf;
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1.5;
+  min-height: 42px;
+  margin: 8px 0 20px;
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.45;
 }
 
 .tags {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 7px;
-  margin-bottom: 19px;
+  gap: 8px;
+  margin-bottom: 25px;
 }
 
-.tags span,
-.intern-label {
-  border: 1px solid #dbe9ef;
+.tags span {
   border-radius: 999px;
-  color: #446275;
-  background: #f5fafc;
+  color: #1fa3c9;
+  background: #e0f7fa;
   font-size: 10px;
   font-weight: 800;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   line-height: 1;
-  padding: 8px 10px;
+  padding: 7px 16px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.member-label {
+  display: inline-flex;
+  margin: -5px 0 14px;
+  border-radius: 999px;
+  color: #147d9c;
+  background: #dff6fd;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  padding: 8px 12px;
   text-transform: uppercase;
 }
 
+.divider {
+  width: 60px;
+  height: 1px;
+  margin: 0 auto 25px;
+  background: var(--aqua);
+  opacity: 0.22;
+}
+
 .bio {
-  margin: 0 0 22px;
-  color: #607287;
-  font-size: 13px;
-  line-height: 1.68;
+  max-width: 320px;
+  margin: 0 0 30px;
+  color: #64748b;
+  flex-grow: 1;
+  font-size: 14px;
+  line-height: 1.7;
 }
 
 .card-link {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
   margin-top: auto;
-  color: var(--navy);
-  font-size: 12px;
-  font-weight: 800;
+  border-radius: 10px;
+  color: #ffffff;
+  background: #233648;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 12px 28px;
+  text-decoration: none;
+  transition:
+    background-color 180ms ease,
+    transform 180ms ease;
 }
 
-.card-link span {
-  color: var(--aqua);
-  font-size: 16px;
-  transition: transform 180ms ease;
-}
-
-.card-link:hover span {
-  transform: translate(2px, -2px);
+.card-link:hover {
+  background: var(--aqua);
+  transform: translateY(-2px);
 }
 
 .intern-grid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-
-.intern-card {
-  min-height: 405px;
-  padding-top: 32px;
+  max-width: 1300px;
 }
 
 .initials-avatar {
   display: grid;
-  width: 112px;
-  height: 112px;
+  width: 100%;
+  height: 100%;
   place-items: center;
-  margin-bottom: 18px;
-  border: 5px solid #ffffff;
   border-radius: 50%;
   color: #ffffff;
   background: linear-gradient(145deg, #0b1f3a, #1fa3c9);
-  box-shadow: 0 0 0 1px #d9e7ee, 0 12px 26px rgba(11, 31, 58, 0.18);
   font-family: "Sora", sans-serif;
   font-size: 30px;
   font-weight: 800;
   letter-spacing: -0.05em;
-}
-
-.intern-label {
-  margin-bottom: 13px;
-  color: #147d9c;
-  background: #dff6fd;
-}
-
-.intern-card .bio {
-  margin-bottom: 0;
 }
 
 .cta {
@@ -438,9 +446,8 @@
     font-size: clamp(42px, 6.3vw, 66px);
   }
 
-  .team-grid,
-  .intern-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .card {
+    flex-basis: calc(50% - 18px);
   }
 
   .cta {
@@ -497,6 +504,7 @@
   }
 
   .core-section,
+  .researchers-section,
   .intern-section {
     padding: 62px 20px 72px;
   }
@@ -505,15 +513,15 @@
     margin-bottom: 36px;
   }
 
-  .team-grid,
-  .intern-grid {
-    grid-template-columns: 1fr;
+  .team-grid {
+    gap: 20px;
   }
 
-  .card,
-  .intern-card {
+  .card {
     width: 100%;
+    min-width: 0;
     min-height: 0;
+    flex-basis: 100%;
   }
 
   .cta {
@@ -545,14 +553,15 @@
     padding: 28px 22px;
   }
 
-  .portrait-wrap {
-    width: 150px;
-    height: 150px;
+  .portrait-wrap,
+  .avatar-wrap {
+    width: 118px;
+    height: 118px;
   }
 
   .portrait {
-    width: 142px;
-    height: 142px;
+    width: 100%;
+    height: 100%;
   }
 
   .visual-label,
@@ -574,7 +583,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .card,
-  .card-link span,
+  .card-link,
   .cta > a {
     transition: none;
   }
