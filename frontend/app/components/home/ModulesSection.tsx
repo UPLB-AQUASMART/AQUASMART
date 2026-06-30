@@ -50,8 +50,6 @@ export function ModulesSection() {
       gsap.set(carouselShellRef.current, { autoAlpha: 0 });
       carouselShellRef.current.style.display = "none";
     }
-
-    return () => stopMarquee();
   }, []);
 
   const getSpreadOffset = (index: number) => {
@@ -110,22 +108,6 @@ export function ModulesSection() {
 
     const cards = deckCardRefs.current.filter(Boolean);
     const shell = carouselShellRef.current;
-    const track = carouselTrackRef.current;
-
-    stopMarquee();
-
-    cards.forEach((card) => {
-      (card as HTMLElement).style.display = "";
-    });
-
-    if (shell) {
-      shell.style.display = "";
-      gsap.set(shell, { autoAlpha: 0 });
-    }
-
-    if (track) {
-      gsap.set(track, { x: getAlignedTrackX() });
-    }
 
     const timeline = gsap.timeline({
       defaults: { ease: "power4.out" },
@@ -138,12 +120,14 @@ export function ModulesSection() {
         y: 0,
         rotate: 0,
         scale: 1,
-        duration: 1.05,
-        ease: "expo.out",
+        duration: 0.9,
         stagger: {
-          each: 0.075,
+          // Fanning out from the center card reads as one fluid motion
+          // instead of a left-to-right "deal" that snaps card by card.
+          each: 0.07,
           from: "center",
         },
+        ease: "power3.inOut",
       })
       .call(() => {
         // Hard cut, not a cross-fade: the carousel's first cards are
@@ -166,32 +150,18 @@ export function ModulesSection() {
         startMarquee();
         if (shell) {
           shell.style.display = "";
-          gsap.to(shell, {
-            autoAlpha: 1,
-            duration: 0.26,
-            ease: "power2.out",
-          });
+          gsap.set(shell, { autoAlpha: 1 });
         }
-        gsap.to(cards, {
-          autoAlpha: 0,
-          duration: 0.26,
-          ease: "power2.out",
-          stagger: {
-            each: 0.015,
-            from: "center",
-          },
-          onComplete: () => {
-            cards.forEach((card) => {
-              (card as HTMLElement).style.display = "none";
-            });
-            setIsAnimating(false);
-          },
-        });
+        gsap.set(cards, { autoAlpha: 0 });
         // Belt-and-suspenders: opacity/visibility changes on a
         // GPU-composited layer (these cards are promoted due to
         // transform + box-shadow) aren't guaranteed to drop from
         // paint in the same frame — display:none is unconditional
         // and removes any chance of a lingering composited ghost.
+        cards.forEach((card) => {
+          (card as HTMLElement).style.display = "none";
+        });
+
         // Force a layout flush so the transition:none above is
         // actually applied to this frame before we hand transitions
         // back to the stylesheet on the next tick.
@@ -203,6 +173,8 @@ export function ModulesSection() {
           });
           if (shell) shell.style.transition = "";
         });
+
+        setIsAnimating(false);
       });
   };
 
@@ -245,8 +217,12 @@ export function ModulesSection() {
       y: (index) => index * 8,
       rotate: (index) => [-5, 0, 5, -2, 3, -4][index] ?? 0,
       scale: (index) => 1 - index * 0.018,
-      duration: 0.58,
-      stagger: 0.04,
+      duration: 0.7,
+      stagger: {
+        each: 0.06,
+        from: "center",
+      },
+      ease: "power3.inOut",
       zIndex: (index) => learningModules.length - index,
     });
   };
