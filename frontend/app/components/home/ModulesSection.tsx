@@ -124,7 +124,7 @@ export function ModulesSection() {
         </p>
       </div>
 
-      <a className={styles["see-all"]} href="#modules">
+      <a className={styles["see-all"]} href="modules">
         See All Materials <span aria-hidden="true">→</span>
       </a>
     </section>
