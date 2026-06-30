@@ -3,6 +3,7 @@ import Script from "next/script";
 import "./globals.css";
 
 import { ScrollToTopButton } from "@/app/components/ScrollToTopButton";
+import { SmoothScrollProvider } from "@/app/components/SmoothScrollProvider";
 
 export const metadata: Metadata = {
   title: "AQUASMART Mini",
@@ -20,7 +21,7 @@ export default function RootLayout({
 window.scrollTo(0, 0);
 window.addEventListener("DOMContentLoaded", function () { window.scrollTo(0, 0); }, { once: true });`}
         </Script>
-        {children}
+        <SmoothScrollProvider>{children}</SmoothScrollProvider>
         <ScrollToTopButton />
       </body>
     </html>
