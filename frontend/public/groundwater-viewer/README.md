@@ -11,49 +11,14 @@ from the Next.js `/simulation` route.
     elements.
 
 - `styles/groundwater-viewer.css`
-  - Main CSS entry point.
-  - It imports the smaller component styles in `styles/components/`.
-
-- `styles/components/00-base.css`
-  - Base page styles, global buttons, scene mount, and loading states.
-
-- `styles/components/01-section-canvas.css`
-  - Fullscreen 2D canvas, toolbar, discharge controls, and sensor popover.
-
-- `styles/components/02-panel-layout.css`
-  - Shared left panel sizing and panel mode layout rules.
-
-- `styles/components/03-top-view-setup.css`
-  - FloPy/MODFLOW aquifer setup panel, top-view result cards, and legends.
-
-- `styles/components/04-well-menu.css`
-  - 3D well selector menu, active/inactive well cards, and action buttons.
-
-- `styles/components/05-section-controls.css`
-  - 2D metric cards, sliders, pipe screen controls, and soil level controls.
-
-- `styles/components/06-responsive.css`
-  - Mobile and narrow viewport overrides.
-
-- `styles/components/07-soil-dropdown.css`
-  - Custom soil dropdown component.
+  - Visual styling for the standalone viewer inside the iframe.
+  - Edit this for colors, spacing, layout, button design, panels, sliders,
+    labels, and responsive behavior.
 
 - `scripts/groundwater-viewer-app.js`
   - Runtime behavior for the model.
-  - Owns the Three.js 3D model, 2D well section, top-view canvas, rendering,
-    zoom/pan, and event wiring.
-
-- `scripts/data/groundwater-domain-data.js`
-  - Aquifer labels, soil behavior, soil image paths, well display names,
-    default readings, and sensor specs.
-
-- `scripts/dom/viewer-dom-elements.js`
-  - Centralized `document.querySelector` references.
-  - Keep selector IDs synced with `index.html`.
-
-- `scripts/api/modflow-scenario-api.js`
-  - Frontend helper for requesting scenario-based top-view results from the
-    Next.js API proxy / FastAPI backend.
+  - Owns the Three.js 3D model, 2D well section, top-view canvas,
+    sensor specs, scenario configuration, and API calls.
 
 ## Related Next.js Wrapper
 
