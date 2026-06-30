@@ -89,10 +89,6 @@ export function ModulesSection() {
 
     if (prefersReducedMotion) return;
 
-    // Because the track renders the module list twice back-to-back,
-    // shifting left by exactly one set's width (`loopWidth`) lands on
-    // a frame that looks identical to the start — so resetting `x`
-    // back to `alignedX` on each repeat is invisible to the eye.
     marqueeTlRef.current = gsap.timeline({ repeat: -1 }).fromTo(
       track,
       { x: alignedX },
@@ -122,23 +118,13 @@ export function ModulesSection() {
         scale: 1,
         duration: 0.9,
         stagger: {
-          // Fanning out from the center card reads as one fluid motion
-          // instead of a left-to-right "deal" that snaps card by card.
           each: 0.07,
           from: "center",
         },
         ease: "power3.inOut",
       })
       .call(() => {
-        // Hard cut, not a cross-fade: the carousel's first cards are
-        // pre-aligned (via startMarquee -> getAlignedTrackX) to sit
-        // exactly where the spread deck cards already are, so this
-        // swap reads as the same cards continuing to move, not as two
-        // layers fading between each other.
-        //
-        // Kill any tweens still attached to these elements and strip
-        // their CSS transitions for this one swap so nothing — GSAP
-        // or the browser — has a chance to animate the cut.
+
         gsap.killTweensOf(cards);
         if (shell) gsap.killTweensOf(shell);
 
@@ -153,18 +139,12 @@ export function ModulesSection() {
           gsap.set(shell, { autoAlpha: 1 });
         }
         gsap.set(cards, { autoAlpha: 0 });
-        // Belt-and-suspenders: opacity/visibility changes on a
-        // GPU-composited layer (these cards are promoted due to
-        // transform + box-shadow) aren't guaranteed to drop from
-        // paint in the same frame — display:none is unconditional
-        // and removes any chance of a lingering composited ghost.
+
         cards.forEach((card) => {
           (card as HTMLElement).style.display = "none";
         });
 
-        // Force a layout flush so the transition:none above is
-        // actually applied to this frame before we hand transitions
-        // back to the stylesheet on the next tick.
+  
         void (shell ?? cards[0])?.offsetHeight;
 
         requestAnimationFrame(() => {
