@@ -13,11 +13,22 @@ import styles from "./ModulesSection.module.css";
 export function ModulesSection() {
   const [isRevealed, setIsRevealed] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
-  const [isCarouselRunning, setIsCarouselRunning] = useState(false);
   const deckCardRefs = useRef<Array<HTMLElement | null>>([]);
-  const carouselRef = useRef<HTMLDivElement | null>(null);
+  const carouselShellRef = useRef<HTMLDivElement | null>(null);
+  const carouselTrackRef = useRef<HTMLDivElement | null>(null);
+  const marqueeTlRef = useRef<gsap.core.Timeline | null>(null);
   const router = useRouter();
   const loopModules = useMemo(() => [...learningModules, ...learningModules], []);
+
+  const getCardMetrics = () => {
+    const isMobile = window.matchMedia("(max-width: 720px)").matches;
+    const cardWidth = isMobile ? 260 : 388;
+    const gap = isMobile ? 20 : 48;
+    const step = cardWidth + gap;
+    const centerIndex = (learningModules.length - 1) / 2;
+
+    return { cardWidth, gap, step, centerIndex };
+  };
 
   const setDeckStack = () => {
     const cards = deckCardRefs.current.filter(Boolean);
@@ -35,18 +46,58 @@ export function ModulesSection() {
   useEffect(() => {
     setDeckStack();
 
-    if (carouselRef.current) {
-      gsap.set(carouselRef.current, { autoAlpha: 0, y: 24 });
+    if (carouselShellRef.current) {
+      gsap.set(carouselShellRef.current, { autoAlpha: 0 });
+      carouselShellRef.current.style.display = "none";
     }
   }, []);
 
   const getSpreadOffset = (index: number) => {
-    const isMobile = window.matchMedia("(max-width: 720px)").matches;
-    const cardWidth = isMobile ? 260 : 388;
-    const gap = isMobile ? 20 : 48;
-    const centerIndex = (learningModules.length - 1) / 2;
+    const { step, centerIndex } = getCardMetrics();
+    return (index - centerIndex) * step;
+  };
 
-    return (index - centerIndex) * (cardWidth + gap);
+  // Lines up the carousel track's first set of cards with the exact
+  // screen position the spread-out deck cards land in, so the swap
+  // from "deck" to "carousel" is a single matched-position cut instead
+  // of a cross-fade between two differently-positioned layouts.
+  const getAlignedTrackX = () => {
+    const { cardWidth, step, centerIndex } = getCardMetrics();
+    const viewportCenterX = window.innerWidth / 2;
+
+    return viewportCenterX - centerIndex * step - cardWidth / 2;
+  };
+
+  const stopMarquee = () => {
+    marqueeTlRef.current?.kill();
+    marqueeTlRef.current = null;
+  };
+
+  const startMarquee = () => {
+    const track = carouselTrackRef.current;
+    if (!track) return;
+
+    const { step } = getCardMetrics();
+    const loopWidth = step * learningModules.length;
+    const alignedX = getAlignedTrackX();
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    stopMarquee();
+    gsap.set(track, { x: alignedX });
+
+    if (prefersReducedMotion) return;
+
+    // Because the track renders the module list twice back-to-back,
+    // shifting left by exactly one set's width (`loopWidth`) lands on
+    // a frame that looks identical to the start — so resetting `x`
+    // back to `alignedX` on each repeat is invisible to the eye.
+    marqueeTlRef.current = gsap.timeline({ repeat: -1 }).fromTo(
+      track,
+      { x: alignedX },
+      { x: alignedX - loopWidth, duration: loopWidth / 70, ease: "none" },
+    );
   };
 
   const revealDeck = () => {
@@ -54,12 +105,12 @@ export function ModulesSection() {
 
     setIsAnimating(true);
     setIsRevealed(true);
-    setIsCarouselRunning(false);
 
     const cards = deckCardRefs.current.filter(Boolean);
+    const shell = carouselShellRef.current;
+
     const timeline = gsap.timeline({
       defaults: { ease: "power4.out" },
-      onComplete: () => setIsAnimating(false),
     });
 
     timeline
@@ -69,38 +120,84 @@ export function ModulesSection() {
         y: 0,
         rotate: 0,
         scale: 1,
-        duration: 0.86,
-        stagger: 0.075,
+        duration: 0.72,
+        stagger: 0.05,
       })
-      .to({}, { duration: 0.18 })
-      .to(
-        carouselRef.current,
-        {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.36,
-        },
-        "-=0.02",
-      )
-      .call(() => setIsCarouselRunning(true))
-      .to(
-        cards,
-        {
-          autoAlpha: 0,
-          duration: 0.24,
-          stagger: 0.02,
-        },
-        "-=0.18",
-      );
+      .call(() => {
+        // Hard cut, not a cross-fade: the carousel's first cards are
+        // pre-aligned (via startMarquee -> getAlignedTrackX) to sit
+        // exactly where the spread deck cards already are, so this
+        // swap reads as the same cards continuing to move, not as two
+        // layers fading between each other.
+        //
+        // Kill any tweens still attached to these elements and strip
+        // their CSS transitions for this one swap so nothing — GSAP
+        // or the browser — has a chance to animate the cut.
+        gsap.killTweensOf(cards);
+        if (shell) gsap.killTweensOf(shell);
+
+        cards.forEach((card) => {
+          (card as HTMLElement).style.transition = "none";
+        });
+        if (shell) shell.style.transition = "none";
+
+        startMarquee();
+        if (shell) {
+          shell.style.display = "";
+          gsap.set(shell, { autoAlpha: 1 });
+        }
+        gsap.set(cards, { autoAlpha: 0 });
+        // Belt-and-suspenders: opacity/visibility changes on a
+        // GPU-composited layer (these cards are promoted due to
+        // transform + box-shadow) aren't guaranteed to drop from
+        // paint in the same frame — display:none is unconditional
+        // and removes any chance of a lingering composited ghost.
+        cards.forEach((card) => {
+          (card as HTMLElement).style.display = "none";
+        });
+
+        // Force a layout flush so the transition:none above is
+        // actually applied to this frame before we hand transitions
+        // back to the stylesheet on the next tick.
+        void (shell ?? cards[0])?.offsetHeight;
+
+        requestAnimationFrame(() => {
+          cards.forEach((card) => {
+            (card as HTMLElement).style.transition = "";
+          });
+          if (shell) shell.style.transition = "";
+        });
+
+        setIsAnimating(false);
+      });
   };
 
   const collapseDeck = () => {
     if (!isRevealed || isAnimating) return;
 
     setIsAnimating(true);
-    setIsCarouselRunning(false);
+    stopMarquee();
 
     const cards = deckCardRefs.current.filter(Boolean);
+    const shell = carouselShellRef.current;
+
+    if (shell) {
+      gsap.set(shell, { autoAlpha: 0 });
+      shell.style.display = "none";
+    }
+
+    cards.forEach((card) => {
+      (card as HTMLElement).style.display = "";
+    });
+
+    gsap.set(cards, {
+      autoAlpha: 1,
+      x: (index) => getSpreadOffset(index),
+      y: 0,
+      rotate: 0,
+      scale: 1,
+    });
+
     const timeline = gsap.timeline({
       defaults: { ease: "power3.out" },
       onComplete: () => {
@@ -109,32 +206,15 @@ export function ModulesSection() {
       },
     });
 
-    timeline
-      .to(carouselRef.current, {
-        autoAlpha: 0,
-        y: 24,
-        duration: 0.28,
-      })
-      .set(cards, {
-        autoAlpha: 1,
-        x: (index) => getSpreadOffset(index),
-        y: 0,
-        rotate: 0,
-        scale: 1,
-      })
-      .to(
-        cards,
-        {
-          x: (index) => (index - 1) * 12,
-          y: (index) => index * 8,
-          rotate: (index) => [-5, 0, 5, -2, 3, -4][index] ?? 0,
-          scale: (index) => 1 - index * 0.018,
-          duration: 0.62,
-          stagger: 0.055,
-          zIndex: (index) => learningModules.length - index,
-        },
-        "-=0.06",
-      );
+    timeline.to(cards, {
+      x: (index) => (index - 1) * 12,
+      y: (index) => index * 8,
+      rotate: (index) => [-5, 0, 5, -2, 3, -4][index] ?? 0,
+      scale: (index) => 1 - index * 0.018,
+      duration: 0.58,
+      stagger: 0.04,
+      zIndex: (index) => learningModules.length - index,
+    });
   };
 
   const handleCollapsedCardClick = () => {
@@ -190,12 +270,13 @@ export function ModulesSection() {
           ))}
         </div>
 
-        <div className={styles["carousel-shell"]} ref={carouselRef}>
-          <div
-            className={`${styles["carousel-track"]}${
-              isCarouselRunning ? ` ${styles["carousel-running"]}` : ""
-            }`}
-          >
+        <div
+          className={styles["carousel-shell"]}
+          onMouseEnter={() => marqueeTlRef.current?.pause()}
+          onMouseLeave={() => marqueeTlRef.current?.play()}
+          ref={carouselShellRef}
+        >
+          <div className={styles["carousel-track"]} ref={carouselTrackRef}>
             {loopModules.map((module, index) => (
               <ModuleCard
                 isRevealed
