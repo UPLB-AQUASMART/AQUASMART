@@ -17,7 +17,7 @@
   }
 
   .parameter-card-media-current {
-    opacity: 0.2;
+    opacity: 0.5;
   }
 
   .parameter-card-media-previous {
@@ -60,7 +60,7 @@
 }
 
 .parameter-card-media-current {
-  opacity: 0.2;
+  opacity: 0.5;
   transform: scale(1);
   filter: blur(0);
 }
@@ -96,19 +96,20 @@
 }
 
 .parameters-radial-left {
-  left: -20px;
-  bottom: -8px;
+  left: -100px;
+  /* bottom: 100px; */
+  top: 150px;
 }
 
 .parameters-radial-right {
-  top: 0;
-  right: -2px;
+  top: -65;
+  right: -90px;
   transform: rotate(180deg);
 }
 
 .parameters-radial-bottom {
-  right: 80px;
-  bottom: -34px;
+  right: 20px;
+  bottom: -54px;
   opacity: 0.62;
 }
 
