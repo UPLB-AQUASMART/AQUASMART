@@ -1,0 +1,15 @@
+/*
+  AQUASMART Groundwater Viewer Styles
+
+  This stylesheet controls the standalone model UI rendered inside
+  /simulation. It is intentionally separate from the Next.js page wrapper.
+*/
+
+@import url("./components/00-base.css");
+@import url("./components/01-section-canvas.css");
+@import url("./components/02-panel-layout.css");
+@import url("./components/03-top-view-setup.css");
+@import url("./components/04-well-menu.css");
+@import url("./components/05-section-controls.css");
+@import url("./components/06-responsive.css");
+@import url("./components/07-soil-dropdown.css");

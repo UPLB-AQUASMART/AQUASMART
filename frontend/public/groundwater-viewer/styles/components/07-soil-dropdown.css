@@ -1,0 +1,195 @@
+/* Custom soil dropdown component styles. */
+
+
+.soil-dropdown {
+  position: relative;
+  width: 100%;
+  z-index: 1000;
+}
+
+.soil-select-button {
+  display: grid;
+  width: 100%;
+  min-height: 24px;
+  grid-template-columns: 1fr 16px;
+  align-items: center;
+  border: 1px solid #e2e8f0;
+  border-radius: 0;
+  background: #f5fafc;
+  color: #0b1f3a;
+  padding: 2px 4px 2px 26px;
+  font:
+    600 12.5px Inter,
+    ui-sans-serif,
+    system-ui,
+    sans-serif;
+  text-align: center;
+}
+
+.soil-select-button:hover,
+.soil-select-button:focus-visible {
+  background: #f5fafc;
+  outline: 1px solid #9aafc0;
+}
+
+.soil-select-chevron {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform 160ms ease;
+}
+
+.soil-select-button[aria-expanded="true"] .soil-select-chevron {
+  transform: translateY(2px) rotate(225deg);
+}
+
+.soil-select-menu {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  z-index: 9999;
+  border-inline: 1px solid #e2e8f0;
+  background: #f5fafc;
+  box-shadow: 0 5px 12px rgba(11, 31, 58, 0.16);
+}
+
+.soil-select-menu[hidden] {
+  display: none;
+}
+
+.soil-select-option {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  min-height: 24px;
+  border: 0;
+  border-bottom: 1px solid #e2e8f0;
+  border-radius: 0;
+  background: #f5fafc;
+  color: #0b1f3a;
+  padding: 3px 8px;
+  font:
+    600 12.5px Inter,
+    ui-sans-serif,
+    system-ui,
+    sans-serif;
+  text-align: center;
+}
+
+.soil-select-option:hover,
+.soil-select-option:focus-visible {
+  background: #dff6fd;
+  outline: none;
+}
+
+.soil-select-option.is-current {
+  background: #f5fafc;
+  color: rgba(11, 31, 58, 0.3);
+  opacity: 1;
+}
+
+#soil-type {
+  display: none;
+}
+
+.pipe-screen-stack {
+  display: flex;
+  width: 70px;
+  height: 105px;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.pipe-screen-segment {
+  position: relative;
+  width: 70px;
+  height: 35px;
+  flex: 0 0 35px;
+  overflow: hidden;
+  opacity: 0.4;
+  transition: opacity 160ms ease;
+}
+
+.pipe-screen-segment.is-active {
+  opacity: 1;
+}
+
+.pipe-screen-segment img {
+  position: absolute;
+  left: 23px;
+  width: 23px;
+  height: 87px;
+}
+
+.pipe-screen-segment[data-level="1"] img {
+  top: 0;
+}
+
+.pipe-screen-segment[data-level="2"] img {
+  top: -19px;
+}
+
+.pipe-screen-segment[data-level="3"] img {
+  top: -50px;
+}
+
+.section-option-grid {
+  position: relative;
+  isolation: isolate;
+}
+
+.section-option-card {
+  position: relative;
+  overflow: visible;
+}
+
+.section-option-card:first-child {
+  z-index: 20;
+}
+
+.soil-description {
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 760px) {
+  .panel,
+  .panel.is-section-mode {
+    left: 8px;
+    top: 8px;
+    width: min(760px, calc(153.846vw - 25px));
+    max-height: calc(153.846vh - 25px);
+    padding: 30px 34px 28px;
+  }
+
+  .panel:not(.is-section-mode) {
+    width: min(680px, calc(153.846vw - 25px));
+  }
+
+  .cluster-header,
+  .section-panel-header {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .cluster-location,
+  .section-well-location,
+  .active-wells-count {
+    text-align: right;
+  }
+
+  .well-picker,
+  .metric-grid,
+  .section-slider-grid,
+  .section-option-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .metric-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

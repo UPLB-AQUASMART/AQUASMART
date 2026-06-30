@@ -1,0 +1,104 @@
+/* Shared left panel sizing plus mode-specific panel layout rules. */
+
+  background: rgba(223, 246, 253, 0.86);
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.25);
+  padding: 30px 34px 28px;
+  backdrop-filter: blur(12px);
+}
+
+.panel.is-section-mode {
+  width: min(760px, calc(100vw - 32px));
+  overflow-y: auto;
+}
+
+.panel.is-section-mode.is-plan-mode {
+  width: min(560px, calc(200vw - 64px));
+  min-height: min(720px, calc(100vh - 32px));
+}
+
+.panel.is-section-mode.is-top-setup-mode {
+  width: min(1080px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  padding: 0;
+}
+
+.panel.is-plan-mode .section-panel-eyebrow,
+.panel.is-plan-mode .metric-grid,
+.panel.is-plan-mode .section-option-grid {
+  display: none;
+}
+
+.panel.is-top-setup-mode .section-panel-eyebrow,
+.panel.is-top-setup-mode .metric-grid,
+.panel.is-top-setup-mode .section-slider-grid,
+.panel.is-top-setup-mode .section-option-grid,
+.panel.is-top-setup-mode .section-panel-header,
+.panel.is-top-setup-mode .plan-view-summary {
+  display: none;
+}
+
+.panel.is-plan-mode .section-panel-header,
+.panel.is-plan-mode .section-slider-grid,
+.panel.is-plan-mode .section-option-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.panel.is-plan-mode #menu-section-state {
+  display: flex;
+  flex-direction: column;
+}
+
+.panel.is-plan-mode .section-panel-header {
+  order: 0;
+}
+.panel.is-plan-mode .plan-view-summary {
+  order: 1;
+}
+.panel.is-plan-mode .section-slider-grid {
+  order: 2;
+}
+.panel.is-plan-mode .section-option-grid {
+  order: 3;
+}
+
+.panel.is-plan-mode .section-panel-header {
+  gap: 8px;
+}
+
+.panel.is-plan-mode .section-well-location {
+  font-size: 20px;
+  text-align: left;
+}
+
+.panel.is-plan-mode .section-slider-grid,
+.panel.is-plan-mode .section-option-grid {
+  margin-top: 18px;
+  gap: 14px;
+}
+
+.panel.is-plan-mode .section-option-card {
+  min-height: 126px;
+}
+
+.plan-view-summary {
+  margin-top: 24px;
+  border: 1px solid #b9dce6;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.72);
+  padding: 18px;
+  color: #0b1f3a;
+  line-height: 1.45;
+}
+
+.plan-view-summary[hidden],
+.top-setup-panel[hidden],
+.section-actions > button[hidden] {
+  display: none;
+}
+
+.top-setup-panel {
+  margin-top: 0;
+  border: 2px solid #b9dce6;
+  border-radius: 19px;
+  background: rgba(223, 246, 253, 0.9);
+  padding: 28px 24px 18px;

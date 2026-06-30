@@ -1,0 +1,3326 @@
+/*
+  AQUASMART Groundwater Viewer App
+
+  Owns the standalone Three.js model, 2D well section, aquifer setup panel,
+  MODFLOW top-view renderer, and all controls inside the iframe viewer.
+*/
+
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import {
+  aquiferLevelNames,
+  aquiferLevelNumbers,
+  defaultSoilByLevel,
+  sensorProfiles,
+  soilDescriptions,
+  soilDrawdownProfiles,
+  soilImages,
+  wellMetrics,
+  wellPresentation,
+} from "./data/groundwater-domain-data.js";
+import { fetchScenarioTopView } from "./api/modflow-scenario-api.js";
+
+import {
+  activeWellCountEl,
+  influenceTrackEl,
+  influenceValueEl,
+  legendEl,
+  menu3dStateEl,
+  menuPanelEl,
+  menuSectionStateEl,
+  pipeScreenStackEl,
+  planScenarioStatusEl,
+  planScreenReadoutEl,
+  planSoilReadoutEl,
+  planViewDetailsEl,
+  planViewModelEl,
+  planViewSummaryEl,
+  rechargeRateValueEl,
+  scenarioCancelButton,
+  scenarioDirectionButtons,
+  scenarioInputs,
+  scenarioLeakageDirectionRadios,
+  scenarioRechargeZoneRadios,
+  scenarioRunButton,
+  sceneRoot,
+  screenOptionsEl,
+  sectionCanvas,
+  sectionDischargeInput,
+  sectionDischargeValueEl,
+  sectionTitleEl,
+  sectionViewEl,
+  sectionWellLocationEl,
+  sensorSpecsEl,
+  sensorSpecsListEl,
+  sensorSpecsSelectEl,
+  sensorSpecsTitleEl,
+  showPanelButton,
+  soilDescriptionEl,
+  soilDropdownEl,
+  soilFigureEl,
+  soilSelectButtonEl,
+  soilSelectMenuEl,
+  soilSelectValueEl,
+  soilTypeSelect,
+  statusEl,
+  topSetupPanelEl,
+  topSetupStatusEl,
+  topSetupTitleEl,
+  topViewBackButton,
+  wellPickerEl,
+  wellUnavailableToastEl
+} from "./dom/viewer-dom-elements.js";
+
+// Viewer scale and Three.js scene setup
+const sectionContext = sectionCanvas.getContext("2d");
+const xScale = 1 / 1000;
+const yScale = 1 / 1000;
+const zScale = 11 / 1000;
+const domain = { lx_m: 60000, ly_m: 25000 };
+const centerX = domain.lx_m / 2;
+const centerY = domain.ly_m / 2;
+
+const renderer = new THREE.WebGLRenderer({
+  antialias: true,
+  alpha: false,
+});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setClearColor(0xdff6fd, 1);
+sceneRoot.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(0xdff6fd, 95, 165);
+
+const perspectiveCamera = new THREE.PerspectiveCamera(
+  45,
+  window.innerWidth / window.innerHeight,
+  0.1,
+  400,
+);
+const orthoSize = 36;
+const orthoCamera = new THREE.OrthographicCamera(
+  -orthoSize,
+  orthoSize,
+  orthoSize,
+  -orthoSize,
+  0.1,
+  400,
+);
+let activeCamera = perspectiveCamera;
+const controls = new OrbitControls(activeCamera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+controls.target.set(0, 0, 0);
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+
+// Runtime state shared by 3D, 2D section, and top-view modes
+let cameraTween = null;
+let sceneData = null;
+let modflowTopViewData = null;
+let activeSectionWell = null;
+let sectionZoom = 1;
+let sectionMode = false;
+let sectionPanX = 0;
+let sectionPanY = 0;
+let sectionDischarge = 0;
+let selectedSoilType = "loam";
+let activeSoilLevel = 1;
+let soilTypeByLevel = new Map();
+let selectedScreenLevels = new Set();
+let isSectionDragging = false;
+let lastSectionPointer = { x: 0, y: 0 };
+let lastSectionCursor = {
+  x: window.innerWidth / 2,
+  y: window.innerHeight / 2,
+};
+let sensorHitBoxes = [];
+let aquiferHitRegions = [];
+let hoveredAquiferLevel = null;
+let topViewMode = false;
+let activeTopLayer = 0;
+let topViewZoom = 1;
+let topViewPanX = 0;
+let topViewPanY = 0;
+let topViewSetupMode = false;
+let pendingTopViewRegion = null;
+let selectedAquiferRegion = null;
+let scenarioDirection = "left-to-right";
+let activeScenarioConfig = null;
+let topViewAnimatedDischarge = 0;
+let topViewDischargeFrame = null;
+let wellUnavailableToastTimer = null;
+let sensorSpecsVisible = false;
+let activeSensorIndex = 0;
+const headsGroup = new THREE.Group();
+const arrowsGroup = new THREE.Group();
+const wellsGroup = new THREE.Group();
+const frameGroup = new THREE.Group();
+scene.add(headsGroup, arrowsGroup, wellsGroup, frameGroup);
+
+// Lighting
+scene.add(new THREE.HemisphereLight(0xffffff, 0x162033, 2.35));
+const sun = new THREE.DirectionalLight(0xffffff, 3.0);
+sun.position.set(-18, 30, 24);
+scene.add(sun);
+
+// Geometry and rendering helpers
+function toScenePoint(point) {
+  return new THREE.Vector3(
+    (point[0] - centerX) * xScale,
+    (point[2] || 0) * zScale,
+    (point[1] - centerY) * yScale,
+  );
+}
+
+function colorArray(hexColors) {
+  const values = [];
+  const color = new THREE.Color();
+  for (const hex of hexColors) {
+    color.set(hex);
+    values.push(color.r, color.g, color.b);
+  }
+  return new Float32Array(values);
+}
+
+const waterTextureCache = new Map();
+
+function isAquiferType(type) {
+  return Object.hasOwn(aquiferLevelNumbers, type);
+}
+
+function aquiferColor(type) {
+  if (type === "Upper Aquifer") return "#1f9bef";
+  if (type === "Middle Aquifer") return "#158bd7";
+  if (type === "Lower Aquifer") return "#0d72bd";
+  return "#158bd7";
+}
+
+function getLayerFill(layer) {
+  if (isAquiferType(layer.type)) {
+    return aquiferColor(layer.type);
+  }
+  return (
+    sceneData?.legend?.layerColors?.[layer.type] ||
+    layer.sideColor ||
+    "#9ca3af"
+  );
+}
+
+function makeWaterTexture(colorHex) {
+  if (waterTextureCache.has(colorHex)) {
+    return waterTextureCache.get(colorHex);
+  }
+  const canvas = document.createElement("canvas");
+  canvas.width = 128;
+  canvas.height = 128;
+  const context = canvas.getContext("2d");
+  context.fillStyle = colorHex;
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  context.strokeStyle = "rgba(226, 246, 255, 0.16)";
+  context.lineWidth = 2;
+  for (let y = -24; y < canvas.height + 24; y += 18) {
+    context.beginPath();
+    for (let x = -12; x <= canvas.width + 12; x += 12) {
+      const yy = y + Math.sin((x + y) * 0.07) * 4;
+      if (x === -12) context.moveTo(x, yy);
+      else context.lineTo(x, yy);
+    }
+    context.stroke();
+  }
+  context.strokeStyle = "rgba(8, 47, 73, 0.16)";
+  context.lineWidth = 1.1;
+  for (let y = -18; y < canvas.height + 18; y += 23) {
+    context.beginPath();
+    for (let x = -8; x <= canvas.width + 8; x += 16) {
+      const yy = y + Math.cos((x - y) * 0.065) * 3;
+      if (x === -8) context.moveTo(x, yy);
+      else context.lineTo(x, yy);
+    }
+    context.stroke();
+  }
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(6, 3);
+  waterTextureCache.set(colorHex, texture);
+  return texture;
+}
+
+function makeTerrainColors(vertices) {
+  const values = [];
+  const color = new THREE.Color();
+  for (const [x, y, z] of vertices) {
+    const x01 = x / domain.lx_m;
+    const y01 = y / domain.ly_m;
+    const riverA = Math.abs(y01 - (0.22 + 0.08 * Math.sin(x01 * 10)));
+    const riverB = Math.abs(y01 - (0.68 - 0.05 * Math.cos(x01 * 13)));
+    if (riverA < 0.015 || riverB < 0.012) {
+      color.set("#2f83d8");
+    } else if (z > 354) {
+      color.set("#557c35");
+    } else if ((x01 > 0.58 && y01 > 0.48) || z < 300) {
+      color.set("#c7b783");
+    } else {
+      color.set("#78a953");
+    }
+    values.push(color.r, color.g, color.b);
+  }
+  return new Float32Array(values);
+}
+
+function makeSurface(surface, options = {}) {
+  const geometry = new THREE.BufferGeometry();
+  const positions = [];
+  for (const vertex of surface.vertices) {
+    const p = toScenePoint(vertex);
+    positions.push(p.x, p.y, p.z);
+  }
+
+  geometry.setAttribute(
+    "position",
+    new THREE.Float32BufferAttribute(positions, 3),
+  );
+  geometry.setIndex(surface.faces.flat());
+  geometry.computeVertexNormals();
+
+  const materialOptions = {
+    transparent: options.solid ? false : true,
+    opacity: options.opacity ?? 0.74,
+    side: THREE.DoubleSide,
+  };
+  if (!options.unlit) {
+    materialOptions.roughness = 0.9;
+    materialOptions.metalness = 0;
+  }
+
+  if (options.waterColor) {
+    materialOptions.color = options.waterColor;
+    materialOptions.map = makeWaterTexture(options.waterColor);
+  } else if (options.terrainColors) {
+    geometry.setAttribute(
+      "color",
+      new THREE.BufferAttribute(makeTerrainColors(surface.vertices), 3),
+    );
+    materialOptions.vertexColors = true;
+  } else if (surface.vertexColors) {
+    geometry.setAttribute(
+      "color",
+      new THREE.BufferAttribute(colorArray(surface.vertexColors), 3),
+    );
+    materialOptions.vertexColors = true;
+  } else {
+    materialOptions.color = surface.color || options.color || "#9ca3af";
+  }
+
+  const Material = options.unlit
+    ? THREE.MeshBasicMaterial
+    : THREE.MeshStandardMaterial;
+  const mesh = new THREE.Mesh(geometry, new Material(materialOptions));
+  mesh.name = surface.name;
+  if (options.renderOrder !== undefined) {
+    mesh.renderOrder = options.renderOrder;
+  }
+  return mesh;
+}
+
+function addEdges(mesh, color = 0x0b1f3a, opacity = 0.46) {
+  const edges = new THREE.EdgesGeometry(mesh.geometry, 18);
+  const lines = new THREE.LineSegments(
+    edges,
+    new THREE.LineBasicMaterial({ color, transparent: true, opacity }),
+  );
+  mesh.add(lines);
+  return mesh;
+}
+
+function addOutline(mesh, color = 0x0b1f3a, opacity = 0.5) {
+  const edges = new THREE.EdgesGeometry(mesh.geometry, 42);
+  const lines = new THREE.LineSegments(
+    edges,
+    new THREE.LineBasicMaterial({ color, transparent: true, opacity }),
+  );
+  lines.renderOrder = 15;
+  mesh.add(lines);
+  return mesh;
+}
+
+function makeTextSprite(
+  text,
+  color = "#f8fafc",
+  background = "rgba(11,31,58,0.74)",
+) {
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+  const scale = 3;
+  canvas.width = 360 * scale;
+  canvas.height = 84 * scale;
+  context.scale(scale, scale);
+  context.font = "700 24px Inter, system-ui, sans-serif";
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+  const metrics = context.measureText(text);
+  const width = Math.min(336, metrics.width + 34);
+  const x = (360 - width) / 2;
+  context.fillStyle = background;
+  context.strokeStyle = "rgba(255,255,255,0.28)";
+  context.lineWidth = 1;
+  context.beginPath();
+  context.roundRect(x, 12, width, 60, 10);
+  context.fill();
+  context.stroke();
+  context.fillStyle = color;
+  context.fillText(text, 180, 42);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  const material = new THREE.SpriteMaterial({
+    map: texture,
+    transparent: true,
+    depthTest: false,
+  });
+  const sprite = new THREE.Sprite(material);
+  sprite.scale.set(7.2, 1.68, 1);
+  sprite.renderOrder = 20;
+  return sprite;
+}
+
+function inferGrid(surface) {
+  const firstY = surface.vertices[0][1];
+  let cols = 0;
+  while (
+    cols < surface.vertices.length &&
+    surface.vertices[cols][1] === firstY
+  ) {
+    cols += 1;
+  }
+  return { rows: surface.vertices.length / cols, cols };
+}
+
+function surfaceRow(surface, rowIndex) {
+  const { rows, cols } = inferGrid(surface);
+  const row = rowIndex === -1 ? rows - 1 : rowIndex;
+  return surface.vertices.slice(row * cols, row * cols + cols);
+}
+
+function surfaceRowAtY(surface, yValue) {
+  const { rows, cols } = inferGrid(surface);
+  let bestRow = 0;
+  let bestDistance = Number.POSITIVE_INFINITY;
+  for (let row = 0; row < rows; row += 1) {
+    const rowY = surface.vertices[row * cols][1];
+    const distance = Math.abs(rowY - yValue);
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      bestRow = row;
+    }
+  }
+  return surface.vertices.slice(bestRow * cols, bestRow * cols + cols);
+}
+
+function xzPath(points, project) {
+  return points.map((point) => project(point[0], point[2]));
+}
+
+function interpolateRowZ(row, xValue) {
+  if (xValue <= row[0][0]) {
+    return row[0][2];
+  }
+  for (let index = 1; index < row.length; index += 1) {
+    const previous = row[index - 1];
+    const current = row[index];
+    if (xValue <= current[0]) {
+      const t = (xValue - previous[0]) / (current[0] - previous[0] || 1);
+      return previous[2] + (current[2] - previous[2]) * t;
+    }
+  }
+  return row.at(-1)[2];
+}
+
+function getAquiferBandsAtWell(well, topRows, layerBottomRows) {
+  const bandsByLevel = new Map();
+  for (let index = 0; index < sceneData.layers.length; index += 1) {
+    const layer = sceneData.layers[index];
+    const level = aquiferLevelNumbers[layer.type];
+    if (!level) {
+      continue;
+    }
+    const topZ = interpolateRowZ(topRows[index], well.x_m);
+    const bottomZ = interpolateRowZ(layerBottomRows[index], well.x_m);
+    const screenTopZ = Math.min(well.screen_top_m, topZ);
+    const screenBottomZ = Math.max(well.screen_bottom_m, bottomZ);
+    if (screenTopZ <= screenBottomZ) {
+      continue;
+    }
+    const existing = bandsByLevel.get(level) || {
+      level,
+      label: `${aquiferLevelNames[layer.type]} ${layer.type.replace(" Aquifer", "")}`,
+      type: layer.type,
+      firstIndex: index,
+      lastIndex: index,
+      topZ: screenTopZ,
+      bottomZ: screenBottomZ,
+    };
+    existing.firstIndex = Math.min(existing.firstIndex, index);
+    existing.lastIndex = Math.max(existing.lastIndex, index);
+    existing.topZ = Math.max(existing.topZ, screenTopZ);
+    existing.bottomZ = Math.min(existing.bottomZ, screenBottomZ);
+    bandsByLevel.set(level, existing);
+  }
+  return [...bandsByLevel.values()].sort((a, b) => a.level - b.level);
+}
+
+// Pipe screen, soil, and drawdown configuration controls
+function getSoilTypeForLevel(level) {
+  return (
+    soilTypeByLevel.get(level) ||
+    defaultSoilByLevel[level] ||
+    selectedSoilType ||
+    "loam"
+  );
+}
+
+function getSoilProfileForLevel(level) {
+  const soilType = getSoilTypeForLevel(level);
+  return {
+    type: soilType,
+    ...(soilDrawdownProfiles[soilType] || soilDrawdownProfiles.loam),
+  };
+}
+
+function setActiveSoilLevel(level) {
+  activeSoilLevel = level;
+  selectedSoilType = getSoilTypeForLevel(level);
+  soilTypeSelect.value = selectedSoilType;
+  updateSoilControl();
+  updateDischargeLabel();
+  updateScreenPreview();
+}
+
+function updateScreenOptions(well) {
+  if (!sceneData || !well) {
+    screenOptionsEl.replaceChildren();
+    return;
+  }
+  const sectionY = well.y_m;
+  const topRows = sceneData.layers.map((layer) =>
+    surfaceRowAtY(layer.topSurface, sectionY),
+  );
+  const bedrockRow = surfaceRowAtY(sceneData.bedrock, sectionY);
+  const layerBottomRows = sceneData.layers.map((_, index) =>
+    index < sceneData.layers.length - 1 ? topRows[index + 1] : bedrockRow,
+  );
+  const bands = getAquiferBandsAtWell(well, topRows, layerBottomRows);
+  const availableLevels = bands.map((band) => band.level);
+  for (const level of availableLevels) {
+    if (!soilTypeByLevel.has(level)) {
+      soilTypeByLevel.set(level, defaultSoilByLevel[level] || "loam");
+    }
+  }
+  selectedScreenLevels = new Set(
+    [...selectedScreenLevels].filter((level) =>
+      availableLevels.includes(level),
+    ),
+  );
+  if (selectedScreenLevels.size === 0) {
+    selectedScreenLevels = new Set(availableLevels);
+  }
+  if (!availableLevels.includes(activeSoilLevel)) {
+    activeSoilLevel = availableLevels[0] || 1;
+  }
+  screenOptionsEl.replaceChildren();
+  for (const band of bands) {
+    const id = `screen-level-${band.level}`;
+    const label = document.createElement("label");
+    const input = document.createElement("input");
+    input.type = "checkbox";
+    input.id = id;
+    input.value = String(band.level);
+    input.checked = selectedScreenLevels.has(band.level);
+    input.addEventListener("change", () => {
+      if (input.checked) {
+        selectedScreenLevels.add(band.level);
+      } else {
+        selectedScreenLevels.delete(band.level);
+      }
+      if (selectedScreenLevels.size === 0) {
+        input.checked = true;
+        selectedScreenLevels.add(band.level);
+      }
+      if (!selectedScreenLevels.has(activeSoilLevel)) {
+        activeSoilLevel = [...selectedScreenLevels][0] || band.level;
+        selectedSoilType = getSoilTypeForLevel(activeSoilLevel);
+        soilTypeSelect.value = selectedSoilType;
+      }
+      updateScreenPreview();
+      updateSoilControl();
+      updateDischargeLabel();
+      drawSectionView();
+    });
+    const text = document.createElement("span");
+    text.textContent = `Level ${band.level}`;
+    const soilButton = document.createElement("button");
+    soilButton.type = "button";
+    soilButton.className = "screen-soil-button";
+    soilButton.dataset.soilLevel = String(band.level);
+    soilButton.title = `Set Level ${band.level} soil type`;
+    soilButton.setAttribute(
+      "aria-label",
+      `Set Level ${band.level} soil type`,
+    );
+    soilButton.addEventListener("click", () => {
+      setActiveSoilLevel(band.level);
+      setSoilMenuOpen(true);
+    });
+    const soilIcon = document.createElement("img");
+    soilIcon.alt = "";
+    soilButton.appendChild(soilIcon);
+    label.append(input, text, soilButton);
+    screenOptionsEl.appendChild(label);
+  }
+  setActiveSoilLevel(activeSoilLevel);
+  updateScreenPreview();
+}
+
+function updateScreenPreview() {
+  for (const segment of pipeScreenStackEl.querySelectorAll(
+    ".pipe-screen-segment",
+  )) {
+    const level = Number(segment.dataset.level);
+    segment.classList.toggle(
+      "is-active",
+      selectedScreenLevels.has(level),
+    );
+  }
+  for (const button of screenOptionsEl.querySelectorAll(
+    ".screen-soil-button",
+  )) {
+    const level = Number(button.dataset.soilLevel);
+    const soilType = getSoilTypeForLevel(level);
+    const image = button.querySelector("img");
+    if (image) {
+      image.src = soilImages[soilType] || soilImages.loam;
+      image.alt = "";
+    }
+    button.classList.toggle("is-selected", level === activeSoilLevel);
+    button.disabled = !selectedScreenLevels.has(level);
+    button.title = selectedScreenLevels.has(level)
+      ? `Level ${level}: ${getSoilProfileForLevel(level).label}`
+      : `Level ${level} screen is inactive`;
+  }
+}
+
+function drawSubtleWaterTexture(context, topPath, bottomPath) {
+  context.save();
+  context.beginPath();
+  for (const [idx, point] of [...topPath, ...bottomPath].entries()) {
+    if (idx === 0) context.moveTo(point.x, point.y);
+    else context.lineTo(point.x, point.y);
+  }
+  context.closePath();
+  context.clip();
+  context.strokeStyle = "rgba(226, 246, 255, 0.2)";
+  context.lineWidth = 1.05;
+  const xs = [...topPath, ...bottomPath].map((point) => point.x);
+  const ys = [...topPath, ...bottomPath].map((point) => point.y);
+  const minX = Math.min(...xs);
+  const maxX = Math.max(...xs);
+  const minY = Math.min(...ys);
+  const maxY = Math.max(...ys);
+  for (let y = minY + 12; y < maxY; y += 18) {
+    context.beginPath();
+    for (let x = minX - 20; x <= maxX + 20; x += 18) {
+      const yy = y + Math.sin((x + y) * 0.018) * 4;
+      if (x === minX - 20) context.moveTo(x, yy);
+      else context.lineTo(x, yy);
+    }
+    context.stroke();
+  }
+  context.restore();
+}
+
+function makeLayerSides(topSurface, bottomSurface, color) {
+  const { rows, cols } = inferGrid(topSurface);
+  const vertices = [];
+  const faces = [];
+
+  function pushQuad(topA, topB, bottomA, bottomB) {
+    const base = vertices.length;
+    for (const source of [topA, bottomA, topB, bottomB]) {
+      const p = toScenePoint(source);
+      vertices.push(p.x, p.y, p.z);
+    }
+    faces.push(base, base + 1, base + 2, base + 2, base + 1, base + 3);
+  }
+
+  for (let col = 0; col < cols - 1; col += 1) {
+    const a = col;
+    const b = col + 1;
+    const c = (rows - 1) * cols + col;
+    const d = c + 1;
+    pushQuad(
+      topSurface.vertices[a],
+      topSurface.vertices[b],
+      bottomSurface.vertices[a],
+      bottomSurface.vertices[b],
+    );
+    pushQuad(
+      topSurface.vertices[c],
+      topSurface.vertices[d],
+      bottomSurface.vertices[c],
+      bottomSurface.vertices[d],
+    );
+  }
+
+  for (let row = 0; row < rows - 1; row += 1) {
+    const leftA = row * cols;
+    const leftB = (row + 1) * cols;
+    const rightA = row * cols + cols - 1;
+    const rightB = (row + 1) * cols + cols - 1;
+    pushQuad(
+      topSurface.vertices[leftA],
+      topSurface.vertices[leftB],
+      bottomSurface.vertices[leftA],
+      bottomSurface.vertices[leftB],
+    );
+    pushQuad(
+      topSurface.vertices[rightA],
+      topSurface.vertices[rightB],
+      bottomSurface.vertices[rightA],
+      bottomSurface.vertices[rightB],
+    );
+  }
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute(
+    "position",
+    new THREE.Float32BufferAttribute(vertices, 3),
+  );
+  geometry.setIndex(faces);
+  geometry.computeVertexNormals();
+  const mesh = new THREE.Mesh(
+    geometry,
+    new THREE.MeshStandardMaterial({
+      color,
+      transparent: false,
+      opacity: 1,
+      roughness: 0.86,
+      side: THREE.DoubleSide,
+      polygonOffset: true,
+      polygonOffsetFactor: 1,
+      polygonOffsetUnits: 1,
+    }),
+  );
+  mesh.renderOrder = 4;
+  return addEdges(mesh, 0x0b1f3a, 0.62);
+}
+
+function makeBoundaryLines(surface) {
+  const { rows, cols } = inferGrid(surface);
+  const material = new THREE.LineBasicMaterial({
+    color: 0x0b1f3a,
+    transparent: true,
+    opacity: 0.95,
+    depthTest: false,
+  });
+  const group = new THREE.Group();
+  const edges = [
+    Array.from({ length: cols }, (_, col) => col),
+    Array.from({ length: cols }, (_, col) => (rows - 1) * cols + col),
+    Array.from({ length: rows }, (_, row) => row * cols),
+    Array.from({ length: rows }, (_, row) => row * cols + cols - 1),
+  ];
+
+  for (const edge of edges) {
+    const points = edge.map((index) => {
+      const point = toScenePoint(surface.vertices[index]);
+      point.y += 0.018;
+      return point;
+    });
+    const line = new THREE.Line(
+      new THREE.BufferGeometry().setFromPoints(points),
+      material.clone(),
+    );
+    line.renderOrder = 30;
+    group.add(line);
+  }
+  return group;
+}
+
+// 3D model builders
+function makeWireBox(sceneData) {
+  const lx = sceneData.domain.lx_m * xScale;
+  const ly = sceneData.domain.ly_m * yScale;
+  const lz =
+    (sceneData.domain.top_m - sceneData.domain.bottom_m) * zScale;
+  const box = new THREE.BoxGeometry(lx, lz, ly);
+  const edges = new THREE.EdgesGeometry(box);
+  const lines = new THREE.LineSegments(
+    edges,
+    new THREE.LineBasicMaterial({
+      color: 0xe2e8f0,
+      transparent: true,
+      opacity: 0.34,
+    }),
+  );
+  lines.position.y =
+    ((sceneData.domain.top_m + sceneData.domain.bottom_m) / 2) * zScale;
+  return lines;
+}
+
+function makeWell(well) {
+  const top = toScenePoint([well.x_m, well.y_m, well.screen_top_m]);
+  const bottom = toScenePoint([well.x_m, well.y_m, well.screen_bottom_m]);
+  const height = top.distanceTo(bottom);
+  const mid = top.clone().add(bottom).multiplyScalar(0.5);
+  const casing = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.11, 0.11, height, 16),
+    new THREE.MeshStandardMaterial({
+      color: 0xf8fafc,
+      metalness: 0.1,
+      roughness: 0.36,
+    }),
+  );
+  casing.position.copy(mid);
+  const marker = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.16, 0.16, 0.38, 16),
+    new THREE.MeshStandardMaterial({
+      color: well.role === "Pumping" ? 0x0057ff : 0xf8fafc,
+    }),
+  );
+  marker.position.copy(top);
+  marker.position.y += 0.18;
+  const screen = new THREE.Mesh(
+    new THREE.CylinderGeometry(
+      0.13,
+      0.13,
+      Math.max(height * 0.34, 0.5),
+      16,
+    ),
+    new THREE.MeshStandardMaterial({
+      color: well.role === "Pumping" ? 0x00a3ff : 0x38d6d1,
+    }),
+  );
+  screen.position.copy(bottom.clone().lerp(top, 0.22));
+  const presentation = wellPresentation[well.id];
+  const label = makeTextSprite(
+    presentation?.name || `${well.id} ${well.role}`,
+    well.role === "Pumping" ? "#65a8ff" : "#f8fafc",
+  );
+  label.position.copy(top);
+  label.position.y += 2.2;
+  const group = new THREE.Group();
+  group.userData.well = well;
+  group.add(casing, screen, marker, label);
+  group.traverse((child) => {
+    child.userData.well = well;
+    child.userData.selectableWell = true;
+  });
+  return group;
+}
+
+function makeFlowArrow(flow) {
+  const origin = toScenePoint(flow.start);
+  const direction = new THREE.Vector3(
+    flow.direction[0],
+    flow.direction[2] * 3,
+    flow.direction[1],
+  ).normalize();
+  const arrow = new THREE.ArrowHelper(
+    direction,
+    origin,
+    flow.length_m * xScale * 1.45,
+    0xffffff,
+    0.74,
+    0.3,
+  );
+  arrow.traverse((child) => {
+    if (child.material) {
+      child.material.depthTest = false;
+      child.material.transparent = true;
+      child.material.opacity = 0.92;
+    }
+    child.renderOrder = 10;
+  });
+  return arrow;
+}
+
+function makeFlowTraces() {
+  const group = new THREE.Group();
+  const material = new THREE.LineBasicMaterial({
+    color: 0xffffff,
+    transparent: true,
+    opacity: 0.9,
+    depthTest: false,
+  });
+  const frontY = -centerY * yScale - 0.18;
+  const levels = [1.2, 0.35, -0.65, -1.55, -2.45, -3.3];
+  for (let row = 0; row < levels.length; row += 1) {
+    for (let band = 0; band < 2; band += 1) {
+      const points = [];
+      const start = -27 + band * 3.8;
+      const end = 25 - band * 2.8;
+      for (let i = 0; i <= 52; i += 1) {
+        const t = i / 52;
+        const x = start + (end - start) * t;
+        const dip = Math.sin(t * Math.PI * 1.7 + row * 0.55) * 0.22;
+        const pumpSag = -0.52 * Math.exp(-Math.pow((t - 0.62) / 0.18, 2));
+        const y = levels[row] + dip + pumpSag;
+        points.push(new THREE.Vector3(x, y, frontY - row * 0.018));
+      }
+      const line = new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints(points),
+        material.clone(),
+      );
+      line.renderOrder = 12;
+      group.add(line);
+
+      const arrowPoint = points[Math.floor(points.length * 0.72)];
+      const cone = new THREE.Mesh(
+        new THREE.ConeGeometry(0.16, 0.42, 18),
+        new THREE.MeshBasicMaterial({
+          color: 0xffffff,
+          transparent: true,
+          opacity: 0.92,
+          depthTest: false,
+        }),
+      );
+      cone.position.copy(arrowPoint);
+      cone.rotation.z = -Math.PI / 2.8;
+      cone.rotation.x = Math.PI / 2;
+      cone.renderOrder = 13;
+      group.add(cone);
+    }
+  }
+  return group;
+}
+
+function resetCamera() {
+  activeCamera = perspectiveCamera;
+  controls.object = activeCamera;
+  perspectiveCamera.position.set(44, 9, 34);
+  controls.target.set(0, -1.35, 0);
+  perspectiveCamera.updateProjectionMatrix();
+  controls.update();
+}
+
+function updateOrthoCamera() {
+  const aspect = window.innerWidth / window.innerHeight;
+  orthoCamera.left = (-orthoSize * aspect) / 2;
+  orthoCamera.right = (orthoSize * aspect) / 2;
+  orthoCamera.top = orthoSize / 2;
+  orthoCamera.bottom = -orthoSize / 2;
+  orthoCamera.updateProjectionMatrix();
+}
+
+function animateCameraTo(
+  targetCamera,
+  targetPosition,
+  targetLookAt,
+  duration = 850,
+) {
+  const sourceCamera = activeCamera;
+  const startPosition = sourceCamera.position.clone();
+  const startTarget = controls.target.clone();
+  const startTime = performance.now();
+  cameraTween = {
+    targetCamera,
+    startPosition,
+    startTarget,
+    targetPosition,
+    targetLookAt,
+    duration,
+    startTime,
+  };
+}
+
+function transitionToWell(well) {
+  const presentation = wellPresentation[well.id];
+  if (presentation?.active === false) {
+    showUnavailableWell(well, presentation);
+    return;
+  }
+  openSectionView(well);
+}
+
+function showUnavailableWell(
+  well,
+  presentation = wellPresentation[well.id],
+) {
+  if (wellUnavailableToastTimer !== null) {
+    window.clearTimeout(wellUnavailableToastTimer);
+  }
+  const name = presentation?.name || `${well.id} ${well.role}`;
+  wellUnavailableToastEl.textContent = `${name} is inactive and currently unavailable.`;
+  wellUnavailableToastEl.hidden = false;
+  wellUnavailableToastTimer = window.setTimeout(() => {
+    wellUnavailableToastEl.hidden = true;
+    wellUnavailableToastTimer = null;
+  }, 3200);
+}
+
+function updateCameraTween() {
+  if (!cameraTween) {
+    return;
+  }
+  const elapsed = performance.now() - cameraTween.startTime;
+  const t = Math.min(elapsed / cameraTween.duration, 1);
+  const eased = 1 - Math.pow(1 - t, 3);
+  activeCamera.position.lerpVectors(
+    cameraTween.startPosition,
+    cameraTween.targetPosition,
+    eased,
+  );
+  controls.target.lerpVectors(
+    cameraTween.startTarget,
+    cameraTween.targetLookAt,
+    eased,
+  );
+  activeCamera.lookAt(controls.target);
+  activeCamera.updateProjectionMatrix();
+  if (t >= 1) {
+    cameraTween = null;
+  }
+}
+
+function findWellObject(object) {
+  let current = object;
+  while (current) {
+    if (current.userData?.well) {
+      return current.userData.well;
+    }
+    current = current.parent;
+  }
+  return null;
+}
+
+// Shared 2D canvas helpers
+function drawCalloutText(context, text, x, y, options = {}) {
+  const font = options.font || "800 13px Inter, system-ui, sans-serif";
+  const paddingX = options.paddingX || 8;
+  const paddingY = options.paddingY || 5;
+  context.save();
+  context.font = font;
+  context.textAlign = options.align || "left";
+  context.textBaseline = "middle";
+  const metrics = context.measureText(text);
+  const width = metrics.width + paddingX * 2;
+  const height = options.height || 23;
+  const boxX = context.textAlign === "center" ? x - width / 2 : x;
+  context.fillStyle = options.background || "rgba(223, 246, 253, 0.82)";
+  context.strokeStyle = options.border || "rgba(226, 232, 240, 0.22)";
+  context.lineWidth = 1;
+  context.beginPath();
+  context.roundRect(boxX, y - height / 2, width, height, 6);
+  context.fill();
+  context.stroke();
+  context.fillStyle = options.color || "#f8fafc";
+  context.fillText(
+    text,
+    context.textAlign === "center" ? x : x + paddingX,
+    y + (options.baselineOffset || 0),
+  );
+  context.restore();
+}
+
+function pointInPolygon(point, polygon) {
+  let inside = false;
+  for (
+    let i = 0, j = polygon.length - 1;
+    i < polygon.length;
+    j = i, i += 1
+  ) {
+    const a = polygon[i];
+    const b = polygon[j];
+    const crosses =
+      a.y > point.y !== b.y > point.y &&
+      point.x <
+        ((b.x - a.x) * (point.y - a.y)) / (b.y - a.y || 1e-9) + a.x;
+    if (crosses) inside = !inside;
+  }
+  return inside;
+}
+
+function headColor(value, low, high) {
+  const stops = [
+    [0, [68, 1, 84]],
+    [0.25, [59, 82, 139]],
+    [0.5, [33, 145, 140]],
+    [0.75, [94, 201, 98]],
+    [1, [253, 231, 37]],
+  ];
+  const t = Math.max(
+    0,
+    Math.min(1, (value - low) / Math.max(1e-9, high - low)),
+  );
+  const upperIndex = Math.min(
+    stops.length - 1,
+    Math.ceil(t * (stops.length - 1)),
+  );
+  const lowerIndex = Math.max(0, upperIndex - 1);
+  const lower = stops[lowerIndex];
+  const upper = stops[upperIndex];
+  const span = upper[0] - lower[0] || 1;
+  const local = (t - lower[0]) / span;
+  const rgb = lower[1].map((channel, index) =>
+    Math.round(channel + (upper[1][index] - channel) * local),
+  );
+  return `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+}
+
+function drawPlanArrow(
+  context,
+  start,
+  dx,
+  dy,
+  color = "rgba(5, 19, 34, 0.82)",
+) {
+  const end = { x: start.x + dx, y: start.y + dy };
+  const angle = Math.atan2(dy, dx);
+  const head = 4.5;
+  context.beginPath();
+  context.moveTo(start.x, start.y);
+  context.lineTo(end.x, end.y);
+  context.lineTo(
+    end.x - head * Math.cos(angle - Math.PI / 6),
+    end.y - head * Math.sin(angle - Math.PI / 6),
+  );
+  context.moveTo(end.x, end.y);
+  context.lineTo(
+    end.x - head * Math.cos(angle + Math.PI / 6),
+    end.y - head * Math.sin(angle + Math.PI / 6),
+  );
+  context.strokeStyle = color;
+  context.lineWidth = 1.35;
+  context.stroke();
+}
+
+function getTopViewLayout(width, height) {
+  const panelBounds = menuPanelEl.classList.contains("is-hidden")
+    ? null
+    : menuPanelEl.getBoundingClientRect();
+  const safeLeft = panelBounds ? panelBounds.right + 28 : 68;
+  const marginLeft = Math.min(Math.max(68, width - 390), safeLeft);
+  const marginRight = 170;
+  const marginTop = 98;
+  const marginBottom = 72;
+  return {
+    marginLeft,
+    marginRight,
+    marginTop,
+    marginBottom,
+    plotWidth: Math.max(220, width - marginLeft - marginRight),
+    plotHeight: Math.max(220, height - marginTop - marginBottom),
+  };
+}
+
+function getTopViewScenario(
+  data,
+  layer,
+  dischargeValue = sectionDischarge,
+) {
+  const dischargeRatio =
+    dischargeValue / Math.max(1, Number(sectionDischargeInput.max));
+  const screenLevel = activeTopLayer + 1;
+  const soil = getSoilProfileForLevel(screenLevel);
+  const screenActive = selectedScreenLevels.has(screenLevel);
+  const domainWidth = data.domain.xmax - data.domain.xmin;
+  const domainHeight = data.domain.ymax - data.domain.ymin;
+  const wellX =
+    data.domain.xmin +
+    (activeSectionWell.x_m / sceneData.domain.lx_m) * domainWidth;
+  const wellY =
+    data.domain.ymin +
+    (activeSectionWell.y_m / sceneData.domain.ly_m) * domainHeight;
+  const radius =
+    Math.min(domainWidth, domainHeight) * (0.08 + 0.16 * soil.influence);
+  const maximumDrawdown = screenActive
+    ? dischargeRatio * 9.5 * soil.depth
+    : 0;
+  const baselineFlowScale = Math.max(
+    ...layer.qx.map((qx, index) => Math.hypot(qx, layer.qy[index])),
+    1e-9,
+  );
+  const flowBoost = screenActive
+    ? dischargeRatio * baselineFlowScale * 1.15 * soil.depth
+    : 0;
+  const adjustedHead = [];
+  const adjustedQx = [];
+  const adjustedQy = [];
+
+  for (let index = 0; index < data.grid.cells.length; index += 1) {
+    const [cellX, cellY] = data.grid.cells[index].center;
+    const dx = wellX - cellX;
+    const dy = wellY - cellY;
+    const distance = Math.hypot(dx, dy);
+    const influence =
+      soil.type === "sand"
+        ? Math.pow(Math.max(0, 1 - distance / radius), 0.9)
+        : Math.exp(-(distance * distance) / (2 * radius * radius));
+    const directionX = distance > 1e-6 ? dx / distance : 0;
+    const directionY = distance > 1e-6 ? dy / distance : 0;
+    adjustedHead.push(layer.head[index] - maximumDrawdown * influence);
+    adjustedQx.push(layer.qx[index] + directionX * flowBoost * influence);
+    adjustedQy.push(layer.qy[index] + directionY * flowBoost * influence);
+  }
+
+  return {
+    soil,
+    discharge: dischargeValue,
+    dischargeRatio,
+    screenLevel,
+    screenActive,
+    wellX,
+    wellY,
+    radius,
+    maximumDrawdown,
+    head: adjustedHead,
+    qx: adjustedQx,
+    qy: adjustedQy,
+  };
+}
+
+function buildScenarioContours(data, values) {
+  const xs = [
+    ...new Set(
+      data.grid.cells.map((cell) => Number(cell.center[0].toFixed(2))),
+    ),
+  ].sort((a, b) => a - b);
+  const ys = [
+    ...new Set(
+      data.grid.cells.map((cell) => Number(cell.center[1].toFixed(2))),
+    ),
+  ].sort((a, b) => a - b);
+  if (xs.length < 2 || ys.length < 2) {
+    return [];
+  }
+  const valueByCenter = new Map();
+  data.grid.cells.forEach((cell, index) => {
+    valueByCenter.set(
+      `${Number(cell.center[0].toFixed(2))}:${Number(cell.center[1].toFixed(2))}`,
+      values[index],
+    );
+  });
+  const finiteValues = values.filter(Number.isFinite);
+  const low = Math.min(...finiteValues);
+  const high = Math.max(...finiteValues);
+  if (!Number.isFinite(low) || !Number.isFinite(high) || low === high) {
+    return [];
+  }
+  const levels = Array.from({ length: 6 }, (_, index) =>
+    low + ((index + 1) / 7) * (high - low),
+  );
+  const contours = [];
+
+  function valueAt(xIndex, yIndex) {
+    return valueByCenter.get(`${xs[xIndex]}:${ys[yIndex]}`);
+  }
+
+  function interpolate(a, b, level) {
+    const t = (level - a.value) / (b.value - a.value || 1);
+    return {
+      x: a.x + (b.x - a.x) * t,
+      y: a.y + (b.y - a.y) * t,
+    };
+  }
+
+  for (const level of levels) {
+    const segments = [];
+    for (let yi = 0; yi < ys.length - 1; yi += 1) {
+      for (let xi = 0; xi < xs.length - 1; xi += 1) {
+        const corners = [
+          { x: xs[xi], y: ys[yi], value: valueAt(xi, yi) },
+          { x: xs[xi + 1], y: ys[yi], value: valueAt(xi + 1, yi) },
+          {
+            x: xs[xi + 1],
+            y: ys[yi + 1],
+            value: valueAt(xi + 1, yi + 1),
+          },
+          { x: xs[xi], y: ys[yi + 1], value: valueAt(xi, yi + 1) },
+        ];
+        if (corners.some((corner) => !Number.isFinite(corner.value))) {
+          continue;
+        }
+        const crossings = [];
+        const edges = [
+          [corners[0], corners[1]],
+          [corners[1], corners[2]],
+          [corners[2], corners[3]],
+          [corners[3], corners[0]],
+        ];
+        for (const [a, b] of edges) {
+          const crosses =
+            (a.value <= level && b.value > level) ||
+            (b.value <= level && a.value > level);
+          if (crosses) {
+            crossings.push(interpolate(a, b, level));
+          }
+        }
+        if (crossings.length === 2) {
+          segments.push(crossings);
+        } else if (crossings.length === 4) {
+          segments.push([crossings[0], crossings[1]]);
+          segments.push([crossings[2], crossings[3]]);
+        }
+      }
+    }
+    const polylines = [];
+    const unused = segments.slice();
+    const closeEnough = (a, b) =>
+      Math.hypot(a.x - b.x, a.y - b.y) < Math.min(xs[1] - xs[0], ys[1] - ys[0]) * 0.15;
+    while (unused.length > 0) {
+      const line = unused.pop();
+      let changed = true;
+      while (changed) {
+        changed = false;
+        for (let index = unused.length - 1; index >= 0; index -= 1) {
+          const candidate = unused[index];
+          if (closeEnough(line.at(-1), candidate[0])) {
+            line.push(candidate[1]);
+          } else if (closeEnough(line.at(-1), candidate[1])) {
+            line.push(candidate[0]);
+          } else if (closeEnough(line[0], candidate[1])) {
+            line.unshift(candidate[0]);
+          } else if (closeEnough(line[0], candidate[0])) {
+            line.unshift(candidate[1]);
+          } else {
+            continue;
+          }
+          unused.splice(index, 1);
+          changed = true;
+        }
+      }
+      if (line.length >= 2) {
+        polylines.push(line);
+      }
+    }
+    for (const line of polylines) {
+      contours.push({
+        level,
+        points: line.map((point) => [point.x, point.y]),
+      });
+    }
+  }
+  return contours;
+}
+
+// MODFLOW top-view renderer
+function drawTopView() {
+  if (!modflowTopViewData) return;
+  const ratio = Math.min(window.devicePixelRatio, 2);
+  const width = sectionCanvas.clientWidth;
+  const height = sectionCanvas.clientHeight;
+  sectionCanvas.width = Math.max(1, Math.floor(width * ratio));
+  sectionCanvas.height = Math.max(1, Math.floor(height * ratio));
+  sensorHitBoxes = [];
+  aquiferHitRegions = [];
+  sectionContext.setTransform(ratio, 0, 0, ratio, 0, 0);
+  sectionContext.clearRect(0, 0, width, height);
+  sectionContext.fillStyle = "#DFF6FD";
+  sectionContext.fillRect(0, 0, width, height);
+
+  const data = modflowTopViewData;
+  const layer =
+    data.layers[Math.min(activeTopLayer, data.layers.length - 1)];
+  const scenario = getTopViewScenario(
+    data,
+    layer,
+    topViewAnimatedDischarge,
+  );
+  const domainWidth = data.domain.xmax - data.domain.xmin;
+  const domainHeight = data.domain.ymax - data.domain.ymin;
+  const {
+    marginLeft,
+    marginRight,
+    marginTop,
+    marginBottom,
+    plotWidth,
+    plotHeight,
+  } = getTopViewLayout(width, height);
+  const baseScale = Math.min(
+    plotWidth / domainWidth,
+    plotHeight / domainHeight,
+  );
+  const scale = baseScale * topViewZoom;
+  const centerX = marginLeft + plotWidth / 2 + topViewPanX;
+  const centerY = marginTop + plotHeight / 2 + topViewPanY;
+  const worldCenterX = (data.domain.xmin + data.domain.xmax) / 2;
+  const worldCenterY = (data.domain.ymin + data.domain.ymax) / 2;
+  const project = (x, y) => ({
+    x: centerX + (x - worldCenterX) * scale,
+    y: centerY - (y - worldCenterY) * scale,
+  });
+  const low = Math.min(...scenario.head);
+  const high = Math.max(...scenario.head);
+
+  sectionContext.lineJoin = "round";
+  for (let index = 0; index < data.grid.cells.length; index += 1) {
+    const cell = data.grid.cells[index];
+    const points = cell.vertexIds.map((vertexId) =>
+      project(...data.grid.vertices[vertexId]),
+    );
+    sectionContext.beginPath();
+    points.forEach((point, pointIndex) =>
+      pointIndex === 0
+        ? sectionContext.moveTo(point.x, point.y)
+        : sectionContext.lineTo(point.x, point.y),
+    );
+    sectionContext.closePath();
+    sectionContext.fillStyle = headColor(scenario.head[index], low, high);
+    sectionContext.fill();
+    sectionContext.strokeStyle = "rgba(11, 31, 58, 0.12)";
+    sectionContext.lineWidth = 0.55;
+    sectionContext.stroke();
+  }
+
+  for (const cellIndex of data.streamCells) {
+    const cell = data.grid.cells[cellIndex];
+    if (!cell) continue;
+    const points = cell.vertexIds.map((vertexId) =>
+      project(...data.grid.vertices[vertexId]),
+    );
+    sectionContext.beginPath();
+    points.forEach((point, pointIndex) =>
+      pointIndex === 0
+        ? sectionContext.moveTo(point.x, point.y)
+        : sectionContext.lineTo(point.x, point.y),
+    );
+    sectionContext.closePath();
+    sectionContext.strokeStyle = "rgba(14, 165, 233, 0.95)";
+    sectionContext.lineWidth = 2.2;
+    sectionContext.stroke();
+  }
+
+  const foregroundLabels = [];
+  sectionContext.font = "700 11px Inter, system-ui, sans-serif";
+  const scenarioContours = buildScenarioContours(data, scenario.head);
+  for (const contour of scenarioContours) {
+    const points = contour.points.map((point) =>
+      project(point[0], point[1]),
+    );
+    sectionContext.beginPath();
+    points.forEach((point, index) =>
+      index === 0
+        ? sectionContext.moveTo(point.x, point.y)
+        : sectionContext.lineTo(point.x, point.y),
+    );
+    sectionContext.strokeStyle = "rgba(255, 255, 255, 0.88)";
+    sectionContext.lineWidth = 1.35;
+    sectionContext.stroke();
+    if (points.length > 4) {
+      const labelPoint = points[Math.floor(points.length * 0.55)];
+      foregroundLabels.push({
+        text: contour.level.toFixed(2),
+        x: labelPoint.x + 4,
+        y: labelPoint.y - 4,
+        font: "700 11px Inter, system-ui, sans-serif",
+      });
+    }
+  }
+
+  if (scenario.maximumDrawdown > 0.01) {
+    const wellPosition = project(scenario.wellX, scenario.wellY);
+    sectionContext.save();
+    sectionContext.setLineDash([6, 5]);
+    for (let ring = 1; ring <= 4; ring += 1) {
+      const ringRatio = ring / 4;
+      const ringRadius = scenario.radius * ringRatio * scale;
+      const ringInfluence =
+        scenario.soil.type === "sand"
+          ? Math.pow(Math.max(0, 1 - ringRatio), 0.9)
+          : Math.exp(-(ringRatio * ringRatio) / 2);
+      const drawdown = scenario.maximumDrawdown * ringInfluence;
+      sectionContext.beginPath();
+      sectionContext.arc(
+        wellPosition.x,
+        wellPosition.y,
+        ringRadius,
+        0,
+        Math.PI * 2,
+      );
+      sectionContext.strokeStyle = "rgba(255, 255, 255, 0.9)";
+      sectionContext.lineWidth = 1.4;
+      sectionContext.stroke();
+      sectionContext.fillStyle = "#ffffff";
+      sectionContext.font = "700 10px Inter, system-ui, sans-serif";
+      if (drawdown >= 0.05) {
+        foregroundLabels.push({
+          text: `-${drawdown.toFixed(1)} m`,
+          x: wellPosition.x + ringRadius + 4,
+          y: wellPosition.y,
+          font: "700 10px Inter, system-ui, sans-serif",
+        });
+      }
+    }
+    sectionContext.restore();
+  }
+
+  const magnitudes = scenario.qx.map((qx, index) =>
+    Math.hypot(qx, scenario.qy[index]),
+  );
+  const maxMagnitude = Math.max(...magnitudes, 1e-9);
+  const finiteCellWidths = data.grid.cells
+    .map((cell) => {
+      const projected = cell.vertexIds.map((vertexId) =>
+        project(...data.grid.vertices[vertexId]),
+      );
+      const xs = projected.map((point) => point.x);
+      const ys = projected.map((point) => point.y);
+      return Math.min(
+        Math.max(...xs) - Math.min(...xs),
+        Math.max(...ys) - Math.min(...ys),
+      );
+    })
+    .filter((value) => Number.isFinite(value) && value > 0)
+    .sort((a, b) => a - b);
+  const typicalCellWidth =
+    finiteCellWidths.length > 0
+      ? finiteCellWidths[Math.floor(finiteCellWidths.length / 2)]
+      : 18;
+  for (let index = 0; index < data.grid.cells.length; index += 1) {
+    const magnitude = magnitudes[index];
+    if (magnitude <= 1e-12) continue;
+    const center = project(...data.grid.cells[index].center);
+    const length = Math.max(
+      5,
+      Math.min(
+        typicalCellWidth * 0.74,
+        4 + typicalCellWidth * 0.64 * Math.sqrt(magnitude / maxMagnitude),
+      ),
+    );
+    drawPlanArrow(
+      sectionContext,
+      center,
+      (scenario.qx[index] / magnitude) * length,
+      -(scenario.qy[index] / magnitude) * length,
+    );
+  }
+
+  for (const well of data.wells) {
+    const position = project(well.x, well.y);
+    sectionContext.beginPath();
+    sectionContext.arc(position.x, position.y, 7, 0, Math.PI * 2);
+    sectionContext.fillStyle = "#ffffff";
+    sectionContext.fill();
+    sectionContext.strokeStyle = "#e11d48";
+    sectionContext.lineWidth = 3;
+    sectionContext.stroke();
+    sectionContext.fillStyle = "#0b1f3a";
+    sectionContext.font = "800 11px Inter, system-ui, sans-serif";
+    sectionContext.fillText(well.id, position.x + 10, position.y - 8);
+  }
+
+  const scenarioWellPosition = project(scenario.wellX, scenario.wellY);
+  sectionContext.beginPath();
+  sectionContext.arc(
+    scenarioWellPosition.x,
+    scenarioWellPosition.y,
+    10,
+    0,
+    Math.PI * 2,
+  );
+  sectionContext.fillStyle = scenario.screenActive
+    ? "#22d3ee"
+    : "#ffffff";
+  sectionContext.fill();
+  sectionContext.strokeStyle = scenario.screenActive
+    ? "#0b1f3a"
+    : "#94a3b8";
+  sectionContext.lineWidth = 3;
+  sectionContext.stroke();
+  sectionContext.fillStyle = "#0b1f3a";
+  sectionContext.font = "800 11px Inter, system-ui, sans-serif";
+  const scenarioWellName =
+    wellPresentation[activeSectionWell.id]?.name || activeSectionWell.id;
+  sectionContext.fillText(
+    `${scenarioWellName} scenario`,
+    scenarioWellPosition.x + 14,
+    scenarioWellPosition.y + 4,
+  );
+
+  sectionContext.save();
+  sectionContext.textAlign = "left";
+  sectionContext.textBaseline = "alphabetic";
+  sectionContext.lineJoin = "round";
+  for (const label of foregroundLabels) {
+    sectionContext.font = label.font;
+    sectionContext.lineWidth = 3.5;
+    sectionContext.strokeStyle = "rgba(11, 31, 58, 0.92)";
+    sectionContext.strokeText(label.text, label.x, label.y);
+    sectionContext.fillStyle = "#ffffff";
+    sectionContext.fillText(label.text, label.x, label.y);
+  }
+  sectionContext.restore();
+
+  sectionContext.fillStyle = "#0b1f3a";
+  sectionContext.font = "700 20px Inter, system-ui, sans-serif";
+  sectionContext.fillText(
+    `${layer.name}: hydraulic head and flow`,
+    marginLeft,
+    42,
+  );
+  sectionContext.font = "500 12px Inter, system-ui, sans-serif";
+  sectionContext.fillStyle = "#52657d";
+  sectionContext.fillText(
+    `${data.source.solver} · ${data.grid.cells.length} DISV cells · ${data.wells.length} MAW wells`,
+    marginLeft,
+    64,
+  );
+
+  const screenState = scenario.screenActive
+    ? "screen active"
+    : "screen inactive";
+  planScenarioStatusEl.textContent = scenario.screenActive
+    ? `${scenario.soil.label} · ${Math.round(scenario.discharge).toLocaleString()} m³/day · Level ${scenario.screenLevel} ${screenState} · estimated maximum drawdown ${scenario.maximumDrawdown.toFixed(1)} m`
+    : `${scenario.soil.label} · Level ${scenario.screenLevel} ${screenState} · showing the unadjusted MODFLOW result`;
+  planSoilReadoutEl.textContent = scenario.soil.label;
+  const screenLabels = [...selectedScreenLevels]
+    .sort((a, b) => a - b)
+    .map((level) => `L${level}`);
+  planScreenReadoutEl.textContent =
+    screenLabels.length > 0 ? screenLabels.join(", ") : "None";
+
+  const legendX = width - 96;
+  const legendY = Math.max(120, height / 2 - 110);
+  const gradient = sectionContext.createLinearGradient(
+    0,
+    legendY + 190,
+    0,
+    legendY,
+  );
+  for (let step = 0; step <= 10; step += 1) {
+    gradient.addColorStop(
+      step / 10,
+      headColor(low + (high - low) * (step / 10), low, high),
+    );
+  }
+  sectionContext.fillStyle = gradient;
+  sectionContext.fillRect(legendX, legendY, 24, 190);
+  sectionContext.strokeStyle = "rgba(11, 31, 58, 0.55)";
+  sectionContext.strokeRect(legendX, legendY, 24, 190);
+  sectionContext.fillStyle = "#0b1f3a";
+  sectionContext.font = "700 11px Inter, system-ui, sans-serif";
+  sectionContext.fillText(
+    `${high.toFixed(1)} m`,
+    legendX + 34,
+    legendY + 5,
+  );
+  sectionContext.fillText(
+    `${low.toFixed(1)} m`,
+    legendX + 34,
+    legendY + 190,
+  );
+  sectionContext.save();
+  sectionContext.translate(legendX - 14, legendY + 126);
+  sectionContext.rotate(-Math.PI / 2);
+  sectionContext.fillText("Hydraulic head", 0, 0);
+  sectionContext.restore();
+}
+
+// 2D well section renderer
+function drawSectionView() {
+  if (topViewMode) {
+    drawTopView();
+    return;
+  }
+  if (!sceneData || !activeSectionWell) {
+    return;
+  }
+  const ratio = Math.min(window.devicePixelRatio, 2);
+  const width = sectionCanvas.clientWidth;
+  const height = sectionCanvas.clientHeight;
+  sectionCanvas.width = Math.max(1, Math.floor(width * ratio));
+  sectionCanvas.height = Math.max(1, Math.floor(height * ratio));
+  sensorHitBoxes = [];
+  aquiferHitRegions = [];
+  sectionContext.setTransform(ratio, 0, 0, ratio, 0, 0);
+  sectionContext.clearRect(0, 0, width, height);
+  sectionContext.fillStyle = "#DFF6FD";
+  sectionContext.fillRect(0, 0, width, height);
+  const backgroundGradient = sectionContext.createRadialGradient(
+    width * 0.54,
+    height * 0.48,
+    80,
+    width * 0.54,
+    height * 0.48,
+    Math.max(width, height) * 0.78,
+  );
+  backgroundGradient.addColorStop(0, "#f8fdff");
+  backgroundGradient.addColorStop(1, "#DFF6FD");
+  sectionContext.fillStyle = backgroundGradient;
+  sectionContext.fillRect(0, 0, width, height);
+
+  const { marginX, marginTop, plotWidth, plotHeight } =
+    getSectionLayout();
+  const xFactor = (plotWidth * sectionZoom) / sceneData.domain.lx_m;
+  const zMin = sceneData.domain.bottom_m;
+  const zMax = sceneData.domain.top_m;
+  const zFactor = (plotHeight * sectionZoom) / (zMax - zMin);
+  const originX =
+    marginX - ((sectionZoom - 1) * plotWidth) / 2 + sectionPanX;
+  const originY =
+    marginTop + ((sectionZoom - 1) * plotHeight) / 2 + sectionPanY;
+  const skewX = 130;
+  const skewY = -74;
+
+  function project(x, z) {
+    return {
+      x: originX + x * xFactor,
+      y: originY + (zMax - z) * zFactor,
+    };
+  }
+
+  function projectSide(z, x = sceneData.domain.lx_m) {
+    const front = project(x, z);
+    return { x: front.x + skewX, y: front.y + skewY };
+  }
+
+  const layerColors = sceneData.legend.layerColors;
+  const sectionY = activeSectionWell.y_m;
+  const topRows = sceneData.layers.map((layer) =>
+    surfaceRowAtY(layer.topSurface, sectionY),
+  );
+  const bedrockRow = surfaceRowAtY(sceneData.bedrock, sectionY);
+  const baseRow = surfaceRowAtY(sceneData.base, sectionY);
+  const layerBottomRows = sceneData.layers.map((_, index) =>
+    index < sceneData.layers.length - 1 ? topRows[index + 1] : bedrockRow,
+  );
+  const discharge01 =
+    sectionDischarge / Number(sectionDischargeInput.max);
+  const wellX = activeSectionWell.x_m;
+  const aquiferBands = getAquiferBandsAtWell(
+    activeSectionWell,
+    topRows,
+    layerBottomRows,
+  );
+  const visibleScreenBands = aquiferBands.filter((band) =>
+    selectedScreenLevels.has(band.level),
+  );
+
+  function getBandDrawdownConfig(band) {
+    const soilProfile = getSoilProfileForLevel(band.level);
+    return {
+      soilProfile,
+      influenceRadius:
+        (4500 + discharge01 * 12000) * soilProfile.influence,
+      maxDrawdown: discharge01 * 130 * soilProfile.depth,
+    };
+  }
+
+  function drawdownAtX(x, band, scale = 1) {
+    const config = getBandDrawdownConfig(band);
+    const distance = Math.abs(x - wellX);
+    const shape =
+      config.soilProfile.type === "sand"
+        ? Math.pow(
+            Math.max(0, 1 - distance / config.influenceRadius),
+            0.9,
+          )
+        : Math.exp(
+            -(distance * distance) /
+              (2 * config.influenceRadius * config.influenceRadius),
+          );
+    return config.maxDrawdown * scale * shape;
+  }
+
+  function drawdownHeadZ(x, band, originalHeadZ, scale = 1) {
+    return originalHeadZ - drawdownAtX(x, band, scale);
+  }
+
+  function clippedDrawdownZ(x, band, originalHeadZ, scale = 1) {
+    const layerTopZ = interpolateRowZ(topRows[band.firstIndex], x);
+    const layerBottomZ = interpolateRowZ(
+      layerBottomRows[band.lastIndex],
+      x,
+    );
+    const rawZ = drawdownHeadZ(x, band, originalHeadZ, scale);
+    return Math.max(
+      layerBottomZ + 5,
+      Math.min(originalHeadZ, Math.min(layerTopZ - 5, rawZ)),
+    );
+  }
+
+  function clipToBand(band, callback) {
+    const topPath = xzPath(topRows[band.firstIndex], project);
+    const bottomPath = xzPath(
+      layerBottomRows[band.lastIndex],
+      project,
+    ).reverse();
+    sectionContext.save();
+    sectionContext.beginPath();
+    for (const [idx, point] of [...topPath, ...bottomPath].entries()) {
+      if (idx === 0) sectionContext.moveTo(point.x, point.y);
+      else sectionContext.lineTo(point.x, point.y);
+    }
+    sectionContext.closePath();
+    sectionContext.clip();
+    callback();
+    sectionContext.restore();
+  }
+
+  function drawInflowCurrents(
+    originalHeadZ,
+    bandTopZ,
+    bandBottomZ,
+    influenceRadius,
+    band,
+    scale = 1,
+  ) {
+    const currentCount = 4;
+    const span = Math.min(influenceRadius * 0.72, 11000);
+    const screenMid = (bandTopZ + bandBottomZ) / 2;
+    for (let side of [-1, 1]) {
+      for (let index = 0; index < currentCount; index += 1) {
+        const t = (index + 1) / (currentCount + 1);
+        const startX = wellX + side * span * (0.28 + t * 0.6);
+        const startZ =
+          screenMid + (bandTopZ - bandBottomZ) * (0.22 - t * 0.11);
+        const endX = wellX + (side * 17) / xFactor;
+        const endZ = Math.max(
+          bandBottomZ + 4,
+          Math.min(
+            bandTopZ - 4,
+            drawdownHeadZ(wellX, band, originalHeadZ, scale) +
+              (screenMid - originalHeadZ) * 0.22,
+          ),
+        );
+        const start = project(startX, startZ);
+        const end = project(endX, endZ);
+        const control = project(
+          wellX + side * span * (0.12 + t * 0.16),
+          startZ - Math.abs(startZ - endZ) * 0.34 - 10,
+        );
+        sectionContext.beginPath();
+        sectionContext.moveTo(start.x, start.y);
+        sectionContext.quadraticCurveTo(
+          control.x,
+          control.y,
+          end.x,
+          end.y,
+        );
+        sectionContext.strokeStyle = `rgba(191, 239, 255, ${0.2 + t * 0.12})`;
+        sectionContext.lineWidth = 1.1 + t * 0.35;
+        sectionContext.stroke();
+      }
+    }
+  }
+
+  sectionContext.lineJoin = "round";
+  sectionContext.lineCap = "round";
+
+  for (let i = 0; i < sceneData.layers.length; i += 1) {
+    const layer = sceneData.layers[i];
+    const top = xzPath(topRows[i], project);
+    const bottom = xzPath(layerBottomRows[i], project).reverse();
+    sectionContext.beginPath();
+    for (const [idx, point] of [...top, ...bottom].entries()) {
+      if (idx === 0) sectionContext.moveTo(point.x, point.y);
+      else sectionContext.lineTo(point.x, point.y);
+    }
+    sectionContext.closePath();
+    const fill = getLayerFill(layer);
+    sectionContext.fillStyle = fill;
+    sectionContext.fill();
+    if (isAquiferType(layer.type)) {
+      drawSubtleWaterTexture(sectionContext, top, bottom);
+      const polygon = [...top, ...bottom];
+      const level = aquiferLevelNumbers[layer.type];
+      const hasScreen = selectedScreenLevels.has(level);
+      if (hasScreen) {
+        aquiferHitRegions.push({ level, type: layer.type, polygon });
+      }
+      if (hasScreen && hoveredAquiferLevel === level) {
+        sectionContext.beginPath();
+        polygon.forEach((point, pointIndex) =>
+          pointIndex === 0
+            ? sectionContext.moveTo(point.x, point.y)
+            : sectionContext.lineTo(point.x, point.y),
+        );
+        sectionContext.closePath();
+        sectionContext.fillStyle = "rgba(56, 189, 248, 0.16)";
+        sectionContext.fill();
+      }
+    }
+    sectionContext.strokeStyle = "rgba(2, 4, 10, 0.78)";
+    sectionContext.lineWidth = 1.25;
+    sectionContext.stroke();
+  }
+
+  const bedrockTop = xzPath(bedrockRow, project);
+  const baseBottom = xzPath(baseRow, project).reverse();
+  sectionContext.beginPath();
+  for (const [idx, point] of [...bedrockTop, ...baseBottom].entries()) {
+    if (idx === 0) sectionContext.moveTo(point.x, point.y);
+    else sectionContext.lineTo(point.x, point.y);
+  }
+  sectionContext.closePath();
+  sectionContext.fillStyle = layerColors.Bedrock || "#686868";
+  sectionContext.fill();
+  sectionContext.strokeStyle = "rgba(2, 4, 10, 0.78)";
+  sectionContext.stroke();
+
+  const rightX = sceneData.domain.lx_m;
+  for (let i = 0; i < sceneData.layers.length; i += 1) {
+    const layer = sceneData.layers[i];
+    const topFront = project(rightX, topRows[i].at(-1)[2]);
+    const bottomFront = project(rightX, layerBottomRows[i].at(-1)[2]);
+    const topBack = projectSide(topRows[i].at(-1)[2]);
+    const bottomBack = projectSide(layerBottomRows[i].at(-1)[2]);
+    sectionContext.beginPath();
+    sectionContext.moveTo(topFront.x, topFront.y);
+    sectionContext.lineTo(topBack.x, topBack.y);
+    sectionContext.lineTo(bottomBack.x, bottomBack.y);
+    sectionContext.lineTo(bottomFront.x, bottomFront.y);
+    sectionContext.closePath();
+    sectionContext.fillStyle = getLayerFill(layer);
+    sectionContext.fill();
+    sectionContext.strokeStyle = "rgba(2, 4, 10, 0.72)";
+    sectionContext.stroke();
+  }
+
+  const terrain = xzPath(
+    surfaceRowAtY(sceneData.terrain, sectionY),
+    project,
+  );
+  const terrainBack = surfaceRow(sceneData.terrain, -1).map((point) =>
+    projectSide(point[2], point[0]),
+  );
+  sectionContext.beginPath();
+  for (const [idx, point] of [
+    ...terrain,
+    ...terrainBack.reverse(),
+  ].entries()) {
+    if (idx === 0) sectionContext.moveTo(point.x, point.y);
+    else sectionContext.lineTo(point.x, point.y);
+  }
+  sectionContext.closePath();
+  sectionContext.fillStyle = "#83aa5a";
+  sectionContext.fill();
+  sectionContext.strokeStyle = "rgba(2, 4, 10, 0.72)";
+  sectionContext.stroke();
+
+  if (visibleScreenBands.length > 0) {
+    for (const [bandIndex, band] of visibleScreenBands.entries()) {
+      const originalHeadZ = (band.topZ + band.bottomZ) / 2;
+      const bandScale = 1;
+      const originalWater = topRows[0].map((point) =>
+        project(point[0], originalHeadZ),
+      );
+      const drawdownWater = topRows[0].map((point) =>
+        project(
+          point[0],
+          clippedDrawdownZ(point[0], band, originalHeadZ, bandScale),
+        ),
+      );
+      if (sectionDischarge > 0) {
+        clipToBand(band, () => {
+          sectionContext.beginPath();
+          for (const [idx, point] of originalWater.entries()) {
+            if (idx === 0) sectionContext.moveTo(point.x, point.y);
+            else sectionContext.lineTo(point.x, point.y);
+          }
+          for (const point of [...drawdownWater].reverse()) {
+            sectionContext.lineTo(point.x, point.y);
+          }
+          sectionContext.closePath();
+          sectionContext.fillStyle =
+            bandIndex === 0
+              ? "rgba(248, 113, 113, 0.22)"
+              : "rgba(251, 146, 60, 0.17)";
+          sectionContext.fill();
+          drawInflowCurrents(
+            originalHeadZ,
+            band.topZ,
+            band.bottomZ,
+            getBandDrawdownConfig(band).influenceRadius,
+            band,
+            bandScale,
+          );
+        });
+      }
+
+      clipToBand(band, () => {
+        sectionContext.beginPath();
+        for (const [idx, point] of drawdownWater.entries()) {
+          if (idx === 0) sectionContext.moveTo(point.x, point.y);
+          else sectionContext.lineTo(point.x, point.y);
+        }
+        sectionContext.strokeStyle =
+          sectionDischarge > 0 ? "#f97316" : "rgba(56, 189, 248, 0.78)";
+        sectionContext.lineWidth = bandIndex === 0 ? 2.25 : 1.75;
+        sectionContext.stroke();
+      });
+    }
+  }
+
+  if (visibleScreenBands.length > 0 && sectionDischarge > 0) {
+    const deepestBand = visibleScreenBands.at(-1);
+    const deepestOriginalHeadZ =
+      (deepestBand.topZ + deepestBand.bottomZ) / 2;
+    const deepestDrawdownZ = clippedDrawdownZ(
+      wellX,
+      deepestBand,
+      deepestOriginalHeadZ,
+      1,
+    );
+    const deepestInfluenceRadius =
+      getBandDrawdownConfig(deepestBand).influenceRadius;
+    const coneLabel = project(
+      Math.max(2400, wellX - deepestInfluenceRadius * 0.46),
+      deepestDrawdownZ + 22,
+    );
+    drawCalloutText(
+      sectionContext,
+      "drawdown at screens",
+      coneLabel.x,
+      coneLabel.y,
+      {
+        font: "800 12px Inter, system-ui, sans-serif",
+        color: "#fed7aa",
+        background: "rgba(67, 20, 7, 0.76)",
+        border: "rgba(251, 146, 60, 0.48)",
+      },
+    );
+
+    let influenceLabelAnchor = null;
+    for (const [bandIndex, band] of visibleScreenBands.entries()) {
+      const originalHeadZ = (band.topZ + band.bottomZ) / 2;
+      const { influenceRadius } = getBandDrawdownConfig(band);
+      const influenceXMin = Math.max(0, wellX - influenceRadius);
+      const influenceXMax = Math.min(
+        sceneData.domain.lx_m,
+        wellX + influenceRadius,
+      );
+      const leftInfluence = project(influenceXMin, originalHeadZ + 18);
+      const rightInfluence = project(influenceXMax, originalHeadZ + 18);
+      sectionContext.strokeStyle = "rgba(250, 204, 21, 0.94)";
+      sectionContext.lineWidth = 2.1;
+      sectionContext.setLineDash([10, 7]);
+      sectionContext.beginPath();
+      sectionContext.moveTo(leftInfluence.x, leftInfluence.y);
+      sectionContext.lineTo(rightInfluence.x, rightInfluence.y);
+      sectionContext.stroke();
+      sectionContext.setLineDash([]);
+      sectionContext.strokeStyle = "rgba(254, 240, 138, 0.96)";
+      sectionContext.lineWidth = 1.8;
+      sectionContext.beginPath();
+      sectionContext.moveTo(leftInfluence.x, leftInfluence.y - 5);
+      sectionContext.lineTo(leftInfluence.x, leftInfluence.y + 5);
+      sectionContext.moveTo(rightInfluence.x, rightInfluence.y - 5);
+      sectionContext.lineTo(rightInfluence.x, rightInfluence.y + 5);
+      sectionContext.stroke();
+      if (!influenceLabelAnchor) {
+        influenceLabelAnchor = {
+          x: Math.min(
+            rightInfluence.x - 82,
+            Math.max(
+              project(wellX, originalHeadZ).x + 126,
+              (leftInfluence.x + rightInfluence.x) / 2 + 140,
+            ),
+          ),
+          y: leftInfluence.y - 15,
+        };
+      }
+    }
+    if (influenceLabelAnchor) {
+      drawCalloutText(
+        sectionContext,
+        "area of influence",
+        influenceLabelAnchor.x,
+        influenceLabelAnchor.y,
+        {
+          align: "center",
+          font: "900 11px Inter, system-ui, sans-serif",
+          color: "#fef9c3",
+          background: "rgba(66, 32, 6, 0.82)",
+          border: "rgba(250, 204, 21, 0.55)",
+        },
+      );
+    }
+  }
+
+  const top = project(
+    activeSectionWell.x_m,
+    activeSectionWell.screen_top_m,
+  );
+  const bottom = project(
+    activeSectionWell.x_m,
+    activeSectionWell.screen_bottom_m,
+  );
+  const pipeWidth = 16;
+  const pipeX = top.x - pipeWidth / 2;
+  const pipeTopY = top.y - 42;
+  const casingGradient = sectionContext.createLinearGradient(
+    pipeX,
+    0,
+    pipeX + pipeWidth,
+    0,
+  );
+  casingGradient.addColorStop(0, "#6b7280");
+  casingGradient.addColorStop(0.28, "#f8fafc");
+  casingGradient.addColorStop(0.55, "#cbd5e1");
+  casingGradient.addColorStop(1, "#475569");
+  sectionContext.fillStyle = casingGradient;
+  sectionContext.strokeStyle = "#111827";
+  sectionContext.lineWidth = 1.4;
+  sectionContext.beginPath();
+  sectionContext.roundRect(
+    pipeX,
+    pipeTopY,
+    pipeWidth,
+    bottom.y - pipeTopY + 6,
+    5,
+  );
+  sectionContext.fill();
+  sectionContext.stroke();
+
+  sectionContext.fillStyle = "#e5e7eb";
+  sectionContext.strokeStyle = "#111827";
+  sectionContext.lineWidth = 1.2;
+  sectionContext.beginPath();
+  sectionContext.ellipse(
+    top.x,
+    pipeTopY,
+    pipeWidth * 0.72,
+    4.8,
+    0,
+    0,
+    Math.PI * 2,
+  );
+  sectionContext.fill();
+  sectionContext.stroke();
+
+  for (const band of visibleScreenBands) {
+    const segmentTop = project(activeSectionWell.x_m, band.topZ);
+    const segmentBottom = project(activeSectionWell.x_m, band.bottomZ);
+    const segmentTopY = Math.max(
+      pipeTopY + 8,
+      Math.min(segmentTop.y, segmentBottom.y),
+    );
+    const segmentBottomY = Math.min(
+      bottom.y + 2,
+      Math.max(segmentTop.y, segmentBottom.y),
+    );
+    if (segmentBottomY - segmentTopY < 14) {
+      continue;
+    }
+    const screenGradient = sectionContext.createLinearGradient(
+      pipeX,
+      0,
+      pipeX + pipeWidth,
+      0,
+    );
+    screenGradient.addColorStop(0, "#075985");
+    screenGradient.addColorStop(0.35, "#38bdf8");
+    screenGradient.addColorStop(0.65, "#0ea5e9");
+    screenGradient.addColorStop(1, "#075985");
+    sectionContext.fillStyle = screenGradient;
+    sectionContext.strokeStyle = "#082f49";
+    sectionContext.lineWidth = 1.4;
+    sectionContext.beginPath();
+    sectionContext.roundRect(
+      pipeX - 1,
+      segmentTopY,
+      pipeWidth + 2,
+      segmentBottomY - segmentTopY,
+      5,
+    );
+    sectionContext.fill();
+    sectionContext.stroke();
+
+    sectionContext.fillStyle = "rgba(14, 165, 233, 0.42)";
+    sectionContext.beginPath();
+    sectionContext.roundRect(
+      pipeX + 3,
+      segmentTopY + 5,
+      pipeWidth - 6,
+      Math.max(10, segmentBottomY - segmentTopY - 10),
+      4,
+    );
+    sectionContext.fill();
+
+    for (
+      let holeY = segmentTopY + 10;
+      holeY < segmentBottomY - 7;
+      holeY += 13
+    ) {
+      for (const side of [-1, 1]) {
+        const holeX = top.x + side * 5.1;
+        sectionContext.strokeStyle = "rgba(186, 230, 253, 0.95)";
+        sectionContext.fillStyle = "rgba(8, 47, 73, 0.86)";
+        sectionContext.lineWidth = 1.45;
+        sectionContext.beginPath();
+        sectionContext.ellipse(holeX, holeY, 2.1, 3.0, 0, 0, Math.PI * 2);
+        sectionContext.fill();
+        sectionContext.stroke();
+        sectionContext.beginPath();
+        sectionContext.moveTo(top.x + side * 25, holeY - 5);
+        sectionContext.quadraticCurveTo(
+          top.x + side * 15,
+          holeY - 2,
+          holeX + side * 1.5,
+          holeY,
+        );
+        sectionContext.strokeStyle = "rgba(125, 211, 252, 0.72)";
+        sectionContext.lineWidth = 1.35;
+        sectionContext.stroke();
+      }
+    }
+  }
+
+  sectionContext.fillStyle =
+    activeSectionWell.role === "Pumping" ? "#65a8ff" : "#f8fafc";
+  sectionContext.font = "800 16px Inter, system-ui, sans-serif";
+  sectionContext.textAlign = "center";
+  const activeWellName =
+    wellPresentation[activeSectionWell.id]?.name || activeSectionWell.id;
+  sectionContext.fillText(activeWellName, top.x, top.y - 58);
+  const sensorLabels = ["WL", "pH", "T", "EC"];
+  const sensorTipY = bottom.y + 22;
+  const sensorOffsets = [-33, -11, 11, 33];
+  sectionContext.strokeStyle = "rgba(8, 47, 73, 0.72)";
+  sectionContext.lineWidth = 1.5;
+  sectionContext.beginPath();
+  sectionContext.moveTo(bottom.x, bottom.y + 5);
+  sectionContext.lineTo(bottom.x, sensorTipY - 9);
+  sectionContext.moveTo(bottom.x - 39, sensorTipY - 9);
+  sectionContext.lineTo(bottom.x + 39, sensorTipY - 9);
+  sectionContext.stroke();
+
+  sensorHitBoxes = sensorOffsets.map((offsetX, index) => {
+    const sensorX = bottom.x + offsetX;
+    const sensorY = sensorTipY;
+    sectionContext.strokeStyle = "rgba(8, 47, 73, 0.55)";
+    sectionContext.lineWidth = 1.2;
+    sectionContext.beginPath();
+    sectionContext.moveTo(sensorX, sensorTipY - 9);
+    sectionContext.lineTo(sensorX, sensorY - 7);
+    sectionContext.stroke();
+
+    const sensorGradient = sectionContext.createRadialGradient(
+      sensorX - 2,
+      sensorY - 2,
+      2,
+      sensorX,
+      sensorY,
+      10,
+    );
+    sensorGradient.addColorStop(0, "#e0f2fe");
+    sensorGradient.addColorStop(0.5, "#22d3ee");
+    sensorGradient.addColorStop(1, "#0e7490");
+    sectionContext.fillStyle = sensorGradient;
+    sectionContext.strokeStyle =
+      activeSensorIndex === index ? "#fef08a" : "#cffafe";
+    sectionContext.lineWidth = activeSensorIndex === index ? 2.6 : 1.8;
+    sectionContext.beginPath();
+    sectionContext.arc(sensorX, sensorY, 7.5, 0, Math.PI * 2);
+    sectionContext.fill();
+    sectionContext.stroke();
+
+    sectionContext.fillStyle = "#083344";
+    sectionContext.beginPath();
+    sectionContext.arc(sensorX, sensorY, 2.3, 0, Math.PI * 2);
+    sectionContext.fill();
+
+    sectionContext.fillStyle = "#0b1f3a";
+    sectionContext.font = "800 9px Inter, system-ui, sans-serif";
+    sectionContext.textAlign = "center";
+    sectionContext.fillText(sensorLabels[index], sensorX, sensorY + 20);
+    return {
+      index,
+      x: sensorX - 13,
+      y: sensorY - 13,
+      width: 26,
+      height: 38,
+    };
+  });
+
+  if (topViewSetupMode && selectedAquiferRegion?.polygon?.length) {
+    const polygon = selectedAquiferRegion.polygon;
+    const target = polygon.reduce(
+      (acc, point) => ({
+        x: acc.x + point.x / polygon.length,
+        y: acc.y + point.y / polygon.length,
+      }),
+      { x: 0, y: 0 },
+    );
+    const start = {
+      x: Math.max(28, target.x - 180),
+      y: Math.max(58, target.y - 76),
+    };
+    const angle = Math.atan2(target.y - start.y, target.x - start.x);
+    sectionContext.save();
+    sectionContext.strokeStyle = "#1fa3c9";
+    sectionContext.fillStyle = "#1fa3c9";
+    sectionContext.lineWidth = 3.2;
+    sectionContext.setLineDash([10, 7]);
+    sectionContext.beginPath();
+    sectionContext.moveTo(start.x, start.y);
+    sectionContext.quadraticCurveTo(
+      (start.x + target.x) / 2,
+      start.y - 42,
+      target.x,
+      target.y,
+    );
+    sectionContext.stroke();
+    sectionContext.setLineDash([]);
+    sectionContext.beginPath();
+    sectionContext.moveTo(target.x, target.y);
+    sectionContext.lineTo(
+      target.x - Math.cos(angle - 0.45) * 16,
+      target.y - Math.sin(angle - 0.45) * 16,
+    );
+    sectionContext.lineTo(
+      target.x - Math.cos(angle + 0.45) * 16,
+      target.y - Math.sin(angle + 0.45) * 16,
+    );
+    sectionContext.closePath();
+    sectionContext.fill();
+    drawCalloutText(
+      sectionContext,
+      `selected ${selectedAquiferRegion.type.toLowerCase()}`,
+      start.x,
+      start.y - 10,
+      {
+        align: "left",
+        font: "900 11px Inter, system-ui, sans-serif",
+        color: "#0b1f3a",
+        background: "rgba(223, 246, 253, 0.9)",
+        border: "rgba(31, 163, 201, 0.58)",
+      },
+    );
+    sectionContext.restore();
+  }
+}
+
+// View transitions and zoom controls
+function openSectionView(well) {
+  activeSectionWell = well;
+  sectionMode = true;
+  topViewMode = false;
+  topViewSetupMode = false;
+  pendingTopViewRegion = null;
+  selectedAquiferRegion = null;
+  sectionZoom = 1;
+  sectionPanX = 0;
+  sectionPanY = 0;
+  lastSectionCursor = {
+    x: sectionCanvas.clientWidth / 2,
+    y: sectionCanvas.clientHeight / 2,
+  };
+  sectionDischarge = Math.abs(well.pumping_m3_day || 0);
+  sectionDischargeInput.value = String(
+    Math.min(Number(sectionDischargeInput.max), sectionDischarge),
+  );
+  sectionDischarge = Number(sectionDischargeInput.value);
+  selectedScreenLevels = new Set();
+  soilTypeByLevel = new Map(
+    Object.entries(defaultSoilByLevel).map(([level, soilType]) => [
+      Number(level),
+      soilType,
+    ]),
+  );
+  activeSoilLevel = 1;
+  selectedSoilType = getSoilTypeForLevel(activeSoilLevel);
+  soilTypeSelect.value = selectedSoilType;
+  updateScreenOptions(well);
+  updateDischargeLabel();
+  controls.enabled = false;
+  const presentation = wellPresentation[well.id] || {
+    name: `${well.id} ${well.role}`,
+    sectionLocation: "Los Baños Laguna",
+  };
+  sectionTitleEl.textContent = presentation.name;
+  sectionWellLocationEl.textContent = presentation.sectionLocation;
+  updateMetricFields(well);
+  menuPanelEl.classList.add("is-section-mode");
+  menuPanelEl.classList.remove("is-plan-mode");
+  menuPanelEl.classList.remove("is-top-setup-mode");
+  planViewSummaryEl.hidden = true;
+  topSetupPanelEl.hidden = true;
+  topViewBackButton.hidden = true;
+  menu3dStateEl.hidden = true;
+  menuSectionStateEl.hidden = false;
+  menuPanelEl.classList.remove("is-hidden");
+  showPanelButton.classList.remove("is-visible");
+  updateWellSelectorStates(well.id);
+  statusEl.textContent = `Selected ${well.id}: 2D section view.`;
+  sectionViewEl.classList.add("is-open");
+  try {
+    drawSectionView();
+  } catch (error) {
+    console.error("Could not draw 2D section view", error);
+  }
+}
+
+function closeSectionView() {
+  stopTopViewDischargeAnimation();
+  sectionMode = false;
+  topViewMode = false;
+  topViewSetupMode = false;
+  pendingTopViewRegion = null;
+  selectedAquiferRegion = null;
+  activeSectionWell = null;
+  hideSensorSpecs();
+  controls.enabled = true;
+  sectionViewEl.classList.remove("is-open");
+  menuPanelEl.classList.remove("is-section-mode");
+  menuPanelEl.classList.remove("is-plan-mode");
+  menuPanelEl.classList.remove("is-top-setup-mode");
+  planViewSummaryEl.hidden = true;
+  topSetupPanelEl.hidden = true;
+  topViewBackButton.hidden = true;
+  menuSectionStateEl.hidden = true;
+  menu3dStateEl.hidden = false;
+  updateWellSelectorStates(null);
+  statusEl.textContent = sceneData
+    ? `${sceneData.layers.length} layers, ${sceneData.flowArrows.length} arrows, ${sceneData.wells.length} wells loaded.`
+    : "3D view restored.";
+}
+
+function setSectionZoom(nextZoom) {
+  sectionZoom = Math.min(2.4, Math.max(0.65, nextZoom));
+  drawSectionView();
+}
+
+function getSectionLayout() {
+  const width = sectionCanvas.clientWidth;
+  const height = sectionCanvas.clientHeight;
+  const panelBounds =
+    topViewSetupMode && !menuPanelEl.classList.contains("is-hidden")
+      ? menuPanelEl.getBoundingClientRect()
+      : null;
+  const marginX = panelBounds
+    ? Math.min(width - 520, panelBounds.right + 92)
+    : Math.min(410, Math.max(92, width * 0.2));
+  const marginTop = topViewSetupMode ? 188 : 116;
+  const marginBottom = topViewSetupMode ? 220 : 76;
+  const availableWidth = width - marginX - 70;
+  const plotWidth = panelBounds
+    ? Math.max(480, Math.min(740, availableWidth * 0.56))
+    : width - marginX - 220;
+  const plotHeight = topViewSetupMode
+    ? Math.max(260, Math.min(460, height - marginTop - marginBottom))
+    : height - marginTop - marginBottom;
+  return { marginX, marginTop, plotWidth, plotHeight };
+}
+
+function zoomSectionAt(nextZoom, anchorX, anchorY) {
+  if (topViewSetupMode) {
+    return;
+  }
+  const previousZoom = sectionZoom;
+  const clampedZoom = Math.min(2.4, Math.max(0.65, nextZoom));
+  if (clampedZoom === previousZoom) {
+    return;
+  }
+  const zoomRatio = clampedZoom / previousZoom;
+  const { marginX, marginTop, plotWidth, plotHeight } =
+    getSectionLayout();
+  const xAnchorBase = marginX + sectionPanX + plotWidth / 2;
+  const yAnchorBase = marginTop + sectionPanY - plotHeight / 2;
+  sectionPanX =
+    anchorX -
+    marginX -
+    plotWidth / 2 -
+    (anchorX - xAnchorBase) * zoomRatio;
+  sectionPanY =
+    anchorY -
+    marginTop +
+    plotHeight / 2 -
+    (anchorY - yAnchorBase) * zoomRatio;
+  sectionZoom = clampedZoom;
+  drawSectionView();
+}
+
+function zoomTopViewAt(nextZoom, anchorX, anchorY) {
+  const previousZoom = topViewZoom;
+  const clampedZoom = Math.min(5, Math.max(0.65, nextZoom));
+  if (clampedZoom === previousZoom) return;
+  const ratio = clampedZoom / previousZoom;
+  const width = sectionCanvas.clientWidth;
+  const height = sectionCanvas.clientHeight;
+  const { marginLeft, marginTop, plotWidth, plotHeight } =
+    getTopViewLayout(width, height);
+  const baseCenterX = marginLeft + plotWidth / 2;
+  const baseCenterY = marginTop + plotHeight / 2;
+  const oldCenterX = baseCenterX + topViewPanX;
+  const oldCenterY = baseCenterY + topViewPanY;
+  topViewPanX = anchorX - baseCenterX - (anchorX - oldCenterX) * ratio;
+  topViewPanY = anchorY - baseCenterY - (anchorY - oldCenterY) * ratio;
+  topViewZoom = clampedZoom;
+  drawSectionView();
+}
+
+function animateTopViewDischarge(targetDischarge) {
+  if (topViewDischargeFrame !== null) {
+    cancelAnimationFrame(topViewDischargeFrame);
+  }
+  const startDischarge = topViewAnimatedDischarge;
+  const change = targetDischarge - startDischarge;
+  const startedAt = performance.now();
+  const duration = 420;
+
+  const step = (timestamp) => {
+    const progress = Math.min(1, (timestamp - startedAt) / duration);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    topViewAnimatedDischarge = startDischarge + change * eased;
+    drawSectionView();
+    if (progress < 1 && topViewMode) {
+      topViewDischargeFrame = requestAnimationFrame(step);
+    } else {
+      topViewAnimatedDischarge = targetDischarge;
+      topViewDischargeFrame = null;
+      if (topViewMode) drawSectionView();
+    }
+  };
+
+  topViewDischargeFrame = requestAnimationFrame(step);
+}
+
+function stopTopViewDischargeAnimation() {
+  if (topViewDischargeFrame !== null) {
+    cancelAnimationFrame(topViewDischargeFrame);
+    topViewDischargeFrame = null;
+  }
+}
+
+function transitionSectionCanvas(callback) {
+  sectionViewEl.classList.add("is-changing");
+  window.setTimeout(() => {
+    callback();
+    drawSectionView();
+    requestAnimationFrame(() =>
+      sectionViewEl.classList.remove("is-changing"),
+    );
+  }, 180);
+}
+
+// MODFLOW setup panel state and API integration
+function updateScenarioDirectionButtons() {
+  for (const button of scenarioDirectionButtons) {
+    button.classList.toggle(
+      "is-active",
+      button.dataset.direction === scenarioDirection,
+    );
+  }
+}
+
+function updateTopSetupReadouts() {
+  const groundwaterElevation = Number(
+    scenarioInputs.groundwaterElevation.value,
+  );
+  const riverElevation = Number(scenarioInputs.riverElevation.value);
+  const groundwaterValue = `${groundwaterElevation.toLocaleString()} m`;
+  const riverValue = `${riverElevation.toLocaleString()} m`;
+  const elevationDifference = riverElevation - groundwaterElevation;
+  const streamLeakage = Math.max(
+    -1,
+    Math.min(1, elevationDifference * 0.000032),
+  );
+  const ranges = topSetupPanelEl.querySelectorAll(".top-setup-range");
+  ranges[0]?.querySelector(".top-setup-value")?.replaceChildren(
+    document.createTextNode(groundwaterValue),
+  );
+  ranges[1]?.querySelector(".top-setup-value")?.replaceChildren(
+    document.createTextNode(riverValue),
+  );
+  scenarioInputs.streamLeakage.value = streamLeakage.toFixed(4);
+  scenarioInputs.leakageDirection.value =
+    streamLeakage >= 0 ? "positive" : "negative";
+  for (const radio of scenarioLeakageDirectionRadios) {
+    radio.checked = radio.value === scenarioInputs.leakageDirection.value;
+  }
+  syncTopSetupChoiceCards();
+  rechargeRateValueEl.textContent = `${Number(
+    scenarioInputs.rechargeRate.value,
+  ).toLocaleString()} m³/day`;
+}
+
+function syncTopSetupChoiceCards() {
+  for (const radio of scenarioRechargeZoneRadios) {
+    radio.closest(".top-setup-mode")?.classList.toggle(
+      "is-active",
+      radio.checked,
+    );
+  }
+  for (const radio of scenarioLeakageDirectionRadios) {
+    radio.closest(".top-setup-leakage")?.classList.toggle(
+      "is-active",
+      radio.checked,
+    );
+  }
+}
+
+function readScenarioConfig(region = pendingTopViewRegion) {
+  const level = region?.level || 1;
+  return {
+    layerIndex: level - 1,
+    layerName: region?.type || `Layer ${level}`,
+    wellId: activeSectionWell?.id || "unknown",
+    wellName:
+      wellPresentation[activeSectionWell?.id]?.name ||
+      activeSectionWell?.id ||
+      "Unknown well",
+    well: activeSectionWell
+      ? {
+          x: activeSectionWell.x_m,
+          y: activeSectionWell.y_m,
+          pumpingRate: sectionDischarge,
+        }
+      : null,
+    grid: {
+      rows: Number(scenarioInputs.rows.value),
+      columns: Number(scenarioInputs.columns.value),
+      areaKm2: Number(scenarioInputs.area.value),
+      gridSizeM: Number(scenarioInputs.gridSize.value),
+      layers: Number(scenarioInputs.layers.value),
+    },
+    boundary: {
+      type: scenarioInputs.boundary.value,
+      direction: scenarioDirection,
+      groundwaterElevation: Number(
+        scenarioInputs.groundwaterElevation.value,
+      ),
+      riverElevation: Number(scenarioInputs.riverElevation.value),
+      streamLeakage: Number(scenarioInputs.streamLeakage.value),
+      leakageDirection: scenarioInputs.leakageDirection.value,
+    },
+    recharge: {
+      enabled: scenarioInputs.rechargeEnabled.checked,
+      rateMmDay: Number(scenarioInputs.rechargeRate.value),
+      zoneMode: scenarioInputs.rechargeZone.value,
+    },
+    screens: [...selectedScreenLevels].sort((a, b) => a - b),
+    soilsByLevel: Object.fromEntries(
+      [1, 2, 3].map((levelNumber) => [
+        String(levelNumber),
+        getSoilTypeForLevel(levelNumber),
+      ]),
+    ),
+    dischargeM3Day: sectionDischarge,
+  };
+}
+
+function openTopViewSetup(region) {
+  if (!modflowTopViewData) {
+    statusEl.textContent = "MODFLOW plan-view data is not available.";
+    return;
+  }
+  topViewSetupMode = true;
+  pendingTopViewRegion = region;
+  selectedAquiferRegion = region;
+  sectionZoom = 1;
+  sectionPanX = 0;
+  sectionPanY = 0;
+  topSetupPanelEl.hidden = false;
+  planViewSummaryEl.hidden = true;
+  menuPanelEl.classList.add("is-top-setup-mode");
+  menuPanelEl.classList.remove("is-plan-mode");
+  topViewBackButton.hidden = false;
+  topSetupStatusEl.textContent =
+    "Configure the selected aquifer before generating the top view.";
+  topSetupTitleEl.textContent = `Layer ${region.level} Aquifer Setup`;
+  sectionTitleEl.textContent = `${region.type} Setup`;
+  sectionWellLocationEl.textContent = "with FloPy & MODFLOW";
+  updateScenarioDirectionButtons();
+  updateTopSetupReadouts();
+  syncTopSetupChoiceCards();
+  drawSectionView();
+}
+
+function closeTopViewSetup() {
+  topViewSetupMode = false;
+  pendingTopViewRegion = null;
+  selectedAquiferRegion = null;
+  topSetupPanelEl.hidden = true;
+  menuPanelEl.classList.remove("is-top-setup-mode");
+  topViewBackButton.hidden = topViewMode ? false : true;
+  const presentation = wellPresentation[activeSectionWell.id] || {};
+  sectionTitleEl.textContent =
+    presentation.name || `${activeSectionWell.id} ${activeSectionWell.role}`;
+  sectionWellLocationEl.textContent =
+    presentation.sectionLocation || "Los Baños Laguna";
+  drawSectionView();
+}
+
+
+async function runScenarioAndOpenTopView() {
+  if (!pendingTopViewRegion) return;
+  const region = pendingTopViewRegion;
+  const config = readScenarioConfig(region);
+  activeScenarioConfig = config;
+  topSetupStatusEl.textContent =
+    "Sending scenario to FloPy / MODFLOW processing...";
+  scenarioRunButton.disabled = true;
+  try {
+    const scenarioData = await fetchScenarioTopView(config);
+    if (scenarioData?.layers?.length) {
+      modflowTopViewData = scenarioData;
+      topSetupStatusEl.textContent =
+        "MODFLOW scenario loaded. Opening top view...";
+    } else {
+      topSetupStatusEl.textContent =
+        "FastAPI is not running, using the loaded MODFLOW export with the same scenario inputs.";
+    }
+    openTopView(region, config);
+  } finally {
+    scenarioRunButton.disabled = false;
+  }
+}
+
+function openTopView(region, config = activeScenarioConfig) {
+  if (!modflowTopViewData) {
+    statusEl.textContent = "MODFLOW plan-view data is not available.";
+    return;
+  }
+  transitionSectionCanvas(() => {
+    topViewMode = true;
+    topViewSetupMode = false;
+    pendingTopViewRegion = null;
+    selectedAquiferRegion = null;
+    activeTopLayer = Math.max(
+      0,
+      Math.min(modflowTopViewData.layers.length - 1, region.level - 1),
+    );
+    topViewZoom = 1;
+    topViewPanX = 0;
+    topViewPanY = 0;
+    stopTopViewDischargeAnimation();
+    topViewAnimatedDischarge = sectionDischarge;
+    hoveredAquiferLevel = null;
+    hideSensorSpecs();
+    topSetupPanelEl.hidden = true;
+    menuPanelEl.classList.add("is-plan-mode");
+    menuPanelEl.classList.remove("is-top-setup-mode");
+    planViewSummaryEl.hidden = false;
+    topViewBackButton.hidden = false;
+    const layer = modflowTopViewData.layers[activeTopLayer];
+    sectionTitleEl.textContent = `${region.type} Top View`;
+    sectionWellLocationEl.textContent = `MODFLOW Layer ${activeTopLayer + 1}`;
+    planViewModelEl.textContent = `${modflowTopViewData.source.solver} ${modflowTopViewData.source.state} result`;
+    planViewDetailsEl.textContent = `${modflowTopViewData.grid.cells.length} DISV cells rendered from FloPy head, contour, well, stream, and specific-discharge output for ${layer.name}. ${config ? `${config.grid.rows} × ${config.grid.columns} setup, ${config.boundary.direction.replaceAll("-", " ")} boundary.` : ""}`;
+    sectionViewEl.setAttribute(
+      "aria-label",
+      `${region.type} MODFLOW plan view`,
+    );
+  });
+}
+
+function closeTopView() {
+  if (topViewSetupMode) {
+    closeTopViewSetup();
+    return;
+  }
+  if (!topViewMode) return;
+  transitionSectionCanvas(() => {
+    stopTopViewDischargeAnimation();
+    topViewMode = false;
+    selectedAquiferRegion = null;
+    menuPanelEl.classList.remove("is-plan-mode");
+    menuPanelEl.classList.remove("is-top-setup-mode");
+    topSetupPanelEl.hidden = true;
+    planViewSummaryEl.hidden = true;
+    topViewBackButton.hidden = true;
+    const presentation = wellPresentation[activeSectionWell.id] || {};
+    sectionTitleEl.textContent =
+      presentation.name ||
+      `${activeSectionWell.id} ${activeSectionWell.role}`;
+    sectionWellLocationEl.textContent =
+      presentation.sectionLocation || "Los Baños Laguna";
+    sectionViewEl.setAttribute("aria-label", "2D well section view");
+  });
+}
+
+// 2D well controls, sensor popover, and panel UI
+function updateDischargeLabel() {
+  const soilProfile = getSoilProfileForLevel(activeSoilLevel);
+  const discharge01 =
+    sectionDischarge / Number(sectionDischargeInput.max);
+  const influenceKm = (
+    (4.5 + discharge01 * 12) *
+    soilProfile.influence
+  ).toFixed(1);
+  sectionDischargeValueEl.textContent = `${Math.round(sectionDischarge).toLocaleString()} m³/day`;
+  sectionDischargeValueEl.title = `${soilProfile.label} drawdown profile`;
+  influenceValueEl.textContent = `${influenceKm} km`;
+  influenceTrackEl.style.setProperty(
+    "--influence-progress",
+    `${Math.min(100, (Number(influenceKm) / 18) * 100)}%`,
+  );
+  soilDescriptionEl.textContent =
+    soilDescriptions[soilProfile.type] || soilDescriptions.loam;
+}
+
+function updateSoilControl() {
+  const profile = getSoilProfileForLevel(activeSoilLevel);
+  soilSelectValueEl.textContent = profile.label;
+  soilFigureEl.src = soilImages[profile.type] || soilImages.loam;
+  soilFigureEl.alt = `${profile.label} soil texture`;
+  for (const option of soilSelectMenuEl.querySelectorAll(
+    "[data-soil-option]",
+  )) {
+    const isCurrent = option.dataset.soilOption === profile.type;
+    option.classList.toggle("is-current", isCurrent);
+    option.setAttribute("aria-selected", String(isCurrent));
+  }
+  soilTypeSelect.value = profile.type;
+  updateScreenPreview();
+}
+
+function setSoilMenuOpen(isOpen) {
+  soilSelectMenuEl.hidden = !isOpen;
+  soilSelectButtonEl.setAttribute("aria-expanded", String(isOpen));
+}
+
+function updateMetricFields(well) {
+  const values = wellMetrics[well.id] || wellMetrics["W-1"];
+  for (const input of document.querySelectorAll("[data-metric]")) {
+    const value = values[input.dataset.metric];
+    if (value !== undefined) {
+      input.value = String(value);
+    }
+  }
+}
+
+function getSensorSpecs(well, sensorIndex = activeSensorIndex) {
+  const profile = sensorProfiles[sensorIndex] || sensorProfiles[0];
+  return {
+    "Sensor ID": `${well.id}-S${sensorIndex + 1}`,
+    Sensor: profile.model,
+    Purpose: profile.description,
+    Placement: "Lowest point of well",
+    ...profile.specs,
+  };
+}
+
+function showSensorSpecs(sensorIndex = activeSensorIndex) {
+  if (!activeSectionWell) {
+    return;
+  }
+  activeSensorIndex = sensorIndex;
+  sensorSpecsSelectEl.replaceChildren();
+  for (let index = 0; index < 4; index += 1) {
+    const option = document.createElement("option");
+    option.value = String(index);
+    option.textContent = `${activeSectionWell.id}-S${index + 1} · ${sensorProfiles[index].shortName}`;
+    option.selected = index === activeSensorIndex;
+    sensorSpecsSelectEl.appendChild(option);
+  }
+  const specs = getSensorSpecs(activeSectionWell, activeSensorIndex);
+  sensorSpecsTitleEl.textContent =
+    sensorProfiles[activeSensorIndex].shortName;
+  sensorSpecsListEl.replaceChildren();
+  for (const [label, value] of Object.entries(specs)) {
+    const term = document.createElement("dt");
+    term.textContent = label;
+    const description = document.createElement("dd");
+    description.textContent = value;
+    sensorSpecsListEl.append(term, description);
+  }
+  sensorSpecsVisible = true;
+  sensorSpecsEl.hidden = false;
+  drawSectionView();
+}
+
+function hideSensorSpecs() {
+  sensorSpecsVisible = false;
+  sensorSpecsEl.hidden = true;
+}
+
+function addLegend(layerColors) {
+  legendEl.replaceChildren();
+  for (const [label, color] of Object.entries(layerColors)) {
+    const item = document.createElement("div");
+    item.className = "legend-item";
+    item.innerHTML = `<span class="swatch" style="background:${color}"></span><span>${label}</span>`;
+    legendEl.appendChild(item);
+  }
+}
+
+function wellIconMarkup(role) {
+  if (role === "Monitoring") {
+    return `
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M3 18.5h2.25v-4H3v4Zm4.1 0h2.25v-7H7.1v7Zm4.1 0h2.25V9h-2.25v9.5Zm4.1 0h2.25V6h-2.25v12.5Zm4.1 0h1.5V3.5h-1.5v15ZM3.4 11.6l4.3-4.1 3.3 2.6 6.1-6.2 1.3 1.3-7.3 7.4-3.3-2.5-3.1 3-1.3-1.5Z"/>
+      </svg>`;
+  }
+  return `
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 2.4c-.7 1.3-6.2 8.2-6.2 12.2A6.2 6.2 0 0 0 12 20.8a6.2 6.2 0 0 0 6.2-6.2C18.2 10.6 12.7 3.7 12 2.4Zm-2.8 13c.2 1.4 1.1 2.2 2.4 2.6-2.1.3-3.8-1.2-3.8-3.3 0-1.2.6-2.5 1.5-3.8-.2 1.6-.3 3.1-.1 4.5Z"/>
+    </svg>`;
+}
+
+function updateWellSelectorStates(selectedWellId) {
+  for (const button of wellPickerEl.querySelectorAll(".well-selector")) {
+    button.classList.toggle(
+      "is-selected",
+      button.dataset.wellId === selectedWellId,
+    );
+  }
+}
+
+function addWellPicker(wells) {
+  wellPickerEl.replaceChildren();
+  for (const well of wells) {
+    const presentation = wellPresentation[well.id] || {
+      name: `${well.id} ${well.role}`,
+      location: `${Math.round(well.x_m / 1000)} km model station`,
+      active: true,
+    };
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "well-selector";
+    button.dataset.wellId = well.id;
+    button.classList.toggle("is-monitoring", well.role === "Monitoring");
+    const isInactive = presentation.active === false;
+    button.classList.toggle("is-alert", isInactive);
+    button.disabled = isInactive;
+    button.setAttribute(
+      "aria-label",
+      isInactive
+        ? `${presentation.name} is inactive and unavailable`
+        : `Open ${presentation.name} 2D section`,
+    );
+    button.title = isInactive
+      ? "This well is currently inactive and cannot be opened."
+      : "";
+    button.innerHTML = `
+      <span class="well-selector-label">
+        <span class="well-selector-icon">${wellIconMarkup(well.role)}</span>
+        <span>${presentation.name}</span>
+      </span>
+      <span class="well-selector-location">${presentation.location}</span>
+      ${isInactive ? '<span class="well-selector-unavailable">Inactive · Unavailable</span>' : ""}`;
+    if (!isInactive) {
+      button.addEventListener("click", () => transitionToWell(well));
+    }
+    wellPickerEl.appendChild(button);
+  }
+  const activeCount = wells.filter(
+    (well) => wellPresentation[well.id]?.active !== false,
+  ).length;
+  activeWellCountEl.textContent = `${activeCount}/${wells.length}`;
+}
+
+// Scene loading and event wiring
+async function loadScene() {
+  try {
+    const response = await fetch(
+      `../generated/demo_groundwater_scene.json?v=${Date.now()}`,
+      {
+        cache: "no-store",
+      },
+    );
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+    sceneData = data;
+    try {
+      const topViewResponse = await fetch(
+        `../generated/modflow_topview.json?v=${Date.now()}`,
+        {
+          cache: "no-store",
+        },
+      );
+      if (topViewResponse.ok) {
+        modflowTopViewData = await topViewResponse.json();
+      } else {
+        console.warn(
+          `MODFLOW plan-view data returned HTTP ${topViewResponse.status}`,
+        );
+      }
+    } catch (topViewError) {
+      console.warn(
+        "MODFLOW plan-view data could not be loaded",
+        topViewError,
+      );
+    }
+    domain.lx_m = data.domain.lx_m;
+    domain.ly_m = data.domain.ly_m;
+
+    updateOrthoCamera();
+    frameGroup.add(
+      makeSurface(data.terrain, { opacity: 1, terrainColors: true }),
+    );
+    if (data.base) {
+      frameGroup.add(
+        makeSurface(data.base, {
+          opacity: 1,
+          solid: true,
+          unlit: true,
+          renderOrder: 1,
+        }),
+      );
+    }
+    if (!data.cutawayFaces?.length) {
+      frameGroup.add(
+        addEdges(
+          makeSurface(data.bedrock, { opacity: 0.94 }),
+          0x0b1f3a,
+          0.56,
+        ),
+      );
+    }
+
+    if (data.cutawayFaces?.length) {
+      for (const face of data.cutawayFaces) {
+        const layerMatch = face.name.match(/^Layer\s+(\d+)/);
+        const layer = layerMatch
+          ? data.layers[Number(layerMatch[1]) - 1]
+          : null;
+        const waterColor =
+          layer && isAquiferType(layer.type)
+            ? aquiferColor(layer.type)
+            : null;
+        headsGroup.add(
+          makeSurface(face, {
+            opacity: 1,
+            solid: true,
+            renderOrder: 5,
+            waterColor,
+          }),
+        );
+      }
+    } else {
+      for (let i = 0; i < data.layers.length - 1; i += 1) {
+        const layer = data.layers[i];
+        const nextLayer = data.layers[i + 1];
+        headsGroup.add(
+          makeLayerSides(
+            layer.topSurface,
+            nextLayer.topSurface,
+            getLayerFill(layer),
+          ),
+        );
+      }
+
+      const deepestLayer = data.layers[data.layers.length - 1];
+      headsGroup.add(
+        makeLayerSides(
+          deepestLayer.topSurface,
+          data.bedrock,
+          getLayerFill(deepestLayer),
+        ),
+      );
+    }
+
+    for (const flow of data.flowArrows) {
+      if (arrowsGroup.children.length % 2 === 0) {
+        arrowsGroup.add(makeFlowArrow(flow));
+      }
+    }
+    arrowsGroup.add(makeFlowTraces());
+
+    for (const well of data.wells) {
+      wellsGroup.add(makeWell(well));
+    }
+
+    addLegend(data.legend.layerColors);
+    addWellPicker(data.wells);
+    statusEl.textContent = `${data.layers.length} layers, ${data.flowArrows.length} arrows, ${data.wells.length} wells loaded.`;
+    resetCamera();
+  } catch (error) {
+    statusEl.className = "status error";
+    statusEl.textContent =
+      "Could not load JSON. Start the viewer with: python3 -m http.server 8765 -d backend";
+    console.error(error);
+  }
+}
+
+document
+  .querySelector("#hide-section-panel")
+  .addEventListener("click", () => {
+    menuPanelEl.classList.add("is-hidden");
+    showPanelButton.classList.add("is-visible");
+    if (topViewMode) requestAnimationFrame(drawSectionView);
+  });
+showPanelButton.addEventListener("click", () => {
+  menuPanelEl.classList.remove("is-hidden");
+  showPanelButton.classList.remove("is-visible");
+  if (topViewMode) requestAnimationFrame(drawSectionView);
+});
+document
+  .querySelector("#section-exit")
+  .addEventListener("click", closeSectionView);
+topViewBackButton.addEventListener("click", closeTopView);
+scenarioCancelButton.addEventListener("click", closeTopViewSetup);
+scenarioRunButton.addEventListener("click", runScenarioAndOpenTopView);
+for (const button of scenarioDirectionButtons) {
+  button.addEventListener("click", () => {
+    scenarioDirection = button.dataset.direction;
+    updateScenarioDirectionButtons();
+  });
+}
+for (const radio of scenarioRechargeZoneRadios) {
+  radio.addEventListener("change", () => {
+    if (!radio.checked) return;
+    scenarioInputs.rechargeZone.value = radio.value;
+    syncTopSetupChoiceCards();
+  });
+}
+for (const radio of scenarioLeakageDirectionRadios) {
+  radio.addEventListener("change", () => {
+    if (!radio.checked) return;
+    scenarioInputs.leakageDirection.value = radio.value;
+    syncTopSetupChoiceCards();
+  });
+}
+scenarioInputs.groundwaterElevation.addEventListener(
+  "input",
+  updateTopSetupReadouts,
+);
+scenarioInputs.riverElevation.addEventListener(
+  "input",
+  updateTopSetupReadouts,
+);
+scenarioInputs.rechargeRate.addEventListener(
+  "input",
+  updateTopSetupReadouts,
+);
+document
+  .querySelector("#sensor-specs-close")
+  .addEventListener("click", hideSensorSpecs);
+sensorSpecsSelectEl.addEventListener("change", () => {
+  showSensorSpecs(Number(sensorSpecsSelectEl.value));
+});
+document
+  .querySelector("#section-zoom-out")
+  .addEventListener("click", () => {
+    if (topViewMode) {
+      zoomTopViewAt(
+        topViewZoom - 0.14,
+        lastSectionCursor.x,
+        lastSectionCursor.y,
+      );
+    } else {
+      zoomSectionAt(
+        sectionZoom - 0.12,
+        lastSectionCursor.x,
+        lastSectionCursor.y,
+      );
+    }
+  });
+document
+  .querySelector("#section-zoom-in")
+  .addEventListener("click", () => {
+    if (topViewMode) {
+      zoomTopViewAt(
+        topViewZoom + 0.14,
+        lastSectionCursor.x,
+        lastSectionCursor.y,
+      );
+    } else {
+      zoomSectionAt(
+        sectionZoom + 0.12,
+        lastSectionCursor.x,
+        lastSectionCursor.y,
+      );
+    }
+  });
+sectionDischargeInput.addEventListener("input", () => {
+  sectionDischarge = Number(sectionDischargeInput.value);
+  updateDischargeLabel();
+  if (topViewMode) {
+    animateTopViewDischarge(sectionDischarge);
+  } else {
+    drawSectionView();
+  }
+  if (sensorSpecsVisible) {
+    showSensorSpecs();
+  }
+});
+soilTypeSelect.addEventListener("change", () => {
+  selectedSoilType = soilTypeSelect.value;
+  soilTypeByLevel.set(activeSoilLevel, selectedSoilType);
+  updateSoilControl();
+  updateDischargeLabel();
+  drawSectionView();
+  if (sensorSpecsVisible) {
+    showSensorSpecs();
+  }
+});
+soilSelectButtonEl.addEventListener("click", () => {
+  setSoilMenuOpen(soilSelectMenuEl.hidden);
+});
+for (const option of soilSelectMenuEl.querySelectorAll(
+  "[data-soil-option]",
+)) {
+  option.addEventListener("click", () => {
+    soilTypeSelect.value = option.dataset.soilOption;
+    soilTypeSelect.dispatchEvent(new Event("change"));
+    setSoilMenuOpen(false);
+  });
+}
+document.addEventListener("pointerdown", (event) => {
+  if (!soilDropdownEl.contains(event.target)) {
+    setSoilMenuOpen(false);
+  }
+});
+updateSoilControl();
+
+sectionCanvas.addEventListener("pointerdown", (event) => {
+  if (!sectionMode) {
+    return;
+  }
+  const rect = sectionCanvas.getBoundingClientRect();
+  lastSectionCursor = {
+    x: event.clientX - rect.left,
+    y: event.clientY - rect.top,
+  };
+  const sensorHit = sensorHitBoxes.find(
+    (box) =>
+      lastSectionCursor.x >= box.x &&
+      lastSectionCursor.x <= box.x + box.width &&
+      lastSectionCursor.y >= box.y &&
+      lastSectionCursor.y <= box.y + box.height,
+  );
+  if (sensorHit) {
+    showSensorSpecs(sensorHit.index);
+    return;
+  }
+  if (topViewSetupMode) {
+    return;
+  }
+  if (!topViewMode) {
+    const aquiferHit = aquiferHitRegions.find((region) =>
+      pointInPolygon(lastSectionCursor, region.polygon),
+    );
+    if (aquiferHit) {
+      openTopViewSetup(aquiferHit);
+      return;
+    }
+  }
+  isSectionDragging = true;
+  lastSectionPointer = { x: event.clientX, y: event.clientY };
+  sectionCanvas.setPointerCapture(event.pointerId);
+});
+
+sectionCanvas.addEventListener("pointermove", (event) => {
+  const rect = sectionCanvas.getBoundingClientRect();
+  lastSectionCursor = {
+    x: event.clientX - rect.left,
+    y: event.clientY - rect.top,
+  };
+  const sensorHit = sensorHitBoxes.find(
+    (box) =>
+      lastSectionCursor.x >= box.x &&
+      lastSectionCursor.x <= box.x + box.width &&
+      lastSectionCursor.y >= box.y &&
+      lastSectionCursor.y <= box.y + box.height,
+  );
+  const aquiferHit = topViewMode
+    || topViewSetupMode
+    ? null
+    : aquiferHitRegions.find((region) =>
+        pointInPolygon(lastSectionCursor, region.polygon),
+      );
+  const nextHoveredLevel = aquiferHit?.level || null;
+  if (!isSectionDragging && hoveredAquiferLevel !== nextHoveredLevel) {
+    hoveredAquiferLevel = nextHoveredLevel;
+    drawSectionView();
+  }
+  sectionCanvas.style.cursor =
+    topViewSetupMode
+      ? "default"
+      : sensorHit || aquiferHit
+      ? "pointer"
+      : isSectionDragging
+        ? "grabbing"
+        : "grab";
+  if (!isSectionDragging) {
+    return;
+  }
+  if (topViewSetupMode) {
+    return;
+  }
+  if (topViewMode) {
+    topViewPanX += event.clientX - lastSectionPointer.x;
+    topViewPanY += event.clientY - lastSectionPointer.y;
+  } else {
+    sectionPanX += event.clientX - lastSectionPointer.x;
+    sectionPanY += event.clientY - lastSectionPointer.y;
+  }
+  lastSectionPointer = { x: event.clientX, y: event.clientY };
+  drawSectionView();
+});
+
+sectionCanvas.addEventListener("pointerup", (event) => {
+  isSectionDragging = false;
+  if (sectionCanvas.hasPointerCapture(event.pointerId)) {
+    sectionCanvas.releasePointerCapture(event.pointerId);
+  }
+});
+
+sectionCanvas.addEventListener("pointercancel", () => {
+  isSectionDragging = false;
+});
+
+sectionCanvas.addEventListener(
+  "wheel",
+  (event) => {
+    event.preventDefault();
+    const rect = sectionCanvas.getBoundingClientRect();
+    lastSectionCursor = {
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top,
+    };
+    if (topViewMode) {
+      zoomTopViewAt(
+        topViewZoom + (event.deltaY < 0 ? 0.12 : -0.12),
+        lastSectionCursor.x,
+        lastSectionCursor.y,
+      );
+    } else if (topViewSetupMode) {
+      return;
+    } else {
+      zoomSectionAt(
+        sectionZoom + (event.deltaY < 0 ? 0.1 : -0.1),
+        lastSectionCursor.x,
+        lastSectionCursor.y,
+      );
+    }
+  },
+  { passive: false },
+);
+
+renderer.domElement.addEventListener("pointerdown", (event) => {
+  if (sectionMode) {
+    return;
+  }
+  const rect = renderer.domElement.getBoundingClientRect();
+  pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+  pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+  raycaster.setFromCamera(pointer, activeCamera);
+  const hits = raycaster.intersectObjects(wellsGroup.children, true);
+  const selectedWell = hits
+    .map((hit) => findWellObject(hit.object))
+    .find(Boolean);
+  if (selectedWell) {
+    transitionToWell(selectedWell);
+  }
+});
+
+window.addEventListener("resize", () => {
+  perspectiveCamera.aspect = window.innerWidth / window.innerHeight;
+  perspectiveCamera.updateProjectionMatrix();
+  updateOrthoCamera();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  if (sectionMode) {
+    drawSectionView();
+  }
+});
+
+// Animation loop
+function animate() {
+  updateCameraTween();
+  controls.update();
+  renderer.render(scene, activeCamera);
+  requestAnimationFrame(animate);
+}
+
+loadScene();
+animate();
