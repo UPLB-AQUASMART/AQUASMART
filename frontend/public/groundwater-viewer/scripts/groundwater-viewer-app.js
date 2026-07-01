@@ -2695,6 +2695,26 @@ function formatStreamLeakage(value) {
   return leakage.toFixed(4);
 }
 
+function calculateGridAreaKm2() {
+  const rows = Number(scenarioInputs.rows.value);
+  const columns = Number(scenarioInputs.columns.value);
+  const gridSizeM = Number(scenarioInputs.gridSize.value);
+  if (![rows, columns, gridSizeM].every(Number.isFinite)) {
+    return 0;
+  }
+  return (rows * columns * gridSizeM * gridSizeM) / 1_000_000;
+}
+
+function formatGridArea(value) {
+  if (value >= 1) {
+    return value.toFixed(2);
+  }
+  if (value >= 0.01) {
+    return value.toFixed(4);
+  }
+  return value.toFixed(6);
+}
+
 function updateAquiferSetupReadouts() {
   const groundwaterElevation = Number(
     scenarioInputs.groundwaterElevation.value,
@@ -2715,6 +2735,7 @@ function updateAquiferSetupReadouts() {
     ?.querySelector(".aquifer-elevation-control__value")
     ?.replaceChildren(document.createTextNode(riverValue));
   scenarioInputs.streamLeakage.value = formatStreamLeakage(streamLeakage);
+  scenarioInputs.area.value = formatGridArea(calculateGridAreaKm2());
   scenarioInputs.leakageDirection.value =
     streamLeakage >= 0 ? "positive" : "negative";
   for (const radio of scenarioLeakageDirectionRadios) {
@@ -3276,6 +3297,13 @@ for (const radio of scenarioLeakageDirectionRadios) {
     scenarioInputs.leakageDirection.value = radio.value;
     syncAquiferSetupChoiceCards();
   });
+}
+for (const input of [
+  scenarioInputs.rows,
+  scenarioInputs.columns,
+  scenarioInputs.gridSize,
+]) {
+  input.addEventListener("input", updateAquiferSetupReadouts);
 }
 scenarioInputs.groundwaterElevation.addEventListener(
   "input",

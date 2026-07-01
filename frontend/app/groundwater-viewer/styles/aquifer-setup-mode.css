@@ -88,7 +88,7 @@
 .is-aquifer-setup-mode .aquifer-grid-row__copy small {
   margin-top: 9px;
   color: #526983;
-  font-size: 13px;
+  font-size: 18px;
   font-style: italic;
   font-weight: 400;
 }
@@ -114,7 +114,7 @@
 
 .is-aquifer-setup-mode .aquifer-field small {
   color: #526983;
-  font-size: 12px;
+  font-size: 17px;
   font-style: italic;
   font-weight: 400;
   line-height: 1.25;
@@ -174,7 +174,7 @@
 .is-aquifer-setup-mode .aquifer-card__header small {
   margin-top: 12px;
   color: #526983;
-  font-size: 11px;
+  font-size: 15px;
   line-height: 1.2;
 }
 
@@ -230,7 +230,7 @@
 .is-aquifer-setup-mode .aquifer-zone-mode__copy small {
   margin-top: 7px;
   color: #33516b;
-  font-size: 13px;
+  font-size: 18px;
   font-style: italic;
   line-height: 1.18;
 }
@@ -292,7 +292,7 @@
 .is-aquifer-setup-mode .aquifer-option small,
 .is-aquifer-setup-mode .aquifer-leakage-option small {
   color: #526983;
-  font-size: 11px;
+  font-size: 15px;
   font-weight: 400;
 }
 
@@ -323,14 +323,14 @@
 
 .is-aquifer-setup-mode .aquifer-option__text small {
   color: #526983;
-  font-size: 13px;
+  font-size: 18px;
   line-height: 1.12;
 }
 
 .is-aquifer-setup-mode .aquifer-note {
   margin-top: 28px;
   color: #0b1f3a;
-  font-size: 15px;
+  font-size: 21px;
   font-weight: 400;
 }
 
@@ -348,16 +348,6 @@
   position: relative;
   gap: 34px;
   margin: 26px 18px 28px;
-}
-
-.is-aquifer-setup-mode .aquifer-elevation-grid::before {
-  position: absolute;
-  left: 50%;
-  top: 2px;
-  bottom: 0;
-  width: 1px;
-  background: rgba(206, 226, 235, 0.82);
-  content: "";
 }
 
 .is-aquifer-setup-mode .aquifer-elevation-control {

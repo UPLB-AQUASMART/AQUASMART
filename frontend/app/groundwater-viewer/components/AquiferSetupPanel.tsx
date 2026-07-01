@@ -82,13 +82,13 @@ function GridDimensionsRow() {
           />
         </label>
         <label className="aquifer-field">
-          Area:
+          Area (km²):
           <NumericInput
             id="scenario-area"
-            min="1"
-            max="60"
-            step="1"
-            defaultValue="10"
+            min="0"
+            max="10000"
+            step="0.0001"
+            defaultValue="0.0100"
             disabled
           />
         </label>
