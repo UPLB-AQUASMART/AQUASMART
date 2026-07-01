@@ -53,9 +53,9 @@
   }
 
   .scroll-reveal.is-visible .frame-copy,
-.scroll-reveal.is-visible .goal-card,
-.scroll-reveal.is-visible .simulation-card,
-.scroll-reveal.is-visible .parameters-card-content {
+  .scroll-reveal.is-visible .goal-card,
+  .scroll-reveal.is-visible .simulation-card,
+  .scroll-reveal.is-visible .parameters-card-content {
     animation: none;
   }
 }

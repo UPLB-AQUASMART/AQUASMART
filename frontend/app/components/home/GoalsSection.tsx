@@ -5,7 +5,6 @@ import { goals, type GoalIcon, type GoalItem } from "@/app/data/home";
 
 import { SectionPill } from "./SectionPill";
 import frameStyles from "./Frame.module.css";
-import revealStyles from "./ScrollReveal.module.css";
 import styles from "./GoalsSection.module.css";
 
 const goalIcons: Record<GoalIcon, ComponentType<{ size?: number; strokeWidth?: number }>> = {
@@ -26,7 +25,7 @@ function GoalCard({ item }: { item: GoalItem }) {
   const { before, after } = splitHighlightedTitle(item.title, item.highlight);
 
   return (
-    <article className={`${styles["goal-card"]} ${revealStyles["goal-card"]}`} tabIndex={0}>
+    <article className={styles["goal-card"]} tabIndex={0}>
       <div className={styles["goal-icon"]}>
         <Icon size={34} strokeWidth={1.7} />
       </div>
@@ -42,7 +41,7 @@ function GoalCard({ item }: { item: GoalItem }) {
 
 export function GoalsSection() {
   return (
-    <section className={`${styles["goals-section"]} ${revealStyles["scroll-reveal"]}`} id="about">
+    <section className={styles["goals-section"]} id="about">
       <SectionPill>Our Goals</SectionPill>
       <div className={`${frameStyles["dark-frame"]} ${frameStyles["goals-frame"]}`}>
         {/* <img className="frame-bg" src="/figma/goals-bg.png" alt="" /> */}
@@ -55,7 +54,7 @@ export function GoalsSection() {
             alt=""
           />
         </div>
-        <div className={`${frameStyles["frame-copy"]} ${revealStyles["frame-copy"]}`}>
+        <div className={frameStyles["frame-copy"]}>
           <h2>Water Intelligence</h2>
           <p>
             AQUASMART is an integrated water resources management initiative
@@ -68,7 +67,7 @@ export function GoalsSection() {
           {goals.map((item) => (
             <GoalCard key={item.title} item={item} />
           ))}
-          <div className={`${styles["goal-card"]} ${styles["empty-card"]} ${revealStyles["goal-card"]}`} />
+          <div className={`${styles["goal-card"]} ${styles["empty-card"]}`} />
         </div>
       </div>
     </section>

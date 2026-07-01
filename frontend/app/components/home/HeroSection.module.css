@@ -3,7 +3,8 @@
 .hero-section {
   position: relative;
   display: flex;
-  height: 845px;
+  min-height: 845px;
+  height: 100svh;
   align-items: center;
   overflow: hidden;
   padding: 24px 80px 0;
@@ -11,12 +12,13 @@
 
 .hero-image {
   position: absolute;
-  top: -9px;
-  left: -70px;
-  width: 1523px;
-  height: 854px;
+  inset: 0;
+  width: max(100%, 1675px);
+  min-width: 1523px;
+  height: 100%;
   max-width: none;
   object-fit: cover;
+  object-position: 58% center;
 }
 
 .hero-fade {
@@ -34,18 +36,20 @@
   position: relative;
   z-index: 2;
   display: flex;
-  max-width: 760px;
+  max-width: clamp(760px, 56vw, 1080px);
   flex-direction: column;
   gap: 20px;
+  transform: translateY(clamp(-96px, -8.5vh, -72px));
 }
 
 .hero-copy h1 {
   margin: 0;
   color: var(--navy);
   font-family: "Sora", sans-serif;
-  font-size: 85px;
+  font-size: clamp(84px, 5.25vw, 108px);
   font-weight: 800;
   line-height: 1.02;
+  letter-spacing: -0.045em;
 }
 
 .hero-copy h1 span {
@@ -58,22 +62,20 @@
 }
 
 .hero-copy p {
-  width: 650px;
+  width: min(760px, 42vw);
   margin: 0;
   color: var(--muted);
-  font-size: 20px;
-  line-height: 32px;
+  font-size: clamp(20px, 1.2vw, 24px);
+  line-height: 1.55;
 }
 
 @media (max-width: 1100px) {
-
   .hero-copy h1 {
     font-size: 54px;
   }
 }
 
 @media (max-width: 720px) {
-
   .hero-section {
     padding-right: 24px;
     padding-left: 24px;
@@ -92,7 +94,6 @@
 }
 
 @media (max-width: 900px) {
-
   .hero-section {
     min-height: 720px;
     height: auto;
@@ -110,12 +111,22 @@
   .hero-fade {
     inset: 0;
     background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0.72) 48%, rgba(255, 255, 255, 0.18) 100%),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.3));
+      linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.96) 0%,
+        rgba(255, 255, 255, 0.72) 48%,
+        rgba(255, 255, 255, 0.18) 100%
+      ),
+      linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.92),
+        rgba(255, 255, 255, 0.3)
+      );
   }
 
   .hero-copy {
     max-width: min(620px, 100%);
+    transform: none;
   }
 
   .hero-copy h1 {
@@ -135,7 +146,6 @@
 }
 
 @media (max-width: 520px) {
-
   .hero-section {
     min-height: 650px;
     padding: 118px 20px 56px;
@@ -156,7 +166,6 @@
 }
 
 @media (max-width: 900px) {
-
   .hero-copy {
     min-width: 0;
   }
@@ -173,7 +182,6 @@
 }
 
 @media (max-width: 640px) {
-
   .hero-section {
     min-height: min(620px, 100svh);
     padding-top: 96px;
@@ -192,7 +200,6 @@
 }
 
 @media (max-width: 420px) {
-
   .hero-section {
     min-height: min(580px, 100svh);
     padding-top: 88px;
