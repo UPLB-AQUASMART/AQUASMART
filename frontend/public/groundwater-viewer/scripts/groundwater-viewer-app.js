@@ -7,69 +7,94 @@
 
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import {
-  aquiferLevelNames,
-  aquiferLevelNumbers,
-  defaultSoilByLevel,
-  sensorProfiles,
-  soilDescriptions,
-  soilDrawdownProfiles,
-  soilImages,
-  wellMetrics,
-  wellPresentation,
-} from "./data/groundwater-domain-data.js";
-import { fetchScenarioTopView } from "./api/modflow-scenario-api.js";
-
-import {
-  activeWellCountEl,
-  influenceTrackEl,
-  influenceValueEl,
-  legendEl,
-  menu3dStateEl,
-  menuPanelEl,
-  menuSectionStateEl,
-  pipeScreenStackEl,
-  planScenarioStatusEl,
-  planScreenReadoutEl,
-  planSoilReadoutEl,
-  planViewDetailsEl,
-  planViewModelEl,
-  planViewSummaryEl,
-  rechargeRateValueEl,
-  scenarioCancelButton,
-  scenarioDirectionButtons,
-  scenarioInputs,
-  scenarioLeakageDirectionRadios,
-  scenarioRechargeZoneRadios,
-  scenarioRunButton,
-  sceneRoot,
-  screenOptionsEl,
-  sectionCanvas,
-  sectionDischargeInput,
-  sectionDischargeValueEl,
-  sectionTitleEl,
-  sectionViewEl,
-  sectionWellLocationEl,
-  sensorSpecsEl,
-  sensorSpecsListEl,
-  sensorSpecsSelectEl,
-  sensorSpecsTitleEl,
-  showPanelButton,
-  soilDescriptionEl,
-  soilDropdownEl,
-  soilFigureEl,
-  soilSelectButtonEl,
-  soilSelectMenuEl,
-  soilSelectValueEl,
-  soilTypeSelect,
-  statusEl,
-  topSetupPanelEl,
-  topSetupStatusEl,
-  topSetupTitleEl,
-  topViewBackButton,
-  wellPickerEl,
-  wellUnavailableToastEl
-} from "./dom/viewer-dom-elements.js";
+// DOM references
+const sceneRoot = document.querySelector("#scene");
+const statusEl = document.querySelector("#status");
+const legendEl = document.querySelector("#legend");
+const wellPickerEl = document.querySelector("#well-picker");
+const menuPanelEl = document.querySelector("#menu-panel");
+const menu3dStateEl = document.querySelector("#menu-3d-state");
+const menuSectionStateEl = document.querySelector("#menu-section-state");
+const activeWellCountEl = document.querySelector("#active-well-count");
+const showPanelButton = document.querySelector("#show-panel");
+const sectionViewEl = document.querySelector("#section-view");
+const sectionCanvas = document.querySelector("#section-canvas");
+const sectionTitleEl = document.querySelector("#section-title");
+const sectionWellLocationEl = document.querySelector(
+  "#section-well-location",
+);
+const sectionDischargeInput =
+  document.querySelector("#section-discharge");
+const sectionDischargeValueEl = document.querySelector(
+  "#section-discharge-value",
+);
+const influenceValueEl = document.querySelector("#influence-value");
+const influenceTrackEl = document.querySelector("#influence-track");
+const soilTypeSelect = document.querySelector("#soil-type");
+const soilDropdownEl = document.querySelector("#soil-dropdown");
+const soilSelectButtonEl = document.querySelector("#soil-select-button");
+const soilSelectValueEl = document.querySelector("#soil-select-value");
+const soilSelectMenuEl = document.querySelector("#soil-select-menu");
+const soilFigureEl = document.querySelector("#soil-figure");
+const soilDescriptionEl = document.querySelector("#soil-description");
+const screenOptionsEl = document.querySelector("#screen-options");
+const pipeScreenStackEl = document.querySelector("#pipe-screen-stack");
+const sensorSpecsEl = document.querySelector("#sensor-specs");
+const sensorSpecsTitleEl = document.querySelector("#sensor-specs-title");
+const sensorSpecsSelectEl = document.querySelector(
+  "#sensor-specs-select",
+);
+const sensorSpecsListEl = document.querySelector("#sensor-specs-list");
+const topViewBackButton = document.querySelector("#top-view-back");
+const planViewSummaryEl = document.querySelector("#plan-view-summary");
+const planViewModelEl = document.querySelector("#plan-view-model");
+const planViewDetailsEl = document.querySelector("#plan-view-details");
+const planScenarioStatusEl = document.querySelector(
+  "#plan-scenario-status",
+);
+const planSoilReadoutEl = document.querySelector("#plan-soil-readout");
+const planScreenReadoutEl = document.querySelector(
+  "#plan-screen-readout",
+);
+const topSetupPanelEl = document.querySelector("#top-setup-panel");
+const topSetupTitleEl = document.querySelector("#top-setup-title");
+const topSetupStatusEl = document.querySelector("#top-setup-status");
+const rechargeRateValueEl = document.querySelector(
+  "#recharge-rate-value",
+);
+const scenarioRunButton = document.querySelector("#scenario-run");
+const scenarioCancelButton = document.querySelector("#scenario-cancel");
+const scenarioDirectionButtons = document.querySelectorAll(
+  "[data-direction]",
+);
+const scenarioRechargeZoneRadios = document.querySelectorAll(
+  "[name='scenario-recharge-zone-ui']",
+);
+const scenarioLeakageDirectionRadios = document.querySelectorAll(
+  "[name='scenario-leakage-direction-ui']",
+);
+const scenarioInputs = {
+  rows: document.querySelector("#scenario-rows"),
+  columns: document.querySelector("#scenario-columns"),
+  area: document.querySelector("#scenario-area"),
+  gridSize: document.querySelector("#scenario-grid-size"),
+  layers: document.querySelector("#scenario-layers"),
+  boundary: document.querySelector("#scenario-boundary"),
+  rechargeEnabled: document.querySelector("#scenario-recharge-enabled"),
+  rechargeRate: document.querySelector("#scenario-recharge-rate"),
+  groundwaterElevation: document.querySelector(
+    "#scenario-groundwater-elevation",
+  ),
+  riverElevation: document.querySelector("#scenario-river-elevation"),
+  streamLeakage: document.querySelector("#scenario-stream-leakage"),
+  rechargeZone: document.querySelector("#scenario-recharge-zone"),
+  leakageDirection: document.querySelector(
+    "#scenario-leakage-direction",
+  ),
+};
+const wellUnavailableToastEl = document.querySelector(
+  "#well-unavailable-toast",
+);
 
 // Viewer scale and Three.js scene setup
 const sectionContext = sectionCanvas.getContext("2d");
@@ -153,6 +178,147 @@ let topViewDischargeFrame = null;
 let wellUnavailableToastTimer = null;
 let sensorSpecsVisible = false;
 let activeSensorIndex = 0;
+const aquiferLevelNames = {
+  "Upper Aquifer": "Level 1",
+  "Middle Aquifer": "Level 2",
+  "Lower Aquifer": "Level 3",
+};
+const aquiferLevelNumbers = {
+  "Upper Aquifer": 1,
+  "Middle Aquifer": 2,
+  "Lower Aquifer": 3,
+};
+
+// Domain data, labels, sensor profiles, and default well presentation
+const soilDrawdownProfiles = {
+  sand: { label: "Sand", influence: 0.68, depth: 1.15 },
+  loam: { label: "Loam", influence: 1.05, depth: 0.9 },
+  silt: { label: "Silt", influence: 1.22, depth: 0.78 },
+  clay: { label: "Clay", influence: 1.38, depth: 0.66 },
+  gravel: { label: "Gravel", influence: 0.82, depth: 1.02 },
+};
+const soilDescriptions = {
+  sand: "Drains water quickly because of large particles, causing faster water drawdown and lower water retention.",
+  loam: "Holds a balanced amount of water and allows moderate drainage, so water drawdown is usually steady and controlled.",
+  clay: "Holds water for a long time because of very small particles, resulting in slower water drawdown and poor drainage.",
+};
+const soilImages = {
+  loam: "./assets/soil/loam.png",
+  sand: "./assets/soil/sand.png",
+  clay: "./assets/soil/clay.png",
+};
+const defaultSoilByLevel = {
+  1: "loam",
+  2: "loam",
+  3: "loam",
+};
+const wellPresentation = {
+  "W-1": {
+    name: "UP Pumping",
+    location: "Batong Malake UP Pumping",
+    sectionLocation: "Batong Malake Los Baños",
+    active: true,
+  },
+  "W-2": {
+    name: "DOST Monitoring",
+    location: "Quezon City DOST",
+    sectionLocation: "DOST Los Baños",
+    active: true,
+  },
+  "W-3": {
+    name: "Pili Pumping",
+    location: "Pili Drive 1251",
+    sectionLocation: "Pili Drive Los Baños",
+    active: true,
+  },
+  "W-4": {
+    name: "Calamba Monitoring",
+    location: "SM City Calamba",
+    sectionLocation: "Calamba Laguna",
+    active: false,
+  },
+};
+const wellMetrics = {
+  "W-1": {
+    oxygen: 7.2,
+    ph: 7.6,
+    temperature: 27.7,
+    salinity: 0.9,
+    tds: 536,
+    gwLevel: 12.0,
+  },
+  "W-2": {
+    oxygen: 6.9,
+    ph: 7.3,
+    temperature: 27.1,
+    salinity: 0.7,
+    tds: 488,
+    gwLevel: 10.8,
+  },
+  "W-3": {
+    oxygen: 7.4,
+    ph: 7.5,
+    temperature: 28.2,
+    salinity: 1.0,
+    tds: 552,
+    gwLevel: 13.6,
+  },
+  "W-4": {
+    oxygen: 6.4,
+    ph: 7.1,
+    temperature: 28.7,
+    salinity: 1.3,
+    tds: 611,
+    gwLevel: 14.2,
+  },
+};
+const sensorProfiles = [
+  {
+    shortName: "Water level",
+    model: "SS634 Water Level Pressure Sensor",
+    description: "Submersible pressure sensor for groundwater depth.",
+    specs: {
+      Range: "0–60 m water depth",
+      Accuracy: "±0.5% full scale at 25 °C",
+      Response: "<4 ms",
+      Protection: "IP68",
+    },
+  },
+  {
+    shortName: "pH",
+    model: "SEN0161-V2 Analog pH Sensor",
+    description: "Industrial probe for continuous water pH monitoring.",
+    specs: {
+      Range: "pH 0–14",
+      Accuracy: "±0.1 pH at 25 °C",
+      Response: "<1 min",
+      "Water temperature": "0–60 °C",
+    },
+  },
+  {
+    shortName: "Temperature",
+    model: "DS18B20 Waterproof Temperature Sensor",
+    description: "Waterproof digital temperature probe.",
+    specs: {
+      Range: "−55 to 125 °C",
+      Accuracy: "±0.05 °C from −10 to 85 °C",
+      Resolution: "9–12 bit selectable",
+      Probe: "Stainless steel",
+    },
+  },
+  {
+    shortName: "EC / TDS / Salinity",
+    model: "Atlas Scientific K1 EZO Conductivity Kit",
+    description: "Conductivity probe with derived TDS and salinity.",
+    specs: {
+      "EC range": "5–200,000 µS/cm",
+      Accuracy: "±2 µS/cm",
+      Outputs: "EC, TDS (KCl), salinity (PSS-78)",
+      "Water temperature": "0–70 °C",
+    },
+  },
+];
+
 const headsGroup = new THREE.Group();
 const arrowsGroup = new THREE.Group();
 const wellsGroup = new THREE.Group();
@@ -2646,6 +2812,28 @@ function closeTopViewSetup() {
 }
 
 
+async function fetchScenarioTopView(config) {
+  const apiCandidates = [
+    "/api/simulation/top-view",
+    "http://localhost:8000/simulation/top-view",
+  ];
+  for (const url of apiCandidates) {
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(config),
+      });
+      if (response.ok) {
+        return await response.json();
+      }
+    } catch (error) {
+      console.warn(`Scenario API unavailable at ${url}`, error);
+    }
+  }
+  return null;
+}
+
 async function runScenarioAndOpenTopView() {
   if (!pendingTopViewRegion) return;
   const region = pendingTopViewRegion;
@@ -2733,7 +2921,6 @@ function closeTopView() {
   });
 }
 
-// 2D well controls, sensor popover, and panel UI
 function updateDischargeLabel() {
   const soilProfile = getSoilProfileForLevel(activeSoilLevel);
   const discharge01 =
@@ -2904,7 +3091,6 @@ function addWellPicker(wells) {
   activeWellCountEl.textContent = `${activeCount}/${wells.length}`;
 }
 
-// Scene loading and event wiring
 async function loadScene() {
   try {
     const response = await fetch(
@@ -3314,7 +3500,6 @@ window.addEventListener("resize", () => {
   }
 });
 
-// Animation loop
 function animate() {
   updateCameraTween();
   controls.update();
