@@ -87,7 +87,7 @@ export function SimulationModelEntry({
           </div>
           <iframe
             className={frameStyles.viewerFrame}
-            src="/groundwater-viewer/index.html"
+            src="/groundwater-viewer"
             title="AQUASMART 3D groundwater simulation viewer"
           />
         </div>

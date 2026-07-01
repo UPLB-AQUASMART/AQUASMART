@@ -1,0 +1,42 @@
+/* Mobile and narrow viewport overrides. */
+
+@media (max-width: 760px) {
+  .panel,
+  .panel.is-section-mode {
+    left: 8px;
+    top: 8px;
+    width: calc(100vw - 16px);
+
+    max-height: calc(100vh - 16px);
+    padding: 22px 18px;
+  }
+
+  .cluster-header,
+  .section-panel-header {
+    grid-template-columns: 1fr;
+  }
+
+  .cluster-location,
+  .section-well-location,
+  .active-wells-count {
+    text-align: left;
+  }
+
+  .well-picker,
+  .metric-grid,
+  .section-slider-grid,
+  .section-option-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .well-picker {
+    max-height: 42vh;
+  }
+
+  .section-toolbar {
+    right: 10px;
+    top: auto;
+    bottom: 10px;
+  }
+}

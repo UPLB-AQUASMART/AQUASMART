@@ -11,6 +11,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1076.0",
     "@aws-sdk/s3-request-presigner": "^3.1076.0",
+    "@iconify/react": "^6.0.2",
     "@radix-ui/react-slider": "^1.4.0",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.6.1",

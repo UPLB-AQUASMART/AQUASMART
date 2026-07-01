@@ -1,0 +1,525 @@
+/* Figma-style active aquifer setup board overrides. */
+
+.panel.is-aquifer-setup-mode {
+  left: 16px;
+  top: 16px;
+  width: min(1180px, calc(192.307vw - 62px));
+  max-height: calc(192.307vh - 62px);
+  overflow-y: auto;
+  border: 1px solid rgba(104, 190, 211, 0.78);
+  border-radius: 22px;
+  background: #dff6fd;
+  box-shadow:
+    0 18px 34px rgba(15, 52, 68, 0.2),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.46);
+  padding: 20px 22px 18px;
+  transform: scale(0.52);
+  transform-origin: top left;
+}
+
+.is-aquifer-setup-mode #menu-section-state {
+  display: block;
+}
+
+.is-aquifer-setup-mode .aquifer-setup {
+  position: relative;
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  padding: 0 10px 64px;
+}
+
+.is-aquifer-setup-mode .aquifer-setup__title {
+  margin: 8px 0 0;
+  color: #0b1f3a;
+  font-size: clamp(33px, 2.8vw, 42px);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 0.95;
+}
+
+.is-aquifer-setup-mode .aquifer-setup__subtitle {
+  margin: 6px 0 18px;
+  color: #0b1f3a;
+  font-size: clamp(19px, 1.7vw, 26px);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.is-aquifer-setup-mode .aquifer-card {
+  border: 2px solid rgba(151, 211, 226, 0.76);
+  border-radius: 31px;
+  background: rgba(248, 253, 255, 0.42);
+  box-shadow: none;
+}
+
+.is-aquifer-setup-mode .aquifer-setup > .aquifer-card {
+  padding: 26px 34px 20px 56px;
+}
+
+.is-aquifer-setup-mode .aquifer-grid-row {
+  grid-template-columns: 96px 290px minmax(0, 1fr);
+  gap: 22px;
+}
+
+.is-aquifer-setup-mode .aquifer-grid-row + .aquifer-grid-row {
+  margin-top: 26px;
+}
+
+.is-aquifer-setup-mode .aquifer-icon {
+  width: 76px;
+  height: 76px;
+  color: #23a8ce;
+}
+
+.is-aquifer-setup-mode .aquifer-icon__svg {
+  width: 62px;
+  height: 62px;
+}
+
+.is-aquifer-setup-mode .aquifer-grid-row__copy strong {
+  color: #0b1f3a;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.is-aquifer-setup-mode .aquifer-grid-row__copy small {
+  margin-top: 9px;
+  color: #526983;
+  font-size: 13px;
+  font-style: italic;
+  font-weight: 400;
+}
+
+.is-aquifer-setup-mode .aquifer-field-grid {
+  gap: 28px;
+}
+
+.is-aquifer-setup-mode .aquifer-field-grid--two {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.is-aquifer-setup-mode .aquifer-field-grid--two .aquifer-field:last-child {
+  grid-column: 2 / span 1;
+}
+
+.is-aquifer-setup-mode .aquifer-field {
+  gap: 10px;
+  color: #0b1f3a;
+  font-size: 21px;
+  font-weight: 500;
+}
+
+.is-aquifer-setup-mode .aquifer-field small {
+  color: #526983;
+  font-size: 12px;
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.25;
+}
+
+.is-aquifer-setup-mode .aquifer-field input,
+.is-aquifer-setup-mode .aquifer-field select {
+  min-height: 35px;
+  border: 1px solid #c8e4ec;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.64);
+  color: #0b1f3a;
+  font-size: 19px;
+  font-weight: 400;
+}
+
+.is-aquifer-setup-mode .aquifer-field input:disabled {
+  color: rgba(11, 31, 58, 0.35);
+  background: rgba(255, 255, 255, 0.34);
+}
+
+.is-aquifer-setup-mode .aquifer-setup__content-grid {
+  align-items: stretch;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.is-aquifer-setup-mode .aquifer-setup__content-grid > .aquifer-card {
+  min-height: 600px;
+  padding: 20px 24px 20px;
+}
+
+.is-aquifer-setup-mode .aquifer-card__header {
+  grid-template-columns: 148px 1fr;
+  min-height: 124px;
+  gap: 14px;
+}
+
+.is-aquifer-setup-mode .aquifer-card__header .aquifer-icon {
+  width: 118px;
+  height: 118px;
+}
+
+.is-aquifer-setup-mode .aquifer-card__header .aquifer-icon__svg {
+  width: 108px;
+  height: 108px;
+  color: rgba(105, 166, 193, 0.58);
+}
+
+.is-aquifer-setup-mode .aquifer-card__header strong {
+  font-size: 21px;
+  font-weight: 500;
+  line-height: 1.12;
+}
+
+.is-aquifer-setup-mode .aquifer-card__header small {
+  margin-top: 12px;
+  color: #526983;
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.is-aquifer-setup-mode .aquifer-toggle {
+  min-height: 66px;
+  margin: 12px 0 18px;
+  border: 1px solid rgba(206, 226, 235, 0.76);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.34);
+  padding: 0 22px;
+  color: #0b1f3a;
+  font-size: 19px;
+  font-weight: 400;
+}
+
+.is-aquifer-setup-mode .aquifer-toggle input {
+  width: 48px;
+  height: 32px;
+}
+
+.is-aquifer-setup-mode .aquifer-field__value {
+  color: #16a6ce;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.is-aquifer-setup-mode input[type="range"] {
+  accent-color: #20a8cd;
+}
+
+.is-aquifer-setup-mode .aquifer-field input[type="range"] {
+  min-height: 44px;
+}
+
+.is-aquifer-setup-mode .aquifer-zone-mode {
+  grid-template-columns: minmax(0, 1fr);
+  align-items: stretch;
+  gap: 14px;
+  border: 1px solid rgba(206, 226, 235, 0.76);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.22);
+  margin-top: 24px;
+  padding: 18px 20px;
+}
+
+.is-aquifer-setup-mode .aquifer-zone-mode__copy strong {
+  color: #0b1f3a;
+  font-size: 21px;
+  font-weight: 400;
+  line-height: 1.05;
+}
+
+.is-aquifer-setup-mode .aquifer-zone-mode__copy small {
+  margin-top: 7px;
+  color: #33516b;
+  font-size: 13px;
+  font-style: italic;
+  line-height: 1.18;
+}
+
+.is-aquifer-setup-mode .aquifer-option-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 10px;
+  margin-top: 0;
+}
+
+.is-aquifer-setup-mode .aquifer-option,
+.is-aquifer-setup-mode .aquifer-leakage-option {
+  min-height: 76px;
+  border: 1px solid #c1e1eb;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.62);
+  color: #0b1f3a;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+}
+
+.is-aquifer-setup-mode .aquifer-option {
+  grid-template-columns: 30px minmax(0, 1fr);
+  grid-template-rows: auto;
+  column-gap: 12px;
+  min-height: 108px;
+  overflow: hidden;
+  padding: 16px 58px 16px 16px;
+}
+
+.is-aquifer-setup-mode .aquifer-option__choice {
+  width: 26px;
+  height: 26px;
+  border: 3px solid #7e8a8f;
+}
+
+.is-aquifer-setup-mode .aquifer-option.is-active .aquifer-option__choice {
+  border-color: #2f6df6;
+  box-shadow: inset 0 0 0 8px #ffffff;
+  background: #2f6df6;
+}
+
+.is-aquifer-setup-mode .aquifer-leakage-option.is-active {
+  background: rgba(136, 179, 181, 0.58);
+}
+
+.is-aquifer-setup-mode .aquifer-option.is-active {
+  border-color: rgba(214, 224, 235, 0.92);
+  background: rgba(248, 253, 255, 0.86);
+}
+
+.is-aquifer-setup-mode .aquifer-option.is-disabled {
+  background: rgba(100, 111, 111, 0.48);
+  opacity: 1;
+}
+
+.is-aquifer-setup-mode .aquifer-option small,
+.is-aquifer-setup-mode .aquifer-leakage-option small {
+  color: #526983;
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.is-aquifer-setup-mode .aquifer-option .aquifer-icon__svg,
+.is-aquifer-setup-mode .aquifer-leakage-option .aquifer-icon__svg {
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  vertical-align: middle;
+}
+
+.is-aquifer-setup-mode .aquifer-option .aquifer-icon__svg {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  width: 42px;
+  height: 42px;
+}
+
+.is-aquifer-setup-mode .aquifer-option__text {
+  min-width: 0;
+  gap: 6px;
+  font-size: 16px;
+  line-height: 1.08;
+  overflow-wrap: anywhere;
+}
+
+.is-aquifer-setup-mode .aquifer-option__text small {
+  color: #526983;
+  font-size: 13px;
+  line-height: 1.12;
+}
+
+.is-aquifer-setup-mode .aquifer-note {
+  margin-top: 28px;
+  color: #0b1f3a;
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.is-aquifer-setup-mode .aquifer-note .aquifer-icon__svg {
+  width: 34px;
+  height: 34px;
+}
+
+.is-aquifer-setup-mode .aquifer-card__image {
+  width: 118px;
+  height: 118px;
+}
+
+.is-aquifer-setup-mode .aquifer-elevation-grid {
+  position: relative;
+  gap: 34px;
+  margin: 26px 18px 28px;
+}
+
+.is-aquifer-setup-mode .aquifer-elevation-grid::before {
+  position: absolute;
+  left: 50%;
+  top: 2px;
+  bottom: 0;
+  width: 1px;
+  background: rgba(206, 226, 235, 0.82);
+  content: "";
+}
+
+.is-aquifer-setup-mode .aquifer-elevation-control {
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 18px;
+  min-height: 190px;
+}
+
+.is-aquifer-setup-mode .aquifer-elevation-control__scale {
+  grid-template-columns: 42px 34px;
+  grid-template-rows: 1fr 1fr;
+  align-items: center;
+  justify-items: center;
+  gap: 0 6px;
+  color: rgba(11, 31, 58, 0.52);
+  font-size: 17px;
+  font-weight: 400;
+}
+
+.is-aquifer-setup-mode
+  .aquifer-elevation-control__scale
+  .aquifer-elevation-control__scale-value:first-child {
+  align-self: start;
+}
+
+.is-aquifer-setup-mode
+  .aquifer-elevation-control__scale
+  .aquifer-elevation-control__scale-value:last-child {
+  align-self: end;
+}
+
+.is-aquifer-setup-mode
+  .aquifer-elevation-control
+  input[type="range"].aquifer-elevation-control__slider {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  justify-self: center;
+  width: 34px;
+  height: 190px;
+  transform: none;
+  writing-mode: vertical-lr;
+  direction: rtl;
+}
+
+.is-aquifer-setup-mode .aquifer-elevation-control label {
+  color: #698095;
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.is-aquifer-setup-mode .aquifer-elevation-control__value {
+  color: #16a6ce;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.is-aquifer-setup-mode #scenario-stream-leakage {
+  min-height: 42px;
+  font-size: 18px;
+}
+
+.is-aquifer-setup-mode .aquifer-leakage-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  border: 1px solid rgba(206, 226, 235, 0.76);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.2);
+  margin-top: 22px;
+  padding: 12px;
+}
+
+.is-aquifer-setup-mode .aquifer-leakage-option {
+  display: grid;
+  align-content: center;
+  min-height: 94px;
+  border-color: rgba(214, 224, 235, 0.92);
+  border-radius: 20px;
+  background: rgba(248, 253, 255, 0.84);
+  padding: 16px 20px;
+  color: #0b1f3a;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.02;
+  text-align: center;
+}
+
+.is-aquifer-setup-mode .aquifer-leakage-option.is-active {
+  border-color: #21a8cd;
+  background: rgba(248, 253, 255, 0.84);
+  box-shadow: inset 0 0 0 2px #21a8cd;
+}
+
+.is-aquifer-setup-mode .aquifer-leakage-option small {
+  display: block;
+  margin-top: 8px;
+  color: #526983;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.08;
+}
+
+.is-aquifer-setup-mode .aquifer-leakage-option.is-active small {
+  color: #3f5c74;
+}
+
+.is-aquifer-setup-mode .aquifer-setup__actions {
+  position: absolute;
+  right: 18px;
+  bottom: 8px;
+  margin-top: 0;
+  padding-right: 0;
+}
+
+.is-aquifer-setup-mode .aquifer-setup__actions button {
+  min-height: 38px;
+  border-radius: 10px;
+  padding: 8px 18px;
+}
+
+.is-aquifer-setup-mode .aquifer-setup__status {
+  position: absolute;
+  left: 22px;
+  bottom: 18px;
+  min-height: 18px;
+  margin: 0;
+  font-size: 13px;
+  text-align: left;
+}
+
+.is-aquifer-setup-mode + .section-view .section-toolbar,
+.is-aquifer-setup-mode ~ .section-view .section-toolbar {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .panel.is-aquifer-setup-mode {
+    left: 12px;
+    top: 12px;
+    width: min(1180px, calc(192.307vw - 46px));
+    max-height: calc(192.307vh - 46px);
+    padding: 18px 14px;
+  }
+
+  .is-aquifer-setup-mode .aquifer-grid-row,
+  .is-aquifer-setup-mode .aquifer-setup__content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .is-aquifer-setup-mode .aquifer-grid-row {
+    gap: 12px;
+  }
+
+  .is-aquifer-setup-mode .aquifer-field-grid,
+  .is-aquifer-setup-mode .aquifer-field-grid--two,
+  .is-aquifer-setup-mode .aquifer-option-grid,
+  .is-aquifer-setup-mode .aquifer-leakage-grid,
+  .is-aquifer-setup-mode .aquifer-elevation-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .is-aquifer-setup-mode .aquifer-field-grid--two .aquifer-field:last-child {
+    grid-column: auto;
+  }
+}
