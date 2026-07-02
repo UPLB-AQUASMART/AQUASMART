@@ -1,162 +1,139 @@
-.partners-section {
+.sponsors {
   width: 100%;
   overflow: hidden;
-  border-top: 1px solid #dde7ee;
-  border-bottom: 1px solid #dde7ee;
   background: #f5fafc;
-  padding: 80px 0 100px;
+  box-sizing: border-box;
+  padding: clamp(56px, 4.2vw, 60px) clamp(24px, 5.55vw, 80px);
+  color: #0b1f3a;
 }
 
-.partners-header {
-  margin-bottom: 60px;
-  padding: 0 5%;
+.sponsorships {
+  width: 100%;
+  margin: 0 0 24px;
+  color: #0b1f3a;
+  font-family: "Sora", sans-serif;
+  font-size: clamp(28px, 2.25vw, 32px);
+  font-weight: 800;
+  line-height: 1.6;
   text-align: center;
 }
 
-.partners-header h2 {
+.sponsorRow {
+  display: grid;
+  width: min(100%, 1280px);
+  margin: 0 auto;
+  grid-template-columns: minmax(0, 672px) minmax(360px, 534px);
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(36px, 5.2vw, 74px);
+}
+
+.sponsorRow + .sponsorRow {
+  margin-top: 24px;
+}
+
+.sponsorDescription {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  text-align: left;
+}
+
+.sponsorDescription p {
+  width: 100%;
+  max-width: 672px;
   margin: 0;
   color: #0b1f3a;
-  font-family: "Sora", sans-serif;
-  font-size: 26px;
-  font-weight: 700;
+  font-size: clamp(12px, 1.67vw, 17px);
+  font-weight: 400;
+  line-height: 1.6;
 }
 
-.partners-marquee-viewport {
-  display: flex;
-  width: 100%;
-  flex-direction: column;
-  gap: 40px;
-  overflow: hidden;
-  padding: 40px 0;
-  background: transparent;
-  mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
-  -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+.sponsorDescription strong {
+  font-weight: 800;
 }
 
-.partners-marquee-track {
-  display: flex;
-  width: max-content;
-  align-items: center;
+.eguLogo {
+  width: min(267px, 42vw);
+  height: auto;
+  object-fit: contain;
+  filter: grayscale(1);
+  opacity: 0.58;
 }
 
-.partners-row-left {
-  animation: partnersScrollLeft 45s linear infinite;
-}
-
-.partners-row-right {
-  animation: partnersScrollRight 45s linear infinite;
-}
-
-@keyframes partnersScrollLeft {
-  from {
-    transform: translateX(0);
-  }
-
-  to {
-    transform: translateX(-33.333%);
-  }
-}
-
-@keyframes partnersScrollRight {
-  from {
-    transform: translateX(-33.333%);
-  }
-
-  to {
-    transform: translateX(0);
-  }
-}
-
-.partner-logo-tile {
-  display: flex;
-  height: 85px;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  margin: 0 50px;
-}
-
-.partner-logo-tile img {
-  width: auto;
-  max-width: 250px;
-  height: 100%;
+.gwynLogo {
+  width: min(210px, 38vw);
+  height: auto;
   object-fit: contain;
 }
 
-@media (max-width: 1100px) {
-  .partner-logo-tile {
-    height: 70px;
-    margin: 0 34px;
-  }
+.sponsorImage {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  object-fit: cover;
 }
 
-@media (max-width: 900px) {
-  .partners-header {
-    min-width: 0;
+.gwynRow {
+  grid-template-columns: minmax(360px, 533px) minmax(0, 672px);
+}
+
+.gwynDescription {
+  align-items: flex-end;
+  text-align: right;
+}
+
+@media (max-width: 1100px) {
+  .sponsorRow,
+  .gwynRow {
+    grid-template-columns: 1fr;
+    gap: 28px;
   }
 
-  .partners-header h2 {
-    max-width: 100%;
-    overflow-wrap: break-word;
-    font-size: clamp(22px, 6vw, 28px);
-    line-height: 1.18;
-    text-wrap: balance;
+  .sponsorImage {
+    max-width: 534px;
   }
 
-  .partners-section {
-    scroll-margin-top: 84px;
+  .eguRow .sponsorImage {
+    justify-self: end;
+  }
+
+  .gwynRow .sponsorImage {
+    order: 2;
+    justify-self: start;
+  }
+
+  .gwynDescription {
+    order: 1;
   }
 }
 
 @media (max-width: 720px) {
-  .partners-section {
-    padding: 64px 0 76px;
+  .sponsors {
+    padding: 52px 20px 64px;
   }
 
-  .partners-header {
-    margin-bottom: 36px;
+  .sponsorships {
+    margin-bottom: 32px;
   }
 
-  .partners-marquee-viewport {
-    gap: 28px;
-    padding: 25px 0;
+  .sponsorRow + .sponsorRow {
+    margin-top: 48px;
   }
 
-  .partner-logo-tile {
-    height: 60px;
-    margin: 0 30px;
-  }
-}
-
-@media (max-width: 640px) {
-  .partners-section {
-    padding-top: 48px;
-    padding-bottom: 64px;
+  .sponsorDescription,
+  .gwynDescription {
+    align-items: center;
+    text-align: center;
   }
 
-  .partner-logo-tile {
-    max-width: 64vw;
-  }
-}
-
-@media (max-width: 520px) {
-  .partners-marquee-viewport {
-    mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
-    -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  .sponsorDescription p {
+    font-size: clamp(16px, 4.8vw, 20px);
   }
 
-  .partner-logo-tile {
-    height: 52px;
-    margin: 0 22px;
-  }
-}
-
-@media (max-width: 420px) {
-  .partners-marquee-track {
-    gap: 0;
-  }
-
-  .partner-logo-tile {
-    margin: 0 16px;
+  .sponsorImage {
+    justify-self: center;
   }
 }

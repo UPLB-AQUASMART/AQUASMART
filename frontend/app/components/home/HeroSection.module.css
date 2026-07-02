@@ -44,7 +44,7 @@
 
 .hero-copy h1 {
   margin: 0;
-  color: var(--navy);
+  color: #0B1F3A;
   font-family: "Sora", sans-serif;
   font-size: clamp(84px, 5.25vw, 108px);
   font-weight: 800;

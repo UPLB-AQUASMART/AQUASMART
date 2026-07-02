@@ -1,47 +1,89 @@
+import Image from "next/image";
+
 import revealStyles from "./ScrollReveal.module.css";
 import styles from "./PartnersSection.module.css";
 
-const partnerLogos = [
-  "/assets/partners/partner-8.png",
-  "/assets/partners/partner-7.png",
-  "/assets/partners/partner-6.png",
-  "/assets/partners/partner-5.png",
-  // "/assets/partners/partner-4.png",
-  // "/assets/partners/partner-3.png",
-  // "/assets/partners/partner-2.png",
-  "/assets/partners/partner-1.png",
-];
-
-const partnerLoop = [...partnerLogos, ...partnerLogos, ...partnerLogos];
-const reversedPartnerLogos = [...partnerLogos].reverse();
-const partnerLoopReverse = [
-  ...reversedPartnerLogos,
-  ...reversedPartnerLogos,
-  ...reversedPartnerLogos,
+const sponsorships = [
+  {
+    id: "egu",
+    logo: "/assets/partners/partner-1.png",
+    logoAlt: "European Geosciences Union",
+    image: "/assets/partners/egu-news.png",
+    imageAlt: "EGU Public Engagement Grants news card",
+    description: (
+      <>
+        The <strong>European Geosciences Union</strong> (EGU) is the leading organisation for Earth,
+        planetary and space science research in Europe. With our partner organisations worldwide, we
+        foster fundamental geoscience research, alongside applied research that addresses key societal
+        and environmental challenges.
+      </>
+    ),
+  },
+  {
+    id: "gwyn",
+    logo: "/assets/partners/partner-8.png",
+    logoAlt: "Groundwater Youth Network",
+    image: "/assets/partners/gwyn-photo.png",
+    imageAlt: "Groundwater Youth Network gathering",
+    description: (
+      <>
+        The <strong>Groundwater Youth Network</strong> (GWYN) is a youth led network aiming to provide
+        a coordination mechanism between pre-existing youth organizations focused on water, and more
+        specifically groundwater. The network will place an emphasis on inclusiveness and diversity in
+        order to facilitate the global exchange of ideas, to contribute to groundwater resilience around
+        the world.
+      </>
+    ),
+  },
 ];
 
 export function PartnersSection() {
   return (
-    <section className={`${styles["partners-section"]} ${revealStyles["scroll-reveal"]}`} id="partners">
-      <div className={styles["partners-header"]}>
-        <h2>Supported By</h2>
-      </div>
-      <div className={styles["partners-marquee-viewport"]} aria-label="Research and institutional partner logos">
-        <div className={`${styles["partners-marquee-track"]} ${styles["partners-row-left"]}`}>
-          {partnerLoop.map((logo, index) => (
-            <div className={styles["partner-logo-tile"]} key={`${logo}-left-${index}`}>
-              <img src={logo} alt="" />
-            </div>
-          ))}
+    <section className={`${styles.sponsors} ${revealStyles["scroll-reveal"]}`} id="partners">
+      <h2 className={styles.sponsorships}>Sponsorships</h2>
+
+      <article className={`${styles.sponsorRow} ${styles.eguRow}`}>
+        <div className={styles.sponsorDescription}>
+          <Image
+            className={styles.eguLogo}
+            src={sponsorships[0].logo}
+            alt={sponsorships[0].logoAlt}
+            width={267}
+            height={117}
+            priority={false}
+          />
+          <p>{sponsorships[0].description}</p>
         </div>
-        <div className={`${styles["partners-marquee-track"]} ${styles["partners-row-right"]}`}>
-          {partnerLoopReverse.map((logo, index) => (
-            <div className={styles["partner-logo-tile"]} key={`${logo}-right-${index}`}>
-              <img src={logo} alt="" />
-            </div>
-          ))}
+
+        <Image
+          className={styles.sponsorImage}
+          src={sponsorships[0].image}
+          alt={sponsorships[0].imageAlt}
+          width={534}
+          height={462}
+        />
+      </article>
+
+      <article className={`${styles.sponsorRow} ${styles.gwynRow}`}>
+        <Image
+          className={styles.sponsorImage}
+          src={sponsorships[1].image}
+          alt={sponsorships[1].imageAlt}
+          width={533}
+          height={462}
+        />
+
+        <div className={`${styles.sponsorDescription} ${styles.gwynDescription}`}>
+          <Image
+            className={styles.gwynLogo}
+            src={sponsorships[1].logo}
+            alt={sponsorships[1].logoAlt}
+            width={210}
+            height={100}
+          />
+          <p>{sponsorships[1].description}</p>
         </div>
-      </div>
+      </article>
     </section>
   );
 }
