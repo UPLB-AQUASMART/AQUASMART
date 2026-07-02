@@ -43,7 +43,7 @@ Service URL: https://aquasmart-zf44.onrender.com
 Health URL: https://aquasmart-zf44.onrender.com/health
 Root Directory: backend
 Build Command: pip install -r requirements.txt
-Start Command: uvicorn api.main:app --host 0.0.0.0 --port $PORT
+Start Command: uvicorn main:app --host 0.0.0.0 --port $PORT
 Health Check Path: /health
 ```
 
@@ -129,7 +129,12 @@ Set these values in `backend/.env` for local development:
 SUPABASE_URL=your_supabase_project_url
 SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 FRONTEND_ORIGIN=http://localhost:3000
+MODFLOW_EXE=bin/mf6
 ```
+
+The groundwater scenario endpoint uses FloPy to write and run MODFLOW 6. Install
+the `mf6` executable on PATH, point `MODFLOW_EXE` at the binary location, or use
+the bundled local macOS arm64 executable at `backend/bin/mf6`.
 
 Do not expose `SUPABASE_SERVICE_ROLE_KEY` in the browser or in the Next.js app.
 
@@ -191,8 +196,8 @@ Recommended manual settings:
 Service type: Web Service
 Runtime: Python
 Root directory: backend
-Build command: pip install -r requirements.txt
-Start command: uvicorn api.main:app --host 0.0.0.0 --port $PORT
+Build command: pip install -r requirements.txt && rm -f bin/mf6 && mkdir -p bin && python -m flopy.utils.get_modflow bin --subset mf6 --quiet && chmod +x bin/mf6
+Start command: uvicorn main:app --host 0.0.0.0 --port $PORT
 Health check path: /health
 Plan: Free
 ```
@@ -203,6 +208,7 @@ Render environment variables:
 
 ```bash
 PYTHON_VERSION=3.12.8
+MODFLOW_EXE=bin/mf6
 SUPABASE_URL=your_supabase_project_url
 SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 FRONTEND_ORIGIN=https://aquasmart-frontend-tawny.vercel.app
@@ -212,12 +218,18 @@ For this project:
 
 ```bash
 PYTHON_VERSION=3.12.8
+MODFLOW_EXE=bin/mf6
 SUPABASE_URL=https://erjcmensjjhdpwwqnisq.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=copy_from_supabase_dashboard
-FRONTEND_ORIGIN=http://localhost:3000
+FRONTEND_ORIGIN=https://aquasmart-frontend-tawny.vercel.app
 ```
 
-After changing `render.yaml`, redeploy the Render service so `FRONTEND_ORIGIN` is applied in production.
+During local development, `backend/bin/mf6` is the bundled macOS arm64 solver.
+During Render builds, `render.yaml` removes that file and downloads a
+Linux-compatible MODFLOW 6 executable into the same `bin/mf6` path.
+
+After changing `render.yaml`, redeploy the Render service so `MODFLOW_EXE` and
+`FRONTEND_ORIGIN` are applied in production.
 
 Where to get the service role key:
 
@@ -255,7 +267,7 @@ Render is trying to deploy the repo root as a Node app. Fix the service settings
 Language: Python
 Root Directory: backend
 Build Command: pip install -r requirements.txt
-Start Command: uvicorn api.main:app --host 0.0.0.0 --port $PORT
+Start Command: uvicorn main:app --host 0.0.0.0 --port $PORT
 ```
 
 Then click:
@@ -290,6 +302,7 @@ Vercel environment variables:
 NEXT_PUBLIC_SUPABASE_URL=https://erjcmensjjhdpwwqnisq.supabase.co
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=copy_from_frontend_env_local_or_supabase_dashboard
 NEXT_PUBLIC_API_URL=https://your-render-service.onrender.com
+AQUASMART_API_URL=https://your-render-service.onrender.com
 ```
 
 After Vercel deploys, copy the Vercel URL into Render's `FRONTEND_ORIGIN`.
@@ -302,6 +315,7 @@ npx vercel login
 npx vercel env add NEXT_PUBLIC_SUPABASE_URL production
 npx vercel env add NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY production
 npx vercel env add NEXT_PUBLIC_API_URL production
+npx vercel env add AQUASMART_API_URL production
 npx vercel deploy --prod
 ```
 

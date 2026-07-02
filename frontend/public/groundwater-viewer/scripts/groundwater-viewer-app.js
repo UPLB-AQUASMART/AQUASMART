@@ -2870,6 +2870,14 @@ async function fetchScenarioTopView(config) {
       if (response.ok) {
         return await response.json();
       }
+      let detail = `HTTP ${response.status}`;
+      try {
+        const payload = await response.json();
+        detail = payload.detail || payload.error || detail;
+      } catch {
+        // Keep the status-only detail when the response body is not JSON.
+      }
+      console.warn(`Scenario API unavailable at ${url}: ${detail}`);
     } catch (error) {
       console.warn(`Scenario API unavailable at ${url}`, error);
     }
@@ -2893,7 +2901,7 @@ async function runScenarioAndOpenTopView() {
         "MODFLOW scenario loaded. Opening top view...";
     } else {
       aquiferSetupStatusEl.textContent =
-        "FastAPI is not running, using the loaded MODFLOW export with the same scenario inputs.";
+        "MODFLOW backend unavailable, using the loaded plan-view export with the same scenario inputs.";
     }
     openTopView(region, config);
   } finally {
