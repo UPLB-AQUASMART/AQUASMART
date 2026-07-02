@@ -1,5 +1,9 @@
+import copy
+import json
 import os
 import traceback
+from collections import OrderedDict
+from time import perf_counter
 from typing import Any
 
 from fastapi import FastAPI, HTTPException
@@ -11,6 +15,9 @@ from .modflow_runner import ModflowExecutionError, modflow_diagnostics, run_top_
 
 
 load_dotenv()
+
+SIMULATION_CACHE_SIZE = int(os.getenv("SIMULATION_CACHE_SIZE", "32"))
+_top_view_cache: OrderedDict[str, dict[str, Any]] = OrderedDict()
 
 
 class HealthResponse(BaseModel):
@@ -25,6 +32,35 @@ def _allowed_origins() -> list[str]:
         "http://localhost:3000,http://localhost:8768,http://127.0.0.1:8768",
     )
     return [origin.strip() for origin in raw_origins.split(",") if origin.strip()]
+
+
+def _scenario_cache_key(scenario: "TopViewScenarioRequest") -> str:
+    return json.dumps(
+        scenario.model_dump(mode="json"),
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+
+
+def _get_cached_top_view(cache_key: str) -> dict[str, Any] | None:
+    if SIMULATION_CACHE_SIZE <= 0:
+        return None
+    cached = _top_view_cache.get(cache_key)
+    if cached is None:
+        return None
+    _top_view_cache.move_to_end(cache_key)
+    result = copy.deepcopy(cached)
+    result.setdefault("source", {})["cacheHit"] = True
+    return result
+
+
+def _set_cached_top_view(cache_key: str, result: dict[str, Any]) -> None:
+    if SIMULATION_CACHE_SIZE <= 0:
+        return
+    _top_view_cache[cache_key] = copy.deepcopy(result)
+    _top_view_cache.move_to_end(cache_key)
+    while len(_top_view_cache) > SIMULATION_CACHE_SIZE:
+        _top_view_cache.popitem(last=False)
 
 
 class ScenarioGrid(BaseModel):
@@ -184,8 +220,21 @@ def simulation_modflow_health() -> dict[str, Any]:
 @app.post("/simulation/top-view")
 def top_view_scenario(scenario: TopViewScenarioRequest) -> dict[str, Any]:
     """Build and run a FloPy/MODFLOW model, then return frontend-ready JSON."""
+    cache_key = _scenario_cache_key(scenario)
+    cached = _get_cached_top_view(cache_key)
+    if cached is not None:
+        return cached
+
+    started_at = perf_counter()
     try:
-        return run_top_view_model(scenario)
+        result = run_top_view_model(scenario)
+        result.setdefault("source", {})["runtimeSeconds"] = round(
+            perf_counter() - started_at,
+            3,
+        )
+        result["source"]["cacheHit"] = False
+        _set_cached_top_view(cache_key, result)
+        return result
     except ModflowExecutionError as error:
         raise HTTPException(status_code=503, detail=str(error)) from error
     except Exception as error:
