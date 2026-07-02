@@ -225,7 +225,7 @@
   flex: 0 0 90px;
   overflow: hidden;
   margin: 0;
-  color: #000000;
+  color: #0b1f3a;
   font-family: "Sora", "Inter", sans-serif;
   font-size: 17px;
   font-weight: 700;
@@ -246,7 +246,7 @@
 
 .desc > p {
   margin: 4px 0 0;
-  color: #000000;
+  color: #0b1f3a;
   font-size: 14px;
   line-height: 1.16;
 }
@@ -355,5 +355,4 @@
   .see-all {
     transition: none;
   }
-
 }

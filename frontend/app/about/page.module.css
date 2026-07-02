@@ -1,0 +1,287 @@
+.page {
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: #f5fafc;
+  color: #0b1f3a;
+}
+
+.introSection {
+  width: 100%;
+  background: #f5fafc;
+  box-sizing: border-box;
+  padding: 170px 5% 100px;
+  text-align: center;
+}
+
+.introReveal {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.badge {
+  display: inline-block;
+  margin-bottom: 25px;
+  border-radius: 50px;
+  background: #dff5fb;
+  padding: 6px 18px;
+  color: #1fa3c9;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+.introSection h1 {
+  max-width: 900px;
+  margin: 0 auto 30px;
+  color: #0b1f3a;
+  font-family: "Sora", sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.introSection h1 span {
+  color: #57c784;
+}
+
+.introSection p {
+  max-width: 850px;
+  margin: 0 auto;
+  color: #5f6b6c;
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+.storySection {
+  width: 100%;
+  background: #dde7ee;
+  box-sizing: border-box;
+  padding: 80px 5%;
+}
+
+.storyGrid {
+  display: grid;
+  max-width: 1300px;
+  align-items: flex-start;
+  gap: 60px;
+  grid-template-columns: 1.1fr 1fr;
+  margin: 0 auto;
+}
+
+.storyContent h2,
+.techCard h2,
+.mvCard h2 {
+  margin: 0;
+  color: #0b1f3a;
+  font-family: "Sora", sans-serif;
+  font-weight: 700;
+}
+
+.storyContent h2 {
+  margin-bottom: 25px;
+  font-size: 32px;
+}
+
+.storyContent p {
+  margin: 0 0 22px;
+  color: #5f6b6c;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.partnerCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  border-radius: 8px;
+  background: #f6c344;
+  color: #0b1f3a;
+  padding: 14px 30px;
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: none;
+  transition:
+    background 0.3s ease,
+    transform 0.3s ease;
+}
+
+.partnerCta:hover {
+  background: #e5b33a;
+  transform: translateY(-2px);
+}
+
+.statsGrid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.statCard {
+  border: 1px solid #9aafc0;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  padding: 25px;
+  transition:
+    box-shadow 0.3s ease,
+    transform 0.3s ease;
+}
+
+.statCard:hover {
+  box-shadow: 0 14px 34px rgba(11, 31, 58, 0.08);
+  transform: translateY(-4px);
+}
+
+.wide {
+  grid-column: span 2;
+}
+
+.statNumber {
+  margin-bottom: 8px;
+  color: #1fa3c9;
+  font-family: "Sora", sans-serif;
+  font-size: 32px;
+  font-weight: 800;
+}
+
+.green {
+  color: #57c784;
+}
+
+.statLabel {
+  color: #5f6b6c;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.missionTechSection {
+  width: 100%;
+  background: #f5fafc;
+  box-sizing: border-box;
+  padding: 80px 5%;
+}
+
+.missionContainer {
+  display: flex;
+  max-width: 1300px;
+  flex-direction: column;
+  gap: 25px;
+  margin: 0 auto;
+}
+
+.mvGrid {
+  display: grid;
+  gap: 25px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.mvCard {
+  border: 1px solid #c5eaf3;
+  border-radius: 20px;
+  background: #dff5fb;
+  padding: 50px 45px;
+}
+
+.mvCard h2 {
+  margin-bottom: 15px;
+  font-size: 28px;
+}
+
+.mvCard p {
+  margin: 0;
+  color: #5f6b6c;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.techCard {
+  border: 1px solid #dde7ee;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 4px 24px rgba(11, 31, 58, 0.04);
+  padding: 60px 50px;
+}
+
+.techCard h2 {
+  margin-bottom: 45px;
+  font-size: 32px;
+}
+
+.techGrid {
+  display: grid;
+  gap: 40px;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.techItem h4 {
+  position: relative;
+  margin: 0 0 10px;
+  padding-bottom: 10px;
+  color: #0b1f3a;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.techItem h4::after {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 30px;
+  height: 3px;
+  background: #1fa3c9;
+  content: "";
+}
+
+.techItem p {
+  margin: 0;
+  color: #5f6b6c;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+@media (max-width: 1100px) {
+  .storyGrid {
+    gap: 40px;
+    grid-template-columns: 1fr;
+  }
+
+  .techGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .introSection {
+    padding: 130px 20px 60px;
+  }
+
+  .introSection h1 {
+    font-size: 26px;
+  }
+
+  .introSection p {
+    font-size: 16px;
+  }
+
+  .storySection,
+  .missionTechSection {
+    padding: 60px 20px;
+  }
+
+  .statsGrid,
+  .mvGrid,
+  .techGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .wide {
+    grid-column: auto;
+  }
+
+  .mvCard,
+  .techCard {
+    padding: 34px 24px;
+  }
+}

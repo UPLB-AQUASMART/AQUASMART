@@ -1,0 +1,202 @@
+.section {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  min-height: 720px;
+  overflow: hidden;
+  background: #ffffff;
+  color: #0b0b0b;
+}
+
+.container {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  margin-inline: 0;
+  padding-right: clamp(28px, 6.7vw, 120px);
+  padding-left: clamp(28px, 6.7vw, 120px);
+}
+
+.imageScale {
+  position: relative;
+  height: 100%;
+}
+
+/* Single vertical divider, full height, at the 50% split.
+   The horizontal segments of the "grid" are not separate elements —
+   they come from box--one's border-bottom and box--two's border-left,
+   which stay visible even while those boxes are scaled to 0. */
+.divider {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 1;
+  width: 1px;
+  height: 100%;
+  background-color: #ebebeb;
+  transform: translateX(-1px);
+}
+
+.box {
+  position: absolute;
+  z-index: 3;
+  background-color: #ffffff;
+}
+
+.boxOne {
+  top: 0;
+  left: 50%;
+  width: 50%;
+  height: 50%;
+  transform: scaleY(0);
+  transform-origin: top center;
+  border-bottom: solid 1px #ebebeb;
+}
+
+.boxTwo {
+  top: 50%;
+  left: 75%;
+  width: 25%;
+  height: 50%;
+  transform: scaleX(0);
+  transform-origin: right center;
+  border-left: solid 1px #ebebeb;
+}
+
+.boxThree {
+  top: 50%;
+  left: 50%;
+  width: 25%;
+  height: 50%;
+  transform: scaleY(0);
+  transform-origin: bottom center;
+}
+
+.boxFour {
+  top: 50%;
+  left: 50%;
+  width: 12.5%;
+  height: 25%;
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.left {
+  position: relative;
+  z-index: 4;
+  display: grid;
+  width: min(50%, 760px);
+  align-content: start;
+  padding-top: clamp(160px, 17.8vw, 320px);
+  padding-right: clamp(32px, 4.5vw, 80px);
+}
+
+.left::before {
+  position: absolute;
+  z-index: -1;
+  inset: clamp(96px, 10vw, 180px) -14vw clamp(54px, 8vw, 130px) -8vw;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.96) 0%,
+    rgba(255, 255, 255, 0.78) 54%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  content: "";
+  pointer-events: none;
+}
+
+.topline {
+  display: inline-block;
+  margin-bottom: clamp(14px, 1.5vw, 24px);
+  color: #0b0b0b;
+  font-size: clamp(17px, 1.35vw, 24px);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.heading {
+  margin: 0 0 clamp(32px, 3.6vw, 64px);
+  color: #1fa3c9;
+  font-family: "Sora", sans-serif;
+  font-size: clamp(72px, 6.7vw, 120px);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.08;
+}
+
+.left p {
+  max-width: 50ch;
+  margin: 0;
+  color: #82837f;
+  font-size: clamp(15px, 0.95vw, 18px);
+  line-height: 1.7;
+}
+
+.imagePanel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  transform-origin: center right;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+@media (max-width: 900px) {
+  .section {
+    min-height: 680px;
+  }
+
+  .container {
+    padding-right: 24px;
+    padding-left: 24px;
+  }
+
+  .divider,
+  .box {
+    display: none;
+  }
+
+  .left {
+    width: min(100%, 620px);
+    padding-top: 120px;
+    padding-right: 0;
+  }
+
+  .imagePanel {
+    opacity: 0.28;
+  }
+}
+
+@media (max-width: 560px) {
+  .section {
+    min-height: 620px;
+  }
+
+  .left {
+    padding-top: 96px;
+  }
+
+  .heading {
+    font-size: clamp(54px, 16vw, 76px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .imagePanel,
+  .image,
+  .boxOne,
+  .boxTwo,
+  .boxThree,
+  .boxFour {
+    transform: none;
+  }
+}

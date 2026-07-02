@@ -135,7 +135,7 @@
 .idw-info-section h2,
 .idw-drawdown-section h2 {
   margin: 0 0 10px;
-  color: #000000;
+  color: #0b1f3a;
   font-family: "Sora", sans-serif;
   font-size: clamp(20px, 1.67vw, 24px);
   font-weight: 600;
@@ -209,14 +209,14 @@
 
 @media (max-width: 1180px) {
   .idw-map-content,
-.idw-info-section,
-.idw-drawdown-section {
+  .idw-info-section,
+  .idw-drawdown-section {
     padding-right: 48px;
     padding-left: 48px;
   }
 
   .idw-info-row,
-.idw-drawdown-images {
+  .idw-drawdown-images {
     grid-template-columns: 1fr;
   }
 
@@ -225,7 +225,7 @@
   }
 
   .idw-drawdown-images img:first-child,
-.idw-drawdown-images img:last-child {
+  .idw-drawdown-images img:last-child {
     height: auto;
   }
 }
@@ -243,8 +243,8 @@
   }
 
   .idw-map-content,
-.idw-info-section,
-.idw-drawdown-section {
+  .idw-info-section,
+  .idw-drawdown-section {
     padding: 32px 24px;
   }
 
@@ -272,7 +272,6 @@
 }
 
 @media (max-width: 900px) {
-
   .idw-page {
     max-width: 100vw;
     overflow-x: clip;
@@ -284,27 +283,27 @@
   }
 
   .idw-map-bottom p,
-.idw-info-section p,
-.idw-drawdown-section p {
+  .idw-info-section p,
+  .idw-drawdown-section p {
     max-width: 100%;
     overflow-wrap: break-word;
   }
 
   .idw-info-row,
-.idw-drawdown-images {
+  .idw-drawdown-images {
     grid-template-columns: 1fr;
   }
 
   .idw-info-row img,
-.idw-drawdown-images img {
+  .idw-drawdown-images img {
     max-width: 100%;
   }
 }
 
 @media (max-width: 520px) {
   .idw-map-content,
-.idw-info-section,
-.idw-drawdown-section {
+  .idw-info-section,
+  .idw-drawdown-section {
     padding-right: 18px;
     padding-left: 18px;
   }
@@ -314,8 +313,8 @@
   }
 
   .idw-map-bottom p,
-.idw-info-section p,
-.idw-drawdown-section p {
+  .idw-info-section p,
+  .idw-drawdown-section p {
     font-size: 14px;
     line-height: 1.55;
   }

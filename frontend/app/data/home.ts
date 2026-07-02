@@ -29,7 +29,7 @@ export type LearningModule = {
 
 export const navItems = [
   { label: "Home", href: "/#home" },
-  { label: "About", href: "/#about" },
+  { label: "About", href: "/about" },
   { label: "Simulation", href: "/#simulations" },
   { label: "Modules", href: "/modules" },
   { label: "Weather", href: "/forecast" },
