@@ -26,8 +26,8 @@ export function WaterSavingScaleSection() {
     ).matches;
 
     if (prefersReducedMotion) {
-      number.textContent = "94";
-      gsap.set(`.${styles.heading}`, { color: "#1FA3C9" });
+      number.textContent = "97";
+      gsap.set(`.${styles.heading}`, { color: "#91a052" });
       gsap.set(imagePanelRef.current, { xPercent: 50 });
       gsap.set(imageRef.current, { xPercent: -40 });
       gsap.set([`.${styles.boxOne}`, `.${styles.boxTwo}`], { scale: 1 });
@@ -55,7 +55,7 @@ export function WaterSavingScaleSection() {
 
       timeline
         .to(counter, {
-          value: 94,
+          value: 97,
           duration: 90,
           snap: { value: 1 },
           onUpdate: () => {
@@ -66,7 +66,7 @@ export function WaterSavingScaleSection() {
           `.${styles.heading}`,
           {
             duration: 60,
-            color: "#1FA3C9",
+            color: "#91a052",
           },
           0,
         )
@@ -150,6 +150,16 @@ export function WaterSavingScaleSection() {
       <div className={`${styles.box} ${styles.boxThree}`} />
       <div className={`${styles.box} ${styles.boxFour}`} />
 
+      <div className={styles.imagePanel} ref={imagePanelRef}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          className={styles.image}
+          ref={imageRef}
+          src="https://assets.codepen.io/2479807/field.jpeg"
+          alt="Green agricultural field"
+        />
+      </div>
+
       <div className={styles.container}>
         <div className={styles.imageScale}>
           <div className={styles.left} ref={leftContentRef}>
@@ -163,16 +173,6 @@ export function WaterSavingScaleSection() {
               methods. AQUASMART mini helps reduce water waste with smarter monitoring,
               weather-aware recommendations, and data-guided decisions.
             </p>
-          </div>
-
-          <div className={styles.imagePanel} ref={imagePanelRef}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              className={styles.image}
-              ref={imageRef}
-              src="https://assets.codepen.io/2479807/field.jpeg"
-              alt="Green agricultural field"
-            />
           </div>
         </div>
       </div>

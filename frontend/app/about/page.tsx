@@ -50,23 +50,23 @@ export default function AboutPage() {
     <main className={styles.page}>
       <ScrollRevealInit />
       <SiteNav activeLabel="About" />
-      <WaterSavingScaleSection />
-
       <section className={`${styles.introSection} ${revealStyles["scroll-reveal"]}`}>
         <div className={styles.introReveal}>
-          <div className={styles.badge}>About AquaSmart</div>
+          <div className={styles.badge}>About AQUASMART Mini</div>
           <h1>
             <span>Water Intelligence</span> for a Sustainable Future
           </h1>
           <p>
-            AQUASMART is an integrated water resources management initiative focused on
-            strengthening the resilience and sustainability of rice-fish farming systems
-            through groundwater monitoring, AI-assisted forecasting, and data-driven
-            irrigation management.
+            AQUASMART Mini (Advancing Quality Awareness in Subsurface Management and Real-time
+            Monitoring Technology) is an interactive, sensor-based miniature aquifer and farm system
+            designed to improve public understanding of groundwater and its link to sustainable agriculture.
+            This initiative forms the public engagement component of the proposed larger AQUASMART
+            research project at the University of the Philippines Los Baños, which promotes climate-resilient
+            groundwater management in farming systems.
           </p>
         </div>
       </section>
-
+      <WaterSavingScaleSection />
       <section className={`${styles.storySection} ${revealStyles["scroll-reveal"]}`}>
         <div className={styles.storyGrid}>
           <div className={styles.storyContent}>
