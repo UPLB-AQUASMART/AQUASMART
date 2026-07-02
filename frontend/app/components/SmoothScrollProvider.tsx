@@ -15,7 +15,7 @@ export function SmoothScrollProvider({
   useEffect(() => {
     const lenis = new Lenis({
       // higher = more "floaty"/lagged smoothing, lower = snappier.
-      duration: 1.1,
+      duration: 0.8,
       easing: (t: number) => 1 - Math.pow(1 - t, 3), // cubic ease-out
       smoothWheel: true,
       touchMultiplier: 1.5,
