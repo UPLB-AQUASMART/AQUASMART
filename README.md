@@ -83,6 +83,7 @@ Local frontend environment variables:
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_key
 NEXT_PUBLIC_API_URL=http://localhost:8000
+AQUASMART_API_URL=http://127.0.0.1:8000
 ```
 
 Local backend environment variables:
@@ -91,14 +92,22 @@ Local backend environment variables:
 SUPABASE_URL=your_supabase_project_url
 SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 FRONTEND_ORIGIN=http://localhost:3000
+MODFLOW_EXE=bin/mf6
 ```
+
+`/simulation/top-view` builds and runs a MODFLOW 6 model through FloPy. The
+project includes a local macOS arm64 executable at `backend/bin/mf6`. On another
+platform, install a compatible MODFLOW 6 executable on PATH, or set
+`MODFLOW_EXE` to that binary.
+
+Render production builds replace the local macOS `backend/bin/mf6` with a
+Linux-compatible MODFLOW 6 executable during `render.yaml` build.
 
 Keep `SUPABASE_SERVICE_ROLE_KEY` only on the backend. Never expose it in browser code or `NEXT_PUBLIC_*` variables.
 
 Not yet added:
 
 - Supabase schema/migrations
-- Production MODFLOW execution flow
 - 3D dashboard scene implementation
 
 Add these only when the app needs them, keeping the prototype small and cheap.

@@ -7,6 +7,7 @@ export async function POST(request: NextRequest) {
   const apiOrigin =
     process.env.AQUASMART_API_URL ||
     process.env.NEXT_PUBLIC_AQUASMART_API_URL ||
+    process.env.NEXT_PUBLIC_API_URL ||
     DEFAULT_API_ORIGIN;
 
   try {

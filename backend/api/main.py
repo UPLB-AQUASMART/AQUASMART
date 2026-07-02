@@ -1,11 +1,13 @@
 import os
+import traceback
 from typing import Any
-from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 from dotenv import load_dotenv
+
+from .modflow_runner import ModflowExecutionError, modflow_diagnostics, run_top_view_model
 
 
 load_dotenv()
@@ -28,7 +30,7 @@ def _allowed_origins() -> list[str]:
 class ScenarioGrid(BaseModel):
     rows: int = Field(ge=5, le=120)
     columns: int = Field(ge=5, le=120)
-    areaKm2: float = Field(ge=1, le=60)
+    areaKm2: float = Field(ge=0, le=10000)
     gridSizeM: float = Field(ge=1, le=1000)
     layers: int = Field(ge=1, le=3)
 
@@ -116,104 +118,16 @@ class TopViewScenarioRequest(BaseModel):
             raise ValueError(f"soil values must be one of {sorted(allowed)}")
         return value
 
-
-SOIL_PROFILES = {
-    "sand": {"influence": 0.68, "depth": 1.15},
-    "loam": {"influence": 1.05, "depth": 0.9},
-    "silt": {"influence": 1.22, "depth": 0.78},
-    "clay": {"influence": 1.38, "depth": 0.66},
-    "gravel": {"influence": 0.82, "depth": 1.02},
-}
-
-
-def _generated_topview_path() -> Path:
-    return Path(__file__).resolve().parents[1] / "generated" / "modflow_topview.json"
-
-
-def _load_topview_payload() -> dict[str, Any]:
-    path = _generated_topview_path()
-    return __import__("json").loads(path.read_text(encoding="utf-8"))
-
-
-def _scenario_influence(scenario: TopViewScenarioRequest, cell: dict[str, Any], domain: dict[str, float]) -> tuple[float, float, float]:
-    level = scenario.layerIndex + 1
-    soil_name = scenario.soilsByLevel.get(str(level), "loam")
-    soil = SOIL_PROFILES.get(soil_name, SOIL_PROFILES["loam"])
-    domain_width = domain["xmax"] - domain["xmin"]
-    domain_height = domain["ymax"] - domain["ymin"]
-    well_x = domain["xmin"] + 0.5 * domain_width
-    well_y = domain["ymin"] + 0.5 * domain_height
-    if scenario.well:
-        # The conceptual 3D model is 60 km by 25 km; map the selected well into
-        # the MODFLOW exercise domain for a stable scenario location.
-        well_x = domain["xmin"] + (scenario.well.x / 60000) * domain_width
-        well_y = domain["ymin"] + (scenario.well.y / 25000) * domain_height
-
-    cell_x, cell_y = cell["center"]
-    dx = well_x - cell_x
-    dy = well_y - cell_y
-    distance = (dx * dx + dy * dy) ** 0.5
-    radius = min(domain_width, domain_height) * (0.08 + 0.16 * soil["influence"])
-    if radius <= 0:
-        return 0.0, 0.0, 0.0
-    if soil_name == "sand":
-        influence = max(0.0, 1 - distance / radius) ** 0.9
-    else:
-        influence = __import__("math").exp(-(distance * distance) / (2 * radius * radius))
-    direction_x = dx / distance if distance > 1e-6 else 0.0
-    direction_y = dy / distance if distance > 1e-6 else 0.0
-    return influence, direction_x, direction_y
-
-
-def _apply_scenario(payload: dict[str, Any], scenario: TopViewScenarioRequest) -> dict[str, Any]:
-    import copy
-    import math
-
-    result = copy.deepcopy(payload)
-    layer = result["layers"][scenario.layerIndex]
-    level = scenario.layerIndex + 1
-    soil_name = scenario.soilsByLevel.get(str(level), "loam")
-    soil = SOIL_PROFILES.get(soil_name, SOIL_PROFILES["loam"])
-    screen_active = level in scenario.screens
-    discharge_ratio = scenario.dischargeM3Day / 8000
-    recharge_factor = scenario.recharge.rateMmDay / 138 if scenario.recharge.enabled else 0
-    boundary_factor = 1.0
-    if scenario.boundary.type == "river":
-        boundary_factor = 0.86
-    elif scenario.boundary.type == "recharge":
-        boundary_factor = 1.12
-    max_drawdown = discharge_ratio * 9.5 * soil["depth"] * boundary_factor if screen_active else 0
-    if scenario.recharge.enabled:
-        max_drawdown = max(0.0, max_drawdown - 0.8 * min(2.0, recharge_factor))
-
-    magnitudes = [math.hypot(qx, qy) for qx, qy in zip(layer["qx"], layer["qy"])]
-    baseline_flow = max(magnitudes or [1e-9], default=1e-9)
-    flow_boost = discharge_ratio * baseline_flow * 1.15 * soil["depth"] if screen_active else 0
-    if scenario.boundary.direction == "right-to-left":
-        flow_boost *= -1
-
-    adjusted_head = []
-    adjusted_drawdown = []
-    adjusted_qx = []
-    adjusted_qy = []
-    for index, cell in enumerate(result["grid"]["cells"]):
-        influence, direction_x, direction_y = _scenario_influence(scenario, cell, result["domain"])
-        drawdown = max_drawdown * influence
-        adjusted_head.append(round(layer["head"][index] - drawdown, 5))
-        adjusted_drawdown.append(round(max(0.0, layer["baselineHead"][index] - (layer["head"][index] - drawdown)), 5))
-        adjusted_qx.append(round(layer["qx"][index] + direction_x * flow_boost * influence, 7))
-        adjusted_qy.append(round(layer["qy"][index] + direction_y * flow_boost * influence, 7))
-
-    layer["head"] = adjusted_head
-    layer["drawdown"] = adjusted_drawdown
-    layer["qx"] = adjusted_qx
-    layer["qy"] = adjusted_qy
-    result["source"]["state"] = "scenario steady state"
-    result["source"]["processor"] = f"{result['source'].get('processor', 'FloPy')} + scenario validation"
-    result["scenario"] = scenario.model_dump()
-    result["scenario"]["screenActive"] = screen_active
-    result["scenario"]["maximumDrawdownM"] = round(max_drawdown, 3)
-    return result
+    @model_validator(mode="after")
+    def validate_layer_references(self) -> "TopViewScenarioRequest":
+        if self.layerIndex >= self.grid.layers:
+            raise ValueError("layerIndex must be lower than grid.layers")
+        invalid_screens = [screen for screen in self.screens if screen > self.grid.layers]
+        if invalid_screens:
+            raise ValueError("screens cannot reference layers deeper than grid.layers")
+        if self.well and abs(self.well.pumpingRate - self.dischargeM3Day) > 1e-6:
+            raise ValueError("well.pumpingRate must match dischargeM3Day")
+        return self
 
 
 app = FastAPI(
@@ -254,15 +168,30 @@ def demo_simulation() -> dict[str, Any]:
     }
 
 
+@app.get("/simulation/modflow-health")
+def simulation_modflow_health() -> dict[str, Any]:
+    """Report whether the backend can find and execute MODFLOW 6."""
+    try:
+        diagnostics = modflow_diagnostics()
+    except ModflowExecutionError as error:
+        raise HTTPException(status_code=503, detail=str(error)) from error
+    return {
+        "status": "ok",
+        "modflow": diagnostics,
+    }
+
+
 @app.post("/simulation/top-view")
 def top_view_scenario(scenario: TopViewScenarioRequest) -> dict[str, Any]:
-    """Validate a groundwater scenario and return MODFLOW/FloPy plan-view data.
-
-    The prototype uses the existing FloPy-exported MODFLOW result as the base
-    dataset, then applies the user scenario consistently on the server. When the
-    production MODFLOW workspace is wired in, this endpoint is the boundary where
-    the request should build/write/run the transient or steady-state model before
-    exporting the same JSON shape back to the viewer.
-    """
-    payload = _load_topview_payload()
-    return _apply_scenario(payload, scenario)
+    """Build and run a FloPy/MODFLOW model, then return frontend-ready JSON."""
+    try:
+        return run_top_view_model(scenario)
+    except ModflowExecutionError as error:
+        raise HTTPException(status_code=503, detail=str(error)) from error
+    except Exception as error:
+        detail = {
+            "message": str(error),
+            "type": type(error).__name__,
+            "traceback": traceback.format_exc(limit=8),
+        }
+        raise HTTPException(status_code=500, detail=detail) from error

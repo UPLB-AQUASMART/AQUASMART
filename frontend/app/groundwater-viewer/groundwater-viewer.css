@@ -1,0 +1,13 @@
+/* Groundwater viewer styles are split by route component for maintainability. */
+
+@import "./styles/base.css";
+@import "./styles/section-view-overlay.css";
+@import "./styles/viewer-panel.css";
+@import "./styles/aquifer-setup-panel.css";
+@import "./styles/plan-view-summary.css";
+@import "./styles/model-menu-state.css";
+@import "./styles/section-menu-state.css";
+@import "./styles/viewer-responsive.css";
+@import "./styles/viewer-scale.css";
+@import "./styles/soil-dropdown.css";
+@import "./styles/aquifer-setup-mode.css";

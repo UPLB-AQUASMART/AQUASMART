@@ -56,9 +56,9 @@ const planSoilReadoutEl = document.querySelector("#plan-soil-readout");
 const planScreenReadoutEl = document.querySelector(
   "#plan-screen-readout",
 );
-const topSetupPanelEl = document.querySelector("#top-setup-panel");
-const topSetupTitleEl = document.querySelector("#top-setup-title");
-const topSetupStatusEl = document.querySelector("#top-setup-status");
+const aquiferSetupPanelEl = document.querySelector("#aquifer-setup");
+const aquiferSetupTitleEl = document.querySelector("#aquifer-setup-title");
+const aquiferSetupStatusEl = document.querySelector("#aquifer-setup-status");
 const rechargeRateValueEl = document.querySelector(
   "#recharge-rate-value",
 );
@@ -178,6 +178,12 @@ let topViewDischargeFrame = null;
 let wellUnavailableToastTimer = null;
 let sensorSpecsVisible = false;
 let activeSensorIndex = 0;
+const STREAMBED_HYDRAULIC_CONDUCTIVITY_M_DAY = 0.00016;
+const STREAMBED_CONTACT_AREA_M2 = 0.2;
+const STREAMBED_THICKNESS_M = 1;
+const STREAMBED_CONDUCTANCE_M2_DAY =
+  (STREAMBED_HYDRAULIC_CONDUCTIVITY_M_DAY * STREAMBED_CONTACT_AREA_M2) /
+  STREAMBED_THICKNESS_M;
 const aquiferLevelNames = {
   "Upper Aquifer": "Level 1",
   "Middle Aquifer": "Level 2",
@@ -203,9 +209,9 @@ const soilDescriptions = {
   clay: "Holds water for a long time because of very small particles, resulting in slower water drawdown and poor drainage.",
 };
 const soilImages = {
-  loam: "./assets/soil/loam.png",
-  sand: "./assets/soil/sand.png",
-  clay: "./assets/soil/clay.png",
+  loam: "/groundwater-viewer/assets/soil/loam.png",
+  sand: "/groundwater-viewer/assets/soil/sand.png",
+  clay: "/groundwater-viewer/assets/soil/clay.png",
 };
 const defaultSoilByLevel = {
   1: "loam",
@@ -2502,9 +2508,9 @@ function openSectionView(well) {
   updateMetricFields(well);
   menuPanelEl.classList.add("is-section-mode");
   menuPanelEl.classList.remove("is-plan-mode");
-  menuPanelEl.classList.remove("is-top-setup-mode");
+  menuPanelEl.classList.remove("is-aquifer-setup-mode");
   planViewSummaryEl.hidden = true;
-  topSetupPanelEl.hidden = true;
+  aquiferSetupPanelEl.hidden = true;
   topViewBackButton.hidden = true;
   menu3dStateEl.hidden = true;
   menuSectionStateEl.hidden = false;
@@ -2533,9 +2539,9 @@ function closeSectionView() {
   sectionViewEl.classList.remove("is-open");
   menuPanelEl.classList.remove("is-section-mode");
   menuPanelEl.classList.remove("is-plan-mode");
-  menuPanelEl.classList.remove("is-top-setup-mode");
+  menuPanelEl.classList.remove("is-aquifer-setup-mode");
   planViewSummaryEl.hidden = true;
-  topSetupPanelEl.hidden = true;
+  aquiferSetupPanelEl.hidden = true;
   topViewBackButton.hidden = true;
   menuSectionStateEl.hidden = true;
   menu3dStateEl.hidden = false;
@@ -2663,7 +2669,7 @@ function transitionSectionCanvas(callback) {
   }, 180);
 }
 
-// MODFLOW setup panel state and API integration
+// MODFLOW aquifer setup panel state and API integration
 function updateScenarioDirectionButtons() {
   for (const button of scenarioDirectionButtons) {
     button.classList.toggle(
@@ -2673,46 +2679,83 @@ function updateScenarioDirectionButtons() {
   }
 }
 
-function updateTopSetupReadouts() {
+function formatElevationMeters(value) {
+  return `${Number(value).toLocaleString(undefined, {
+    maximumFractionDigits: 1,
+  })} m`;
+}
+
+function calculateStreamLeakage(groundwaterElevation, riverElevation) {
+  const headDifference = riverElevation - groundwaterElevation;
+  return STREAMBED_CONDUCTANCE_M2_DAY * headDifference;
+}
+
+function formatStreamLeakage(value) {
+  const leakage = Math.abs(value) < 0.00005 ? 0 : value;
+  return leakage.toFixed(4);
+}
+
+function calculateGridAreaKm2() {
+  const rows = Number(scenarioInputs.rows.value);
+  const columns = Number(scenarioInputs.columns.value);
+  const gridSizeM = Number(scenarioInputs.gridSize.value);
+  if (![rows, columns, gridSizeM].every(Number.isFinite)) {
+    return 0;
+  }
+  return (rows * columns * gridSizeM * gridSizeM) / 1_000_000;
+}
+
+function formatGridArea(value) {
+  if (value >= 1) {
+    return value.toFixed(2);
+  }
+  if (value >= 0.01) {
+    return value.toFixed(4);
+  }
+  return value.toFixed(6);
+}
+
+function updateAquiferSetupReadouts() {
   const groundwaterElevation = Number(
     scenarioInputs.groundwaterElevation.value,
   );
   const riverElevation = Number(scenarioInputs.riverElevation.value);
-  const groundwaterValue = `${groundwaterElevation.toLocaleString()} m`;
-  const riverValue = `${riverElevation.toLocaleString()} m`;
-  const elevationDifference = riverElevation - groundwaterElevation;
-  const streamLeakage = Math.max(
-    -1,
-    Math.min(1, elevationDifference * 0.000032),
+  const groundwaterValue = formatElevationMeters(groundwaterElevation);
+  const riverValue = formatElevationMeters(riverElevation);
+  const streamLeakage = calculateStreamLeakage(
+    groundwaterElevation,
+    riverElevation,
   );
-  const ranges = topSetupPanelEl.querySelectorAll(".top-setup-range");
-  ranges[0]?.querySelector(".top-setup-value")?.replaceChildren(
-    document.createTextNode(groundwaterValue),
-  );
-  ranges[1]?.querySelector(".top-setup-value")?.replaceChildren(
-    document.createTextNode(riverValue),
-  );
-  scenarioInputs.streamLeakage.value = streamLeakage.toFixed(4);
+  scenarioInputs.groundwaterElevation
+    .closest(".aquifer-elevation-control")
+    ?.querySelector(".aquifer-elevation-control__value")
+    ?.replaceChildren(document.createTextNode(groundwaterValue));
+  scenarioInputs.riverElevation
+    .closest(".aquifer-elevation-control")
+    ?.querySelector(".aquifer-elevation-control__value")
+    ?.replaceChildren(document.createTextNode(riverValue));
+  scenarioInputs.streamLeakage.value = formatStreamLeakage(streamLeakage);
+  scenarioInputs.area.value = formatGridArea(calculateGridAreaKm2());
   scenarioInputs.leakageDirection.value =
     streamLeakage >= 0 ? "positive" : "negative";
   for (const radio of scenarioLeakageDirectionRadios) {
     radio.checked = radio.value === scenarioInputs.leakageDirection.value;
   }
-  syncTopSetupChoiceCards();
+  syncAquiferSetupChoiceCards();
   rechargeRateValueEl.textContent = `${Number(
     scenarioInputs.rechargeRate.value,
   ).toLocaleString()} m³/day`;
 }
 
-function syncTopSetupChoiceCards() {
+function syncAquiferSetupChoiceCards() {
   for (const radio of scenarioRechargeZoneRadios) {
-    radio.closest(".top-setup-mode")?.classList.toggle(
+    radio.closest(".aquifer-option")?.classList.toggle(
       "is-active",
       radio.checked,
     );
   }
   for (const radio of scenarioLeakageDirectionRadios) {
-    radio.closest(".top-setup-leakage")?.classList.toggle(
+    radio.closest(".aquifer-leakage-option")?.classList.toggle(
       "is-active",
       radio.checked,
     );
@@ -2780,19 +2823,19 @@ function openTopViewSetup(region) {
   sectionZoom = 1;
   sectionPanX = 0;
   sectionPanY = 0;
-  topSetupPanelEl.hidden = false;
+  aquiferSetupPanelEl.hidden = false;
   planViewSummaryEl.hidden = true;
-  menuPanelEl.classList.add("is-top-setup-mode");
+  menuPanelEl.classList.add("is-aquifer-setup-mode");
   menuPanelEl.classList.remove("is-plan-mode");
   topViewBackButton.hidden = false;
-  topSetupStatusEl.textContent =
+  aquiferSetupStatusEl.textContent =
     "Configure the selected aquifer before generating the top view.";
-  topSetupTitleEl.textContent = `Layer ${region.level} Aquifer Setup`;
+  aquiferSetupTitleEl.textContent = `Layer ${region.level} Aquifer Setup`;
   sectionTitleEl.textContent = `${region.type} Setup`;
   sectionWellLocationEl.textContent = "with FloPy & MODFLOW";
   updateScenarioDirectionButtons();
-  updateTopSetupReadouts();
-  syncTopSetupChoiceCards();
+  updateAquiferSetupReadouts();
+  syncAquiferSetupChoiceCards();
   drawSectionView();
 }
 
@@ -2800,8 +2843,8 @@ function closeTopViewSetup() {
   topViewSetupMode = false;
   pendingTopViewRegion = null;
   selectedAquiferRegion = null;
-  topSetupPanelEl.hidden = true;
-  menuPanelEl.classList.remove("is-top-setup-mode");
+  aquiferSetupPanelEl.hidden = true;
+  menuPanelEl.classList.remove("is-aquifer-setup-mode");
   topViewBackButton.hidden = topViewMode ? false : true;
   const presentation = wellPresentation[activeSectionWell.id] || {};
   sectionTitleEl.textContent =
@@ -2827,6 +2870,14 @@ async function fetchScenarioTopView(config) {
       if (response.ok) {
         return await response.json();
       }
+      let detail = `HTTP ${response.status}`;
+      try {
+        const payload = await response.json();
+        detail = payload.detail || payload.error || detail;
+      } catch {
+        // Keep the status-only detail when the response body is not JSON.
+      }
+      console.warn(`Scenario API unavailable at ${url}: ${detail}`);
     } catch (error) {
       console.warn(`Scenario API unavailable at ${url}`, error);
     }
@@ -2839,18 +2890,18 @@ async function runScenarioAndOpenTopView() {
   const region = pendingTopViewRegion;
   const config = readScenarioConfig(region);
   activeScenarioConfig = config;
-  topSetupStatusEl.textContent =
+  aquiferSetupStatusEl.textContent =
     "Sending scenario to FloPy / MODFLOW processing...";
   scenarioRunButton.disabled = true;
   try {
     const scenarioData = await fetchScenarioTopView(config);
     if (scenarioData?.layers?.length) {
       modflowTopViewData = scenarioData;
-      topSetupStatusEl.textContent =
+      aquiferSetupStatusEl.textContent =
         "MODFLOW scenario loaded. Opening top view...";
     } else {
-      topSetupStatusEl.textContent =
-        "FastAPI is not running, using the loaded MODFLOW export with the same scenario inputs.";
+      aquiferSetupStatusEl.textContent =
+        "MODFLOW backend unavailable, using the loaded plan-view export with the same scenario inputs.";
     }
     openTopView(region, config);
   } finally {
@@ -2879,9 +2930,9 @@ function openTopView(region, config = activeScenarioConfig) {
     topViewAnimatedDischarge = sectionDischarge;
     hoveredAquiferLevel = null;
     hideSensorSpecs();
-    topSetupPanelEl.hidden = true;
+    aquiferSetupPanelEl.hidden = true;
     menuPanelEl.classList.add("is-plan-mode");
-    menuPanelEl.classList.remove("is-top-setup-mode");
+    menuPanelEl.classList.remove("is-aquifer-setup-mode");
     planViewSummaryEl.hidden = false;
     topViewBackButton.hidden = false;
     const layer = modflowTopViewData.layers[activeTopLayer];
@@ -2907,8 +2958,8 @@ function closeTopView() {
     topViewMode = false;
     selectedAquiferRegion = null;
     menuPanelEl.classList.remove("is-plan-mode");
-    menuPanelEl.classList.remove("is-top-setup-mode");
-    topSetupPanelEl.hidden = true;
+    menuPanelEl.classList.remove("is-aquifer-setup-mode");
+    aquiferSetupPanelEl.hidden = true;
     planViewSummaryEl.hidden = true;
     topViewBackButton.hidden = true;
     const presentation = wellPresentation[activeSectionWell.id] || {};
@@ -3094,7 +3145,7 @@ function addWellPicker(wells) {
 async function loadScene() {
   try {
     const response = await fetch(
-      `../generated/demo_groundwater_scene.json?v=${Date.now()}`,
+      `/generated/demo_groundwater_scene.json?v=${Date.now()}`,
       {
         cache: "no-store",
       },
@@ -3107,7 +3158,7 @@ async function loadScene() {
     sceneData = data;
     try {
       const topViewResponse = await fetch(
-        `../generated/modflow_topview.json?v=${Date.now()}`,
+        `/generated/modflow_topview.json?v=${Date.now()}`,
         {
           cache: "no-store",
         },
@@ -3245,27 +3296,34 @@ for (const radio of scenarioRechargeZoneRadios) {
   radio.addEventListener("change", () => {
     if (!radio.checked) return;
     scenarioInputs.rechargeZone.value = radio.value;
-    syncTopSetupChoiceCards();
+    syncAquiferSetupChoiceCards();
   });
 }
 for (const radio of scenarioLeakageDirectionRadios) {
   radio.addEventListener("change", () => {
     if (!radio.checked) return;
     scenarioInputs.leakageDirection.value = radio.value;
-    syncTopSetupChoiceCards();
+    syncAquiferSetupChoiceCards();
   });
+}
+for (const input of [
+  scenarioInputs.rows,
+  scenarioInputs.columns,
+  scenarioInputs.gridSize,
+]) {
+  input.addEventListener("input", updateAquiferSetupReadouts);
 }
 scenarioInputs.groundwaterElevation.addEventListener(
   "input",
-  updateTopSetupReadouts,
+  updateAquiferSetupReadouts,
 );
 scenarioInputs.riverElevation.addEventListener(
   "input",
-  updateTopSetupReadouts,
+  updateAquiferSetupReadouts,
 );
 scenarioInputs.rechargeRate.addEventListener(
   "input",
-  updateTopSetupReadouts,
+  updateAquiferSetupReadouts,
 );
 document
   .querySelector("#sensor-specs-close")

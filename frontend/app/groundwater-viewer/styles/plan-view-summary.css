@@ -1,0 +1,143 @@
+/* Plan-view result summary, configuration readout, and legend styles. */
+
+.plan-view-summary strong,
+.plan-view-summary span {
+  display: block;
+}
+
+.plan-view-summary span {
+  margin-top: 4px;
+  color: #52657d;
+  font-size: 13px;
+}
+
+.plan-scenario-status {
+  margin: 14px 0 0;
+  border-left: 4px solid #1fa3c9;
+  background: rgba(223, 246, 253, 0.86);
+  padding: 10px 12px;
+  color: #0b1f3a;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.plan-config-readout {
+  display: grid;
+  margin: 14px 0 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.plan-config-readout div {
+  border: 1px solid #c7e4ec;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.72);
+  padding: 9px 10px;
+}
+
+.plan-config-readout span,
+.plan-config-readout strong {
+  display: block;
+  margin: 0;
+}
+
+.plan-config-readout span {
+  color: #66758f;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.plan-config-readout strong {
+  margin-top: 3px;
+  color: #0b1f3a;
+  font-size: 13px;
+}
+
+.plan-legend {
+  display: grid;
+  margin-top: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 14px;
+}
+
+.plan-legend-item {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  align-items: center;
+  gap: 9px;
+  color: #334a66;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.plan-legend-item span {
+  margin: 0;
+  color: inherit;
+  font-size: inherit;
+}
+
+.plan-legend-symbol {
+  position: relative;
+  display: block;
+  width: 38px;
+  height: 12px;
+}
+
+.plan-legend-symbol.head {
+  border: 1px solid rgba(11, 31, 58, 0.2);
+  background: linear-gradient(90deg, #440154, #21918c, #fde725);
+}
+
+.plan-legend-symbol.contour::before,
+.plan-legend-symbol.stream::before {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 5px;
+  border-top: 2px solid #ffffff;
+  content: "";
+}
+
+.plan-legend-symbol.contour {
+  border: 1px solid rgba(11, 31, 58, 0.18);
+  background: #4b9b83;
+}
+
+.plan-legend-symbol.stream::before {
+  border-color: #0ea5e9;
+  border-width: 3px;
+}
+
+.plan-legend-symbol.flow::before {
+  position: absolute;
+  left: 2px;
+  top: 5px;
+  width: 30px;
+  border-top: 2px solid #0b1f3a;
+  content: "";
+}
+
+.plan-legend-symbol.flow::after {
+  position: absolute;
+  right: 2px;
+  top: 2px;
+  width: 7px;
+  height: 7px;
+  border-right: 2px solid #0b1f3a;
+  border-top: 2px solid #0b1f3a;
+  content: "";
+  transform: rotate(45deg);
+}
+
+.plan-legend-symbol.well::before {
+  position: absolute;
+  left: 13px;
+  top: -2px;
+  width: 12px;
+  height: 12px;
+  border: 3px solid #e11d48;
+  border-radius: 50%;
+  background: #fff;
+  content: "";
+}
