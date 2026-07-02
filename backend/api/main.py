@@ -1,4 +1,5 @@
 import os
+import traceback
 from typing import Any
 
 from fastapi import FastAPI, HTTPException
@@ -6,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, field_validator, model_validator
 from dotenv import load_dotenv
 
-from .modflow_runner import ModflowExecutionError, run_top_view_model
+from .modflow_runner import ModflowExecutionError, modflow_diagnostics, run_top_view_model
 
 
 load_dotenv()
@@ -167,6 +168,19 @@ def demo_simulation() -> dict[str, Any]:
     }
 
 
+@app.get("/simulation/modflow-health")
+def simulation_modflow_health() -> dict[str, Any]:
+    """Report whether the backend can find and execute MODFLOW 6."""
+    try:
+        diagnostics = modflow_diagnostics()
+    except ModflowExecutionError as error:
+        raise HTTPException(status_code=503, detail=str(error)) from error
+    return {
+        "status": "ok",
+        "modflow": diagnostics,
+    }
+
+
 @app.post("/simulation/top-view")
 def top_view_scenario(scenario: TopViewScenarioRequest) -> dict[str, Any]:
     """Build and run a FloPy/MODFLOW model, then return frontend-ready JSON."""
@@ -174,3 +188,10 @@ def top_view_scenario(scenario: TopViewScenarioRequest) -> dict[str, Any]:
         return run_top_view_model(scenario)
     except ModflowExecutionError as error:
         raise HTTPException(status_code=503, detail=str(error)) from error
+    except Exception as error:
+        detail = {
+            "message": str(error),
+            "type": type(error).__name__,
+            "traceback": traceback.format_exc(limit=8),
+        }
+        raise HTTPException(status_code=500, detail=detail) from error

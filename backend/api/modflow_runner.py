@@ -3,6 +3,8 @@ from __future__ import annotations
 import math
 import os
 import shutil
+import subprocess
+import sys
 import tempfile
 from pathlib import Path
 from typing import Any
@@ -30,6 +32,7 @@ class ModflowExecutionError(RuntimeError):
 def resolve_modflow_executable() -> str:
     backend_dir = Path(__file__).resolve().parents[1]
     executable = os.getenv("MODFLOW_EXE")
+    errors: list[str] = []
     candidates = []
     if executable:
         configured_path = Path(executable)
@@ -39,15 +42,99 @@ def resolve_modflow_executable() -> str:
     candidates.append(backend_dir / "bin" / "mf6")
 
     for candidate in candidates:
-        if candidate.is_file():
+        if candidate.is_file() and _modflow_binary_works(candidate, errors):
             return str(candidate)
 
     resolved = shutil.which(executable or "mf6")
-    if resolved:
+    if resolved and _modflow_binary_works(Path(resolved), errors):
         return resolved
+
+    installed = _install_runtime_modflow(backend_dir / "bin", errors)
+    if installed and _modflow_binary_works(installed, errors):
+        return str(installed)
+
+    detail = " ".join(errors)
     raise ModflowExecutionError(
-        "MODFLOW 6 executable not found. Add backend/bin/mf6, install mf6 on PATH, or set MODFLOW_EXE."
+        f"MODFLOW 6 executable not available. Add backend/bin/mf6, install mf6 on PATH, or set MODFLOW_EXE. {detail}".strip()
     )
+
+
+def modflow_diagnostics() -> dict[str, Any]:
+    errors: list[str] = []
+    executable = Path(resolve_modflow_executable())
+    version = _run_modflow_version(executable, errors)
+    return {
+        "executable": str(executable),
+        "exists": executable.exists(),
+        "isFile": executable.is_file(),
+        "isExecutable": os.access(executable, os.X_OK),
+        "version": version,
+        "errors": errors,
+    }
+
+
+def _modflow_binary_works(path: Path, errors: list[str]) -> bool:
+    if not os.access(path, os.X_OK):
+        try:
+            path.chmod(path.stat().st_mode | 0o755)
+        except OSError as error:
+            errors.append(f"{path} is not executable: {error}")
+            return False
+    return _run_modflow_version(path, errors) is not None
+
+
+def _run_modflow_version(path: Path, errors: list[str]) -> str | None:
+    try:
+        completed = subprocess.run(
+            [str(path), "-v"],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=15,
+        )
+    except OSError as error:
+        errors.append(f"{path} could not start: {error}")
+        return None
+    except subprocess.TimeoutExpired:
+        errors.append(f"{path} timed out while checking version")
+        return None
+    output = "\n".join(part for part in [completed.stdout, completed.stderr] if part).strip()
+    if completed.returncode != 0:
+        errors.append(f"{path} version check failed with code {completed.returncode}: {output[-500:]}")
+        return None
+    return output.splitlines()[0] if output else "MODFLOW 6"
+
+
+def _install_runtime_modflow(target_dir: Path, errors: list[str]) -> Path | None:
+    try:
+        target_dir.mkdir(parents=True, exist_ok=True)
+        target = target_dir / "mf6"
+        if target.exists():
+            target.unlink()
+        completed = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "flopy.utils.get_modflow",
+                str(target_dir),
+                "--subset",
+                "mf6",
+                "--quiet",
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=180,
+        )
+    except (OSError, subprocess.TimeoutExpired) as error:
+        errors.append(f"Runtime MODFLOW install failed: {error}")
+        return None
+    if completed.returncode != 0:
+        output = "\n".join(part for part in [completed.stdout, completed.stderr] if part).strip()
+        errors.append(f"Runtime MODFLOW install exited {completed.returncode}: {output[-1000:]}")
+        return None
+    target.chmod(target.stat().st_mode | 0o755)
+    return target if target.exists() else None
 
 
 def run_top_view_model(scenario: Any) -> dict[str, Any]:
@@ -66,12 +153,15 @@ def run_top_view_model(scenario: Any) -> dict[str, Any]:
 
 
 def _run_simulation(workspace: Path, executable: str) -> None:
-    simulation = flopy.mf6.MFSimulation.load(
-        sim_ws=workspace,
-        exe_name=executable,
-        verbosity_level=0,
-    )
-    success, output = simulation.run_simulation(silent=True)
+    try:
+        simulation = flopy.mf6.MFSimulation.load(
+            sim_ws=workspace,
+            exe_name=executable,
+            verbosity_level=0,
+        )
+        success, output = simulation.run_simulation(silent=True)
+    except OSError as error:
+        raise ModflowExecutionError(f"MODFLOW 6 could not start from {executable}: {error}") from error
     if not success:
         tail = "\n".join(output[-20:]) if isinstance(output, list) else str(output)
         raise ModflowExecutionError(f"MODFLOW 6 failed for {workspace.name}.\n{tail}")
