@@ -62,6 +62,16 @@ const aquiferSetupStatusEl = document.querySelector("#aquifer-setup-status");
 const rechargeRateValueEl = document.querySelector(
   "#recharge-rate-value",
 );
+const modflowTransitionEl = document.querySelector("#modflow-transition");
+const modflowTransitionTitleEl = document.querySelector(
+  "#modflow-transition-title",
+);
+const modflowTransitionDetailEl = document.querySelector(
+  "#modflow-transition-detail",
+);
+const modflowTransitionProgressEl = document.querySelector(
+  "#modflow-transition-progress",
+);
 const scenarioRunButton = document.querySelector("#scenario-run");
 const scenarioCancelButton = document.querySelector("#scenario-cancel");
 const scenarioDirectionButtons = document.querySelectorAll(
@@ -175,6 +185,7 @@ let scenarioDirection = "left-to-right";
 let activeScenarioConfig = null;
 let topViewAnimatedDischarge = 0;
 let topViewDischargeFrame = null;
+let modflowTransitionTimer = null;
 let wellUnavailableToastTimer = null;
 let sensorSpecsVisible = false;
 let activeSensorIndex = 0;
@@ -194,6 +205,32 @@ const aquiferLevelNumbers = {
   "Middle Aquifer": 2,
   "Lower Aquifer": 3,
 };
+const modflowTransitionStages = [
+  {
+    title: "Building aquifer grid",
+    detail:
+      "Rows, columns, layers, and active cells are being written for MODFLOW.",
+    progress: 24,
+  },
+  {
+    title: "Applying recharge and river boundary",
+    detail:
+      "Rainfall infiltration, stream leakage, and constant-head edges are settling in.",
+    progress: 46,
+  },
+  {
+    title: "Solving groundwater heads",
+    detail:
+      "FloPy has handed the scenario to MODFLOW 6 for the numerical solve.",
+    progress: 68,
+  },
+  {
+    title: "Tracing drawdown and flow",
+    detail:
+      "Heads, cell budgets, contours, and vectors are being shaped for the top view.",
+    progress: 86,
+  },
+];
 
 // Domain data, labels, sensor profiles, and default well presentation
 const soilDrawdownProfiles = {
@@ -2669,6 +2706,56 @@ function transitionSectionCanvas(callback) {
   }, 180);
 }
 
+function setModflowTransitionStage(stage) {
+  if (!modflowTransitionEl || !stage) return;
+  modflowTransitionTitleEl.textContent = stage.title;
+  modflowTransitionDetailEl.textContent = stage.detail;
+  modflowTransitionProgressEl.style.width = `${stage.progress}%`;
+}
+
+function showModflowTransition() {
+  if (!modflowTransitionEl) return;
+  let stageIndex = 0;
+  setModflowTransitionStage(modflowTransitionStages[stageIndex]);
+  modflowTransitionEl.hidden = false;
+  modflowTransitionEl.setAttribute("aria-hidden", "false");
+  requestAnimationFrame(() =>
+    modflowTransitionEl.classList.add("is-visible"),
+  );
+  window.clearInterval(modflowTransitionTimer);
+  modflowTransitionTimer = window.setInterval(() => {
+    stageIndex = Math.min(
+      stageIndex + 1,
+      modflowTransitionStages.length - 1,
+    );
+    setModflowTransitionStage(modflowTransitionStages[stageIndex]);
+  }, 1100);
+}
+
+function completeModflowTransition() {
+  window.clearInterval(modflowTransitionTimer);
+  modflowTransitionTimer = null;
+  setModflowTransitionStage({
+    title: "Top view ready",
+    detail:
+      "MODFLOW heads, drawdown, flow vectors, and budget terms are ready to render.",
+    progress: 100,
+  });
+}
+
+function hideModflowTransition(delay = 260) {
+  if (!modflowTransitionEl) return;
+  window.clearInterval(modflowTransitionTimer);
+  modflowTransitionTimer = null;
+  window.setTimeout(() => {
+    modflowTransitionEl.classList.remove("is-visible");
+    modflowTransitionEl.setAttribute("aria-hidden", "true");
+    window.setTimeout(() => {
+      modflowTransitionEl.hidden = true;
+    }, 280);
+  }, delay);
+}
+
 // MODFLOW aquifer setup panel state and API integration
 function updateScenarioDirectionButtons() {
   for (const button of scenarioDirectionButtons) {
@@ -2890,20 +2977,23 @@ async function runScenarioAndOpenTopView() {
   const region = pendingTopViewRegion;
   const config = readScenarioConfig(region);
   activeScenarioConfig = config;
-  aquiferSetupStatusEl.textContent =
-    "Sending scenario to FloPy / MODFLOW processing...";
+  aquiferSetupStatusEl.textContent = "Running MODFLOW scenario...";
   scenarioRunButton.disabled = true;
+  showModflowTransition();
   try {
     const scenarioData = await fetchScenarioTopView(config);
     if (scenarioData?.layers?.length) {
       modflowTopViewData = scenarioData;
-      aquiferSetupStatusEl.textContent =
-        "MODFLOW scenario loaded. Opening top view...";
+      aquiferSetupStatusEl.textContent = "Scenario solved. Opening top view...";
+      completeModflowTransition();
+      await new Promise((resolve) => window.setTimeout(resolve, 420));
+      openTopView(region, config);
+      hideModflowTransition(520);
     } else {
       aquiferSetupStatusEl.textContent =
-        "MODFLOW backend unavailable, using the loaded plan-view export with the same scenario inputs.";
+        "The model run did not return a result. Check the backend connection and try again.";
+      hideModflowTransition(0);
     }
-    openTopView(region, config);
   } finally {
     scenarioRunButton.disabled = false;
   }
@@ -2936,10 +3026,11 @@ function openTopView(region, config = activeScenarioConfig) {
     planViewSummaryEl.hidden = false;
     topViewBackButton.hidden = false;
     const layer = modflowTopViewData.layers[activeTopLayer];
+    const gridType = modflowTopViewData.grid.type || "MODFLOW";
     sectionTitleEl.textContent = `${region.type} Top View`;
     sectionWellLocationEl.textContent = `MODFLOW Layer ${activeTopLayer + 1}`;
     planViewModelEl.textContent = `${modflowTopViewData.source.solver} ${modflowTopViewData.source.state} result`;
-    planViewDetailsEl.textContent = `${modflowTopViewData.grid.cells.length} DISV cells rendered from FloPy head, contour, well, stream, and specific-discharge output for ${layer.name}. ${config ? `${config.grid.rows} × ${config.grid.columns} setup, ${config.boundary.direction.replaceAll("-", " ")} boundary.` : ""}`;
+    planViewDetailsEl.textContent = `${modflowTopViewData.grid.cells.length} ${gridType} cells rendered from FloPy head, contour, well, stream, and specific-discharge output for ${layer.name}. ${config ? `${config.grid.rows} × ${config.grid.columns} setup, ${config.boundary.direction.replaceAll("-", " ")} boundary.` : ""}`;
     sectionViewEl.setAttribute(
       "aria-label",
       `${region.type} MODFLOW plan view`,
