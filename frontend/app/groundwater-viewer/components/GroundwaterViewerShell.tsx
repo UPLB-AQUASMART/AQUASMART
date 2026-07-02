@@ -7,7 +7,13 @@ export function GroundwaterViewerShell() {
     <>
       <ViewerScripts />
       <main id="scene" aria-label="3D groundwater model viewer" />
-      <button className="panel-toggle" id="show-panel" type="button">
+      <button
+        className="panel-toggle"
+        id="show-panel"
+        type="button"
+        aria-controls="menu-panel"
+        aria-expanded="false"
+      >
         Show menu
       </button>
       <div

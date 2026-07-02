@@ -1,0 +1,472 @@
+/* Final mobile overrides for the model viewer bottom sheet and touch controls. */
+
+.panel-mobile-dismiss {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  body {
+    overflow: hidden;
+  }
+
+  #scene,
+  .section-view {
+    min-height: 100dvh;
+  }
+
+  .section-view:not(.is-top-view) #section-canvas {
+    position: absolute;
+    left: 50%;
+    top: 54%;
+    width: min(100vw, calc((100dvh - 88px) * 0.62));
+    max-height: calc(100dvh - 88px);
+    height: auto;
+    aspect-ratio: 0.62;
+    transform: translate(-50%, -50%);
+  }
+
+  .section-view.is-top-view #section-canvas {
+    width: 100%;
+    height: 100%;
+  }
+
+  .panel {
+    left: 8px;
+    right: auto;
+    top: 8px;
+    bottom: auto;
+    width: calc(100% - 16px);
+    max-width: calc(100% - 16px);
+    height: calc(100dvh - 16px);
+    max-height: none;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    touch-action: pan-y;
+    border: 1px solid #b9dce6;
+    border-radius: 18px;
+    padding: calc(14px + env(safe-area-inset-top)) 22px
+      calc(96px + env(safe-area-inset-bottom)) 16px;
+    transform: none;
+    transform-origin: center;
+    z-index: 110;
+  }
+
+  .panel.is-section-mode,
+  .panel.is-section-mode.is-plan-mode,
+  .panel.is-aquifer-setup-mode {
+    left: 8px;
+    right: auto;
+    top: 8px;
+    bottom: auto;
+    width: calc(100% - 16px);
+    max-width: calc(100% - 16px);
+    height: calc(100dvh - 16px);
+    min-height: 0;
+    max-height: none;
+    padding: calc(14px + env(safe-area-inset-top)) 22px
+      calc(96px + env(safe-area-inset-bottom)) 16px;
+    transform: none;
+  }
+
+  .panel.is-aquifer-setup-mode {
+    max-height: none;
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+    visibility: visible;
+    z-index: 110;
+  }
+
+  .panel.is-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(100%);
+    visibility: hidden;
+  }
+
+  .panel-toggle {
+    left: 94px;
+    right: 14px;
+    top: auto;
+    bottom: calc(14px + env(safe-area-inset-bottom));
+    z-index: 9999;
+    width: auto;
+    min-height: 48px;
+    border-radius: 14px;
+    padding: 11px 16px;
+    transform: none;
+    background: rgba(245, 250, 252, 0.96);
+    box-shadow: 0 12px 28px rgba(8, 47, 73, 0.28);
+    font-size: 14px;
+    font-weight: 800;
+  }
+
+  .panel-toggle.is-visible {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+  }
+
+  body:has(#menu-panel.is-hidden) #show-panel {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  body.is-modflow-running #show-panel,
+  body.is-modflow-running:has(#menu-panel.is-hidden) #show-panel {
+    display: none !important;
+    pointer-events: none;
+    visibility: hidden;
+  }
+
+  .panel-mobile-dismiss {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    display: flex;
+    width: 100%;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    margin: 0 0 18px;
+    border-color: #b9dce6;
+    border-radius: 12px;
+    background: rgba(245, 250, 252, 0.94);
+    color: #0b1f3a;
+    font-size: 14px;
+    font-weight: 800;
+  }
+
+  .menu-state {
+    min-height: 0;
+    zoom: 1;
+  }
+
+  #menu-3d-state,
+  #menu-section-state {
+    min-height: 0;
+    padding-bottom: 96px;
+  }
+
+  .panel.is-section-mode #menu-section-state {
+    padding-bottom: 132px;
+  }
+
+  .cluster-header,
+  .section-panel-header {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 5px;
+  }
+
+  .cluster-header h1,
+  .section-panel-header h2 {
+    font-size: 20px;
+  }
+
+  .cluster-location,
+  .section-well-location,
+  .active-wells-label,
+  .active-wells-count {
+    font-size: 16px;
+    text-align: left;
+  }
+
+  .well-picker {
+    max-height: calc(100dvh - 270px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+    margin-top: 18px;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding-right: 10px;
+  }
+
+  .well-selector {
+    min-height: 64px;
+    padding: 14px 16px;
+  }
+
+  .well-menu-hint {
+    margin-top: 14px;
+    font-size: 13px;
+  }
+
+  .metric-grid,
+  .section-slider-grid,
+  .section-option-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    min-height: 0;
+  }
+
+  .metric-grid {
+    margin-top: 10px;
+  }
+
+  .section-option-card {
+    min-height: 130px;
+    grid-template-columns: 70px minmax(0, 1fr);
+  }
+
+  .section-toolbar {
+    left: 8px;
+    right: 8px;
+    top: calc(8px + env(safe-area-inset-top));
+    bottom: auto;
+    justify-content: flex-end;
+    transform: none;
+  }
+
+  .section-actions {
+    gap: 6px;
+  }
+
+  .section-actions > button {
+    min-width: 40px;
+    min-height: 40px;
+    border-radius: 12px;
+    padding: 9px;
+  }
+
+  .section-actions > button span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+
+  .section-actions .ui-icon {
+    width: 22px;
+    height: 22px;
+    flex-basis: 22px;
+  }
+
+  .sensor-specs {
+    left: 12px;
+    right: 12px;
+    top: calc(64px + env(safe-area-inset-top));
+    width: auto;
+    max-height: calc(100dvh - 96px);
+    overflow-y: auto;
+  }
+
+  .is-aquifer-setup-mode .aquifer-setup {
+    min-height: 0;
+    overflow: visible;
+    padding: 0 0 104px;
+  }
+
+  .is-aquifer-setup-mode .aquifer-setup__title {
+    margin-top: 2px;
+    font-size: 30px;
+    line-height: 1.05;
+  }
+
+  .is-aquifer-setup-mode .aquifer-setup__subtitle {
+    margin-bottom: 18px;
+    font-size: 19px;
+  }
+
+  .is-aquifer-setup-mode .aquifer-setup > .aquifer-card,
+  .is-aquifer-setup-mode .aquifer-setup__content-grid > .aquifer-card {
+    min-height: 0;
+    padding: 18px;
+  }
+
+  .is-aquifer-setup-mode .aquifer-grid-row,
+  .is-aquifer-setup-mode .aquifer-setup__content-grid {
+    grid-template-columns: 1fr;
+    min-height: 0;
+    gap: 16px;
+  }
+
+  .is-aquifer-setup-mode .aquifer-grid-row + .aquifer-grid-row {
+    margin-top: 22px;
+  }
+
+  .is-aquifer-setup-mode .aquifer-icon {
+    width: 56px;
+    height: 56px;
+  }
+
+  .is-aquifer-setup-mode .aquifer-icon__svg {
+    width: 48px;
+    height: 48px;
+  }
+
+  .is-aquifer-setup-mode .aquifer-grid-row__copy strong,
+  .is-aquifer-setup-mode .aquifer-card__header strong,
+  .is-aquifer-setup-mode .aquifer-zone-mode__copy strong {
+    font-size: 20px;
+  }
+
+  .is-aquifer-setup-mode .aquifer-grid-row__copy small,
+  .is-aquifer-setup-mode .aquifer-card__header small,
+  .is-aquifer-setup-mode .aquifer-zone-mode__copy small {
+    font-size: 15px;
+  }
+
+  .is-aquifer-setup-mode .aquifer-field-grid,
+  .is-aquifer-setup-mode .aquifer-field-grid--two,
+  .is-aquifer-setup-mode .aquifer-option-grid,
+  .is-aquifer-setup-mode .aquifer-leakage-grid,
+  .is-aquifer-setup-mode .aquifer-elevation-grid {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+
+  .is-aquifer-setup-mode .aquifer-field-grid {
+    gap: 14px;
+  }
+
+  .is-aquifer-setup-mode .aquifer-field-grid--two .aquifer-field:last-child {
+    grid-column: auto;
+  }
+
+  .is-aquifer-setup-mode .aquifer-field {
+    font-size: 18px;
+  }
+
+  .is-aquifer-setup-mode .aquifer-field input,
+  .is-aquifer-setup-mode .aquifer-field select {
+    min-height: 44px;
+    font-size: 18px;
+  }
+
+  .is-aquifer-setup-mode .aquifer-card__header {
+    grid-template-columns: 72px minmax(0, 1fr);
+    min-height: 0;
+  }
+
+  .is-aquifer-setup-mode .aquifer-card__header .aquifer-icon,
+  .is-aquifer-setup-mode .aquifer-card__image {
+    width: 66px;
+    height: 66px;
+  }
+
+  .is-aquifer-setup-mode .aquifer-card__header .aquifer-icon__svg {
+    width: 60px;
+    height: 60px;
+  }
+
+  .is-aquifer-setup-mode .aquifer-toggle {
+    min-height: 58px;
+    margin: 16px 0;
+    padding: 0 16px;
+    font-size: 18px;
+  }
+
+  .is-aquifer-setup-mode .aquifer-zone-mode {
+    margin-top: 18px;
+    padding: 16px;
+  }
+
+  .is-aquifer-setup-mode .aquifer-option {
+    min-height: 96px;
+    padding: 14px 54px 14px 14px;
+  }
+
+  .is-aquifer-setup-mode .aquifer-option__text,
+  .is-aquifer-setup-mode .aquifer-option__text small {
+    font-size: 15px;
+  }
+
+  .is-aquifer-setup-mode .aquifer-note {
+    margin-top: 18px;
+    font-size: 17px;
+  }
+
+  .is-aquifer-setup-mode .aquifer-elevation-grid {
+    gap: 18px;
+    margin: 18px 0;
+  }
+
+  .is-aquifer-setup-mode .aquifer-elevation-control {
+    grid-template-columns: 78px minmax(0, 1fr);
+    min-height: 146px;
+  }
+
+  .is-aquifer-setup-mode
+    .aquifer-elevation-control
+    input[type="range"].aquifer-elevation-control__slider {
+    height: 146px;
+  }
+
+  .is-aquifer-setup-mode .aquifer-elevation-control label {
+    font-size: 19px;
+  }
+
+  .is-aquifer-setup-mode .aquifer-elevation-control__value {
+    font-size: 18px;
+  }
+
+  .is-aquifer-setup-mode .aquifer-setup__actions {
+    position: sticky;
+    right: auto;
+    bottom: -1px;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 18px -2px 0;
+    padding: 10px 0 0;
+    background: linear-gradient(
+      rgba(223, 246, 253, 0),
+      rgba(223, 246, 253, 0.98) 34%
+    );
+  }
+
+  .is-aquifer-setup-mode .aquifer-setup__actions button {
+    min-height: 44px;
+  }
+
+  .is-aquifer-setup-mode .aquifer-setup__status {
+    position: static;
+    margin-top: 12px;
+    font-size: 13px;
+  }
+
+  .panel::-webkit-scrollbar,
+  .well-picker::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .panel::-webkit-scrollbar-track,
+  .well-picker::-webkit-scrollbar-track {
+    border-radius: 999px;
+    background: rgba(245, 250, 252, 0.62);
+  }
+
+  .panel::-webkit-scrollbar-thumb,
+  .well-picker::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: rgba(31, 163, 201, 0.54);
+  }
+}
+
+@media (max-width: 420px) {
+  .is-aquifer-setup-mode .aquifer-card__header {
+    grid-template-columns: 58px minmax(0, 1fr);
+  }
+
+  .is-aquifer-setup-mode .aquifer-card__header .aquifer-icon,
+  .is-aquifer-setup-mode .aquifer-card__image {
+    width: 54px;
+    height: 54px;
+  }
+
+  .is-aquifer-setup-mode .aquifer-setup__title {
+    font-size: 24px;
+  }
+}

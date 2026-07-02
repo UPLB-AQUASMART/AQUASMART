@@ -4,7 +4,7 @@ import { SimulationModelEntry } from "./components/SimulationModelEntry";
 import styles from "./page.module.css";
 
 const heroCopy =
-  "Simulate what goes underneath, providing spatial views for better groundwater understanding and monitoring through accurate representations of working models";
+  "Simulate what goes underneath, providing spatial views for better groundwater understanding and monitoring through accurate representations of working models.";
 
 const detailCopy =
   "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum";
