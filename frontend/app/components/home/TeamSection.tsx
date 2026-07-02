@@ -93,7 +93,7 @@ export function TeamSection() {
     >
       <div className={styles["team-header-group"]}>
         <div className={styles["team-tag"]}>Meet the team</div>
-        <h2>The Experts Behind AQUASMART</h2>
+        <h2>Team Behind AQUASMART Mini</h2>
       </div>
 
       <div
