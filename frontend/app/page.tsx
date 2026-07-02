@@ -9,6 +9,7 @@ import { SimulationsSection } from "@/app/components/home/SimulationsSection";
 import { SiteFooter } from "@/app/components/home/SiteFooter";
 import { SiteNav } from "@/app/components/home/SiteNav";
 import { TaglineSection } from "@/app/components/home/TaglineSection";
+import { TeamSection } from "@/app/components/home/TeamSection";
 import { WeatherPreviewSection } from "@/app/components/home/WeatherPreviewSection";
 import styles from "./Home.module.css";
 
@@ -25,6 +26,7 @@ export default function Home() {
       <SimulationsSection />
       <ModulesSection />
       <WeatherPreviewSection />
+      <TeamSection />
       <PartnersSection />
       <SiteFooter reveal />
     </main>
