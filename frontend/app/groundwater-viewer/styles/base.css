@@ -74,6 +74,81 @@ body {
   display: inline-flex;
 }
 
+.modflow-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  overflow: hidden;
+  background:
+    linear-gradient(rgba(223, 246, 253, 0.88), rgba(223, 246, 253, 0.88)),
+    rgba(223, 246, 253, 0.92);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 260ms ease,
+    visibility 260ms ease;
+  visibility: hidden;
+}
+
+.modflow-transition.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+}
+
+.modflow-transition[hidden] {
+  display: none;
+}
+
+.modflow-transition__copy {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  align-content: center;
+  width: min(640px, calc(100vw - 48px));
+  min-height: 150px;
+  gap: 12px;
+  text-align: center;
+}
+
+.modflow-transition__copy strong {
+  color: #083344;
+  font-size: clamp(24px, 4vw, 44px);
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.modflow-transition__copy span {
+  color: #164e63;
+  font-size: clamp(13px, 1.8vw, 18px);
+  font-weight: 700;
+}
+
+.modflow-transition__progress {
+  position: relative;
+  z-index: 1;
+  width: min(420px, calc(100vw - 80px));
+  height: 7px;
+  margin-top: 26px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.58);
+}
+
+.modflow-transition__progress span {
+  display: block;
+  width: 18%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #0f766e, #1fa3c9, #7dd3fc);
+  box-shadow: 0 0 18px rgba(31, 163, 201, 0.5);
+  transition: width 420ms ease;
+}
+
 h1 {
   margin: 0 0 8px;
   font-size: 16px;

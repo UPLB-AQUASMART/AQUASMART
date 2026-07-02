@@ -19,6 +19,27 @@ export function GroundwaterViewerShell() {
       />
       <ViewerPanel />
       <SectionViewOverlay />
+      <div
+        className="modflow-transition"
+        id="modflow-transition"
+        role="status"
+        aria-live="polite"
+        aria-hidden="true"
+        hidden
+      >
+        <div className="modflow-transition__copy">
+          <strong id="modflow-transition-title">Preparing model grid</strong>
+          <span id="modflow-transition-detail">
+            Mapping recharge, river boundary, wells, and aquifer layers.
+          </span>
+        </div>
+        <div
+          className="modflow-transition__progress"
+          aria-hidden="true"
+        >
+          <span id="modflow-transition-progress" />
+        </div>
+      </div>
     </>
   );
 }
