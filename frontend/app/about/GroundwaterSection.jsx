@@ -42,9 +42,9 @@ export default function GroundwaterSection() {
           </h2>
           <p className="gw-body">
             We translate complex hydrogeological concepts into a hands-on,
-            sensor-based model supported by digital and printed learning
-            tools, this project promotes public awareness of groundwater
-            systems, sustainable farming, and climate adaptation.
+            sensor-based model supported by digital and printed learning tools,
+            this project promotes public awareness of groundwater systems,
+            sustainable farming, and climate adaptation.
           </p>
         </div>
       </div>
@@ -52,7 +52,7 @@ export default function GroundwaterSection() {
       <style jsx>{`
         .gw-section {
           width: 100%;
-          padding: 64px 24px;
+          padding: 64px 80px;
           background: #ffffff;
         }
 
@@ -74,7 +74,10 @@ export default function GroundwaterSection() {
 
         .gw-model-frame {
           width: 100%;
-          aspect-ratio: 16 / 10;
+          aspect-ratio: 4 / 3;
+          border-radius: 12px;
+          overflow: hidden;
+          background: #f7f8fa;
         }
 
         .gw-caption {
@@ -88,7 +91,10 @@ export default function GroundwaterSection() {
         .gw-copy-col {
           display: flex;
           flex-direction: column;
+          align-items: flex-end;
+          justify-self: end;
           gap: 20px;
+          text-align: right;
         }
 
         .gw-heading {
@@ -96,8 +102,10 @@ export default function GroundwaterSection() {
           font-size: 44px;
           line-height: 1.12;
           font-weight: 800;
+          text-align: right;
           display: flex;
           flex-direction: column;
+          align-items: flex-end;
         }
 
         .gw-heading-accent {
@@ -112,8 +120,10 @@ export default function GroundwaterSection() {
           margin: 0;
           font-size: 17px;
           line-height: 1.7;
+          text-align: right;
           color: #6b7280;
           max-width: 46ch;
+          margin-left: auto;
         }
 
         @media (max-width: 900px) {
@@ -125,6 +135,7 @@ export default function GroundwaterSection() {
           .gw-copy-col {
             text-align: center;
             align-items: center;
+            justify-self: center;
           }
 
           .gw-heading {

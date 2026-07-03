@@ -11,28 +11,6 @@ const X_SCALE = 1 / 1000;
 const Y_SCALE = 1 / 1000;
 const Z_SCALE = 11 / 1000;
 
-export { X_SCALE, Y_SCALE, Z_SCALE };
-
-/**
- * Distance the camera needs to sit at (looking at the origin) so that the
- * whole model fits inside the view frustum at every rotation angle,
- * regardless of the canvas's aspect ratio. Computed from the model's
- * bounding sphere (worst case = viewed corner-on, i.e. its diagonal),
- * so nothing gets clipped by the canvas edges as OrbitControls spins it.
- */
-export function getFitDistance(domain, verticalFovDeg, aspect, padding = 1.06) {
-  const halfW = (domain.lx_m / 2) * X_SCALE;
-  const halfD = (domain.ly_m / 2) * Y_SCALE;
-  const halfH = 4.6; // half-height of the full block (terrain top to base bottom), in scene units
-  const radius = Math.sqrt(halfW * halfW + halfD * halfD + halfH * halfH);
-
-  const halfVFov = (verticalFovDeg * Math.PI) / 360;
-  const halfHFov = Math.atan(Math.tan(halfVFov) * aspect);
-  const limitingHalfFov = Math.min(halfVFov, halfHFov);
-
-  return (radius / Math.sin(limitingHalfFov)) * padding;
-}
-
 /** Returns a (point) => THREE.Vector3 converter for the given scene domain. */
 export function makeSceneScaler(domain) {
   const centerX = domain.lx_m / 2;
