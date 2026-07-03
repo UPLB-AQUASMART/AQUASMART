@@ -5,6 +5,7 @@ import revealStyles from "@/app/components/home/ScrollReveal.module.css";
 import { SiteFooter } from "@/app/components/home/SiteFooter";
 import { SiteNav } from "@/app/components/home/SiteNav";
 import { WaterSavingScaleSection } from "@/app/about/WaterSavingScaleSection";
+import GroundwaterSection from "./GroundwaterSection";
 import styles from "./page.module.css";
 
 const stats = [
@@ -67,6 +68,7 @@ export default function AboutPage() {
         </div>
       </section>
       <WaterSavingScaleSection />
+      <GroundwaterSection />
       <section className={`${styles.storySection} ${revealStyles["scroll-reveal"]}`}>
         <div className={styles.storyGrid}>
           <div className={styles.storyContent}>
