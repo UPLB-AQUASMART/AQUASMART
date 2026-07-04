@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import { AquaWebGLBackground } from "@/app/components/effects/AquaWebGLBackground";
 import { ScrollRevealInit } from "@/app/components/home/ScrollRevealInit";
 import revealStyles from "@/app/components/home/ScrollReveal.module.css";
@@ -9,41 +7,31 @@ import { WaterSavingScaleSection } from "@/app/about/WaterSavingScaleSection";
 import GroundwaterSection from "./GroundwaterSection";
 import styles from "./page.module.css";
 
-const stats = [
+const narrativeItems = [
   {
-    number: "28",
-    label: "Active sensors deployed across farm zones",
+    number: "01",
+    title: "Hands-on Groundwater Learning",
+    body: "AQUASMART Mini introduces climate-resilient groundwater management through an interactive aquifer and farm model.",
   },
   {
-    number: "91%",
-    label: "Average irrigation efficiency across zones",
+    number: "02",
+    title: "Visible Subsurface Processes",
+    body: "The model demonstrates infiltration, recharge, groundwater flow, pumping, and contaminant transport.",
   },
   {
-    number: "6",
-    label: "Monitoring zones under active management",
+    number: "03",
+    title: "Real-time Sensor Data",
+    body: "Low-cost sensors monitor groundwater depth, pH, electrical conductivity, and salinity.",
   },
   {
-    number: "23%",
-    label: "Water productivity improvement in pilot study",
-  },
-];
-
-const techStack = [
-  {
-    title: "IoT Sensors",
-    body: "Real-time groundwater, soil moisture, and water quality sensors",
+    number: "04",
+    title: "Web-based Dashboard",
+    body: "Live readings are transmitted to a dashboard with simple visualizations of groundwater conditions.",
   },
   {
-    title: "AI Engine",
-    body: "Machine learning models for irrigation scheduling and anomaly detection",
-  },
-  {
-    title: "Satellite Data",
-    body: "Remote sensing for crop health and water stress mapping",
-  },
-  {
-    title: "Analytics Platform",
-    body: "Interactive dashboards, reports, and decision-support tools",
+    number: "05",
+    title: "Community Outreach",
+    body: "Demonstrations, workshops, booklets, activity sheets, and posters make the science accessible.",
   },
 ];
 
@@ -57,18 +45,17 @@ export default function AboutPage() {
         <div className={styles.heroOrbTwo} aria-hidden="true" />
         <div className={styles.introReveal}>
           <div className={styles.introCopy}>
-          <div className={styles.badge}>About AQUASMART Mini</div>
-          <h1>
-            AQUASMART <span>Mini</span>
-          </h1>
-          <p>
-            AQUASMART Mini (Advancing Quality Awareness in Subsurface Management and Real-time
-            Monitoring Technology) is an interactive, sensor-based miniature aquifer and farm system
-            designed to improve public understanding of groundwater and its link to sustainable agriculture.
-            This initiative forms the public engagement component of the proposed larger AQUASMART
-            research project at the University of the Philippines Los Baños, which promotes climate-resilient
-            groundwater management in farming systems.
-          </p>
+            <div className={styles.badge}>About AQUASMART Mini</div>
+            <h1>
+              AQUASMART <span>Mini</span>
+            </h1>
+            <p>
+              AQUASMART Mini translates groundwater science into an
+              interactive, sensor-based miniature aquifer and farm system. It
+              helps students, teachers, farmers, local officials, and
+              communities understand how groundwater connects to sustainable
+              agriculture and climate-resilient water management.
+            </p>
           </div>
 
           <div className={styles.introVisual} aria-hidden="true">
@@ -80,89 +67,53 @@ export default function AboutPage() {
       </section>
       <WaterSavingScaleSection />
       <GroundwaterSection />
-      <section className={`${styles.storySection} ${revealStyles["scroll-reveal"]}`}>
-        <div className={styles.storyGrid}>
-          <div className={styles.storyContent}>
-            <h2>Our Story &amp; Mission</h2>
-            <p>
-              AQUASMART was developed to address groundwater over-extraction, inefficient
-              irrigation practices, and increasing climate variability affecting agricultural
-              communities in the Philippines.
-            </p>
-            <p>
-              The project integrates low-cost groundwater sensors, real-time data transmission,
-              AI-based weather forecasting, and MODFLOW-based groundwater modeling to support
-              data-driven irrigation and aquaculture decisions.
-            </p>
-            <p>
-              A web-based platform provides accessible information on groundwater levels,
-              water quality, flow direction, and short-term climate forecasts to support
-              adaptive water-use planning and sustainable farming practices.
-            </p>
-            <p>
-              AQUASMART collaborates with research institutions, environmental organizations,
-              and agricultural stakeholders to promote sustainable water management and
-              climate-resilient farming systems.
-            </p>
-            <Link className={styles.partnerCta} href="/#partners">
-              Partner With Us <span aria-hidden="true">→</span>
-            </Link>
-          </div>
-
-          <div className={styles.statsGrid}>
-            {stats.map((stat) => (
-              <article className={styles.statCard} key={stat.label}>
-                <div className={styles.statNumber}>{stat.number}</div>
-                <div className={styles.statLabel}>{stat.label}</div>
-              </article>
-            ))}
-            <article className={`${styles.statCard} ${styles.wide}`}>
-              <div className={`${styles.statNumber} ${styles.green}`}>6 Partners</div>
-              <div className={styles.statLabel}>
-                International institutions supporting AQUASMART&apos;s research and deployment
-              </div>
-            </article>
-          </div>
+      <section
+        className={`${styles.narrativeSection} ${revealStyles["scroll-reveal"]}`}
+        id="about-narrative"
+      >
+        <div className={styles.narrativeWatermark} aria-hidden="true">
+          AQUA
         </div>
-      </section>
-
-      <section className={`${styles.missionTechSection} ${revealStyles["scroll-reveal"]}`}>
-        <div className={styles.missionContainer}>
-          <div className={styles.mvGrid}>
-            <article className={styles.mvCard}>
-              <h2>Our Mission</h2>
-              <p>
-                To empower farmers and water managers with real-time environmental intelligence,
-                enabling data-driven decisions that conserve water, improve yields, and build
-                resilience against climate change — one farm zone at a time.
-              </p>
-            </article>
-
-            <article className={styles.mvCard}>
-              <h2>Our Vision</h2>
-              <p>
-                A world where every farming community has access to precision water intelligence —
-                where technology bridges the gap between environmental data and agricultural
-                action, creating food systems that are resilient, efficient, and sustainable.
-              </p>
-            </article>
+        <div className={styles.narrativeShell}>
+          <div className={styles.narrativeCopy}>
+            <span className={styles.narrativeEyebrow}>AQUASMART Mini</span>
+            <h2>
+              Project Purpose.
+              <br />
+              <span>Outreach in Action.</span>
+            </h2>
+            <p>
+              AQUASMART Mini is the public engagement component of the larger
+              AQUASMART research project at the University of the Philippines
+              Los Banos. It promotes climate-resilient groundwater management
+              in farming systems through hands-on learning.
+            </p>
+            <p>
+              By combining a miniature aquifer and farm model, low-cost
+              sensors, live dashboard data, and printed learning tools, the
+              project turns hidden groundwater processes into clear and
+              relatable experiences for students, teachers, farmers, local
+              officials, and communities.
+            </p>
+            <a className={styles.narrativeCta} href="#contact">
+              Connect With Us <span aria-hidden="true">-&gt;</span>
+            </a>
           </div>
 
-          <article className={styles.techCard}>
-            <h2>Technology Stack</h2>
-            <div className={styles.techGrid}>
-              {techStack.map((item) => (
-                <div className={styles.techItem} key={item.title}>
-                  <h4>{item.title}</h4>
+          <div className={styles.narrativeList}>
+            {narrativeItems.map((item) => (
+              <article className={styles.narrativeItem} key={item.number}>
+                <span>{item.number}</span>
+                <div>
+                  <h3>{item.title}</h3>
                   <p>{item.body}</p>
                 </div>
-              ))}
-            </div>
-          </article>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
-
-      <SiteFooter />
+      <SiteFooter dark />
     </main>
   );
 }

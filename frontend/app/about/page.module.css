@@ -176,6 +176,173 @@
   bottom: 22px;
 }
 
+.narrativeSection {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(31, 163, 201, 0.22), transparent 30%),
+    radial-gradient(circle at 90% 75%, rgba(87, 199, 132, 0.18), transparent 26%),
+    linear-gradient(135deg, #061728 0%, #0b1f3a 54%, #08293a 100%);
+  padding: 108px clamp(24px, 5vw, 76px);
+}
+
+.narrativeSection::before {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 48px 48px;
+  content: "";
+  mask-image: radial-gradient(circle at 50% 50%, #000 0%, transparent 78%);
+  pointer-events: none;
+}
+
+.narrativeWatermark {
+  position: absolute;
+  top: -0.14em;
+  right: clamp(12px, 4vw, 68px);
+  color: rgba(255, 255, 255, 0.025);
+  font-family: "Sora", sans-serif;
+  font-size: clamp(110px, 16vw, 230px);
+  font-weight: 800;
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+
+.narrativeShell {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  max-width: 1280px;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 0.85fr);
+  gap: clamp(48px, 7vw, 96px);
+  align-items: start;
+  margin: 0 auto;
+}
+
+.narrativeCopy {
+  max-width: 620px;
+}
+
+.narrativeEyebrow {
+  display: block;
+  margin-bottom: 16px;
+  color: #57c784;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+}
+
+.narrativeCopy h2 {
+  margin: 0 0 28px;
+  color: #ffffff;
+  font-family: "Sora", sans-serif;
+  font-size: clamp(42px, 5.5vw, 72px);
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 1.05;
+}
+
+.narrativeCopy h2 span {
+  color: #1fa3c9;
+}
+
+.narrativeCopy p {
+  max-width: 590px;
+  margin: 0 0 18px;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+.narrativeCta {
+  display: inline-flex;
+  min-height: 52px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 22px;
+  border-radius: 999px;
+  color: #061728;
+  background: #57c784;
+  box-shadow: 0 18px 42px rgba(87, 199, 132, 0.2);
+  font-size: 15px;
+  font-weight: 800;
+  padding: 0 30px;
+  text-decoration: none;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.narrativeCta:hover {
+  color: #ffffff;
+  background: #1fa3c9;
+  transform: translateY(-2px);
+}
+
+.narrativeList {
+  display: flex;
+  flex-direction: column;
+}
+
+.narrativeItem {
+  display: flex;
+  gap: 22px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.11);
+  padding: 22px 0;
+  cursor: default;
+  transition:
+    border-color 180ms ease,
+    transform 180ms ease;
+}
+
+.narrativeItem:first-child {
+  padding-top: 0;
+}
+
+.narrativeItem:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.narrativeItem:hover {
+  border-color: rgba(87, 199, 132, 0.45);
+  transform: translateX(4px);
+}
+
+.narrativeItem > span {
+  flex: 0 0 auto;
+  color: rgba(31, 163, 201, 0.48);
+  font-family: "Sora", sans-serif;
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.narrativeItem h3 {
+  margin: 0 0 7px;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 800;
+  transition: color 180ms ease;
+}
+
+.narrativeItem:hover h3 {
+  color: #57c784;
+}
+
+.narrativeItem p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.46);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
 .storySection {
   width: 100%;
   background: #dde7ee;
@@ -370,6 +537,11 @@
     gap: 38px;
   }
 
+  .narrativeShell {
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 0.9fr);
+    gap: 44px;
+  }
+
   .storyGrid {
     gap: 40px;
     grid-template-columns: 1fr;
@@ -406,6 +578,22 @@
     height: 410px;
     margin: 0 auto;
   }
+
+  .narrativeSection {
+    padding: 84px 28px;
+  }
+
+  .narrativeShell {
+    grid-template-columns: 1fr;
+  }
+
+  .narrativeCopy {
+    max-width: 720px;
+  }
+
+  .narrativeList {
+    max-width: 720px;
+  }
 }
 
 @media (max-width: 760px) {
@@ -429,6 +617,23 @@
   .introVisual {
     height: min(92vw, 380px);
     border-radius: 30px;
+  }
+
+  .narrativeSection {
+    padding: 68px 20px;
+  }
+
+  .narrativeCopy h2 {
+    font-size: clamp(36px, 12vw, 52px);
+  }
+
+  .narrativeCopy p {
+    font-size: 15px;
+  }
+
+  .narrativeItem {
+    gap: 16px;
+    padding: 20px 0;
   }
 
   .storySection,
@@ -476,5 +681,14 @@
   .visualCaption {
     right: 14px;
     bottom: 14px;
+  }
+
+  .narrativeWatermark {
+    right: -20px;
+    font-size: 96px;
+  }
+
+  .narrativeCta {
+    width: 100%;
   }
 }
