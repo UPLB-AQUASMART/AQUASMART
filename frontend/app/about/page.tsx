@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { AquaWebGLBackground } from "@/app/components/effects/AquaWebGLBackground";
 import { ScrollRevealInit } from "@/app/components/home/ScrollRevealInit";
 import revealStyles from "@/app/components/home/ScrollReveal.module.css";
 import { SiteFooter } from "@/app/components/home/SiteFooter";
@@ -52,10 +53,13 @@ export default function AboutPage() {
       <ScrollRevealInit />
       <SiteNav activeLabel="About" />
       <section className={`${styles.introSection} ${revealStyles["scroll-reveal"]}`}>
+        <div className={styles.heroOrbOne} aria-hidden="true" />
+        <div className={styles.heroOrbTwo} aria-hidden="true" />
         <div className={styles.introReveal}>
+          <div className={styles.introCopy}>
           <div className={styles.badge}>About AQUASMART Mini</div>
           <h1>
-            <span>Water Intelligence</span> for a Sustainable Future
+            AQUASMART <span>Mini</span>
           </h1>
           <p>
             AQUASMART Mini (Advancing Quality Awareness in Subsurface Management and Real-time
@@ -65,6 +69,13 @@ export default function AboutPage() {
             research project at the University of the Philippines Los Baños, which promotes climate-resilient
             groundwater management in farming systems.
           </p>
+          </div>
+
+          <div className={styles.introVisual} aria-hidden="true">
+            <AquaWebGLBackground className={styles.introCanvas} />
+            <span className={styles.visualLabel}>Living water intelligence</span>
+            <span className={styles.visualCaption}>AQUASMART / WebGL2</span>
+          </div>
         </div>
       </section>
       <WaterSavingScaleSection />
