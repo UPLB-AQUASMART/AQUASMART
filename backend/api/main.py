@@ -17,6 +17,11 @@ from .modflow_runner import ModflowExecutionError, modflow_diagnostics, run_top_
 load_dotenv()
 
 SIMULATION_CACHE_SIZE = int(os.getenv("SIMULATION_CACHE_SIZE", "32"))
+MAX_GRID_ROWS = int(os.getenv("MAX_GRID_ROWS", "50"))
+MAX_GRID_COLUMNS = int(os.getenv("MAX_GRID_COLUMNS", "50"))
+MAX_GRID_CELLS = int(os.getenv("MAX_GRID_CELLS", "2500"))
+MIN_GRID_SIZE_M = float(os.getenv("MIN_GRID_SIZE_M", "5"))
+MAX_GRID_SIZE_M = float(os.getenv("MAX_GRID_SIZE_M", "250"))
 _top_view_cache: OrderedDict[str, dict[str, Any]] = OrderedDict()
 
 
@@ -64,11 +69,22 @@ def _set_cached_top_view(cache_key: str, result: dict[str, Any]) -> None:
 
 
 class ScenarioGrid(BaseModel):
-    rows: int = Field(ge=5, le=120)
-    columns: int = Field(ge=5, le=120)
+    rows: int = Field(ge=5, le=MAX_GRID_ROWS)
+    columns: int = Field(ge=5, le=MAX_GRID_COLUMNS)
     areaKm2: float = Field(ge=0, le=10000)
-    gridSizeM: float = Field(ge=1, le=1000)
+    gridSizeM: float = Field(ge=MIN_GRID_SIZE_M, le=MAX_GRID_SIZE_M)
     layers: int = Field(ge=1, le=3)
+
+    @model_validator(mode="after")
+    def validate_grid_cell_count(self) -> "ScenarioGrid":
+        if self.rows * self.columns > MAX_GRID_CELLS:
+            raise ValueError(
+                f"grid cell count must be {MAX_GRID_CELLS} or fewer for responsive MODFLOW runs"
+            )
+        expected_area = (self.rows * self.columns * self.gridSizeM * self.gridSizeM) / 1_000_000
+        if abs(self.areaKm2 - expected_area) > max(0.001, expected_area * 0.02):
+            raise ValueError("areaKm2 must match rows * columns * gridSizeM^2")
+        return self
 
 
 class ScenarioBoundary(BaseModel):

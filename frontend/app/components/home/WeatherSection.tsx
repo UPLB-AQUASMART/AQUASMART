@@ -1,16 +1,25 @@
 "use client";
 import Image from "next/image";
 
+import { Icon } from "@iconify/react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { ForecastDetail } from "@/app/forecast/components/openMeteoWeather";
 
-import { forecast, type ForecastIcon } from "@/app/data/home";
+import { forecast as defaultForecast } from "@/app/data/home";
+import type { ForecastItem } from "@/app/data/home";
 
 import { SectionPill } from "./SectionPill";
-import revealStyles from "./ScrollReveal.module.css";
 import styles from "./WeatherSection.module.css";
 
-const forecastDetails = [
+function formatLiveTime(date: Date) {
+  return new Intl.DateTimeFormat(undefined, {
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(date);
+}
+
+const defaultForecastDetails: ForecastDetail[] = [
   {
     title: "Today is Sunny",
     chance: "with 0% chance of rain",
@@ -167,6 +176,20 @@ const forecastDetails = [
   },
 ];
 
+const forecastMetricIcons: Record<string, string> = {
+  Precipitation: "solar:cloud-rain-linear",
+  "Wind Speed": "solar:wind-linear",
+  "Wind Gusts": "solar:wind-bold",
+  Humidity: "material-symbols:humidity-percentage-outline",
+  "Cloud Cover": "solar:cloud-linear",
+  "Soil Moisture": "solar:waterdrops-linear",
+  ET0: "solar:leaf-linear",
+};
+
+const WEATHER_DISSOLVE_MS = 260;
+const WEATHER_TRANSITION_MS = 1180;
+
+type WeatherTransitionPhase = "idle" | "leaving" | "entering";
 
 function WeatherIcon({
   type,
@@ -201,17 +224,37 @@ function WeatherIcon({
 //   );
 // }
 
-export function WeatherSection() {
+type WeatherSectionProps = {
+  forecastItems?: ForecastItem[];
+  forecastDetails?: ForecastDetail[];
+  isForecastLoading?: boolean;
+};
+
+export function WeatherSection({
+  forecastItems,
+  forecastDetails,
+  isForecastLoading = false,
+}: WeatherSectionProps = {}) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [isWeatherLoading, setIsWeatherLoading] = useState(false);
+  const [weatherTransitionPhase, setWeatherTransitionPhase] =
+    useState<WeatherTransitionPhase>("idle");
+  const [isWeatherMorphing, setIsWeatherMorphing] = useState(false);
   const [slideDirection, setSlideDirection] = useState<"forward" | "back">("forward");
+  const [liveTime, setLiveTime] = useState(() => new Date());
   const sectionRef = useRef<HTMLElement | null>(null);
   const shouldAnchorAfterLoadRef = useRef(false);
-  const loadingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const activeForecast = forecast[activeIndex];
-  const activeDetail = forecastDetails[activeIndex] ?? forecastDetails[0];
+  const transitionTimersRef = useRef<Array<ReturnType<typeof setTimeout>>>([]);
+  const sourceForecast = forecastItems?.length ? forecastItems : defaultForecast;
+  const sourceDetails = forecastDetails?.length ? forecastDetails : defaultForecastDetails;
+  const weeklyForecast = sourceForecast;
+  const detailForecast = sourceDetails;
+  const safeActiveIndex = Math.min(activeIndex, weeklyForecast.length - 1);
+  const activeForecast = weeklyForecast[safeActiveIndex] ?? weeklyForecast[0];
+  const activeDetail = detailForecast[safeActiveIndex] ?? detailForecast[0] ?? defaultForecastDetails[0];
   const isRainy = activeForecast.icon === "rain";
+  const displayedTime = safeActiveIndex === 0 ? formatLiveTime(liveTime) : activeDetail.time;
 
   const anchorWeatherSection = useCallback(() => {
     const section = sectionRef.current;
@@ -224,10 +267,17 @@ export function WeatherSection() {
 
   useEffect(() => {
     return () => {
-      if (loadingTimerRef.current) {
-        clearTimeout(loadingTimerRef.current);
-      }
+      transitionTimersRef.current.forEach((timer) => clearTimeout(timer));
+      transitionTimersRef.current = [];
     };
+  }, []);
+
+  useEffect(() => {
+    const clockTimer = window.setInterval(() => {
+      setLiveTime(new Date());
+    }, 1000);
+
+    return () => window.clearInterval(clockTimer);
   }, []);
 
   useEffect(() => {
@@ -240,32 +290,44 @@ export function WeatherSection() {
   }, [activeIndex, anchorWeatherSection, isWeatherLoading]);
 
   const handleSelectDay = (index: number) => {
-    if (index === activeIndex || isWeatherLoading) return;
+    if (index === safeActiveIndex || isWeatherLoading || isForecastLoading) return;
 
-    if (loadingTimerRef.current) {
-      clearTimeout(loadingTimerRef.current);
-    }
+    transitionTimersRef.current.forEach((timer) => clearTimeout(timer));
+    transitionTimersRef.current = [];
 
-    setSlideDirection(index >= activeIndex ? "forward" : "back");
+    setSlideDirection(index >= safeActiveIndex ? "forward" : "back");
     setDetailsOpen(false);
     setIsWeatherLoading(true);
+    setWeatherTransitionPhase("leaving");
+    setIsWeatherMorphing(weeklyForecast[index]?.icon !== activeForecast.icon);
     shouldAnchorAfterLoadRef.current = true;
     window.requestAnimationFrame(() => {
       anchorWeatherSection();
     });
 
-    loadingTimerRef.current = setTimeout(() => {
+    const swapTimer = setTimeout(() => {
       setActiveIndex(index);
+      setWeatherTransitionPhase("entering");
+    }, WEATHER_DISSOLVE_MS);
+
+    const doneTimer = setTimeout(() => {
       setIsWeatherLoading(false);
-      loadingTimerRef.current = null;
-    }, 620);
+      setWeatherTransitionPhase("idle");
+      setIsWeatherMorphing(false);
+      transitionTimersRef.current = [];
+    }, WEATHER_TRANSITION_MS);
+
+    transitionTimersRef.current = [swapTimer, doneTimer];
   };
 
   const weatherClassName = [
     styles["weather-section"],
     isRainy ? styles["weather-rainy"] : "",
     styles[`weather-slide-${slideDirection}`],
-    revealStyles["scroll-reveal"],
+    weatherTransitionPhase !== "idle"
+      ? styles[`weather-transition-${weatherTransitionPhase}`]
+      : "",
+    isWeatherMorphing ? styles["weather-transition-weather-change"] : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -276,21 +338,29 @@ export function WeatherSection() {
         className={`${styles["weather-sun"]}${activeForecast.icon === "sun" ? "" : ` ${styles[`weather-sun-${activeForecast.icon}`]}`}`}
         aria-hidden="true"
       />
-      <div className={styles["weather-cloud-hero"]} aria-hidden="true" />
+      <div
+        className={[
+          styles["weather-cloud-hero"],
+          styles[`weather-hero-${activeForecast.icon}`],
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        aria-hidden="true"
+      />
       <div className={styles["weather-layout"]}>
-        {isWeatherLoading ? (
+        {isForecastLoading ? (
           <div className={styles["weather-loading"]} role="status" aria-live="polite">
             <span />
             <strong>Loading forecast</strong>
-            <small>Preparing the selected weather frame...</small>
+            <small>Fetching Open-Meteo weather data...</small>
           </div>
         ) : null}
         <div className={styles["weather-copy"]}>
-          <div className={styles["weather-copy-panel"]} key={activeIndex}>
+          <div className={styles["weather-copy-panel"]} key={safeActiveIndex}>
             <SectionPill className={styles["section-pill"]}>Weather Forecast</SectionPill>
             <div className={styles["weather-meta"]}>
               <strong>{activeDetail.date}</strong>
-              <span>{activeDetail.time}</span>
+              <span>{displayedTime}</span>
             </div>
             <h2>
               {activeDetail.title}
@@ -332,16 +402,13 @@ export function WeatherSection() {
                 <span>{activeDetail.status}</span>
               </div>
 
-              <div className={styles["forecast-outlook"]}>
-                <strong>Irrigation outlook</strong>
-                <p>{activeDetail.recommendation}</p>
-              </div>
-
               <dl className={styles["forecast-detail-list"]}>
                 {activeDetail.metrics.slice(0, 6).map(([label, value]) => (
                   <div key={label}>
                     <dt>
-                      <span aria-hidden="true" />
+                      <span aria-hidden="true">
+                        <Icon icon={forecastMetricIcons[label] ?? "solar:chart-linear"} />
+                      </span>
                       {label}
                     </dt>
                     <dd>{value}</dd>
@@ -350,15 +417,17 @@ export function WeatherSection() {
               </dl>
 
               <div className={styles["forecast-eto-row"]}>
-                <span aria-hidden="true" />
+                <span aria-hidden="true">
+                  <Icon icon={forecastMetricIcons.ET0} />
+                </span>
                 <strong>ET0 {activeDetail.metrics[6]?.[1] ?? "3.1 mm"} demand</strong>
               </div>
             </div>
           ) : (
             <>
               <span>This Week</span>
-              {forecast.map((item, index) => {
-                const isActive = index === activeIndex;
+              {weeklyForecast.map((item, index) => {
+                const isActive = index === safeActiveIndex;
 
                 return (
                   <div
@@ -379,7 +448,7 @@ export function WeatherSection() {
                     </button>
                     {isActive ? (
                       <button
-                        aria-expanded="false"
+                        aria-expanded={detailsOpen}
                         aria-label={`Show forecast details for ${item.day}`}
                         className={styles["forecast-arrow-button"]}
                         onClick={() => setDetailsOpen(true)}

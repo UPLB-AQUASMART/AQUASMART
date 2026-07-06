@@ -1,6 +1,6 @@
 import { ScrollRevealInit } from "@/app/components/home/ScrollRevealInit";
 import { SiteNav } from "@/app/components/home/SiteNav";
-import { WeatherSection } from "@/app/components/home/WeatherSection";
+import { ForecastPageClient } from "./ForecastPageClient";
 import styles from "./page.module.css";
 
 export default function ForecastPage() {
@@ -8,7 +8,7 @@ export default function ForecastPage() {
     <main className={styles["weather-page"]}>
       <ScrollRevealInit />
       <SiteNav activeLabel="Weather" />
-      <WeatherSection />
+      <ForecastPageClient />
     </main>
   );
 }

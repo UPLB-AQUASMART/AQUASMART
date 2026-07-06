@@ -1,0 +1,447 @@
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(320px, 0.95fr);
+  gap: 28px;
+  margin-bottom: 56px;
+}
+
+.card,
+.temperatureCard {
+  border: 1px solid #d3e3ef;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 18px 44px rgba(57, 94, 120, 0.08);
+}
+
+.card {
+  padding: 36px 42px 34px;
+}
+
+.cardHeader,
+.tempIntro,
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.cardHeader h3,
+.temperatureCard h3 {
+  margin: 0;
+  color: #0b2a5b;
+  font-size: clamp(15px, 2vw, 18px);
+  font-weight: 800;
+}
+
+.periodButton,
+.controls button {
+  display: inline-flex;
+  min-height: 54px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid #c4ddee;
+  border-radius: 18px;
+  background: #f4fbff;
+  color: #0b2a5b;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 0 24px;
+}
+
+.chartShell {
+  margin-top: 34px;
+}
+
+.axisLabels {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  margin: 0 0 18px;
+  color: #31506f;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.axisLabels span:last-child {
+  color: #1fb4bf;
+}
+
+.chart {
+  position: relative;
+  height: 380px;
+  padding: 8px 58px 48px 48px;
+}
+
+.gridLines {
+  position: absolute;
+  inset: 8px 58px 48px 48px;
+}
+
+.gridLines span {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  border-top: 1px dashed #d8e6f1;
+}
+
+.leftScale,
+.rightScale {
+  position: absolute;
+  top: 2px;
+  bottom: 42px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: #31506f;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.leftScale {
+  left: 0;
+  text-align: right;
+}
+
+.rightScale {
+  right: 0;
+  color: #1fb4bf;
+  text-align: left;
+}
+
+.bars {
+  position: absolute;
+  inset: 8px 86px 48px 76px;
+  display: grid;
+  align-items: end;
+  grid-template-columns: repeat(6, minmax(28px, 1fr));
+  gap: clamp(24px, 5vw, 72px);
+}
+
+.bars span {
+  border: 2px solid #8bc6ff;
+  border-radius: 10px 10px 8px 8px;
+  background: linear-gradient(180deg, rgba(177, 218, 255, 0.78), rgba(216, 237, 255, 0.86));
+  box-shadow: inset 0 1px 8px rgba(255, 255, 255, 0.6);
+}
+
+.lineChart {
+  position: absolute;
+  inset: 8px 86px 48px 76px;
+  width: calc(100% - 162px);
+  height: calc(100% - 56px);
+  overflow: visible;
+}
+
+.humidityLine,
+.temperatureLine {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 3;
+}
+
+.humidityLine {
+  stroke: #1fb4bf;
+  stroke-dasharray: 10 10;
+}
+
+.temperatureLine {
+  stroke: #082653;
+}
+
+.humidityDot {
+  fill: #1fb4bf;
+  stroke: #ffffff;
+  stroke-width: 2;
+}
+
+.temperatureDot {
+  fill: #082653;
+  stroke: #ffffff;
+  stroke-width: 2;
+}
+
+.months {
+  position: absolute;
+  right: 58px;
+  bottom: 0;
+  left: 48px;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  color: #335275;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.legend {
+  display: grid;
+  grid-template-columns: repeat(3, max-content);
+  justify-content: center;
+  gap: clamp(20px, 4vw, 64px);
+  margin-top: 30px;
+  color: #335275;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.legend i {
+  display: inline-block;
+}
+
+.blueDash {
+  position: relative;
+  width: 48px;
+  border-top: 3px dashed #1fb4bf;
+}
+
+.blueDash::after {
+  position: absolute;
+  top: -7px;
+  left: 18px;
+  width: 12px;
+  height: 12px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  background: #1fb4bf;
+  content: "";
+}
+
+.navyLine {
+  position: relative;
+  width: 48px;
+  border-top: 3px solid #082653;
+}
+
+.navyLine::after {
+  position: absolute;
+  top: -7px;
+  left: 18px;
+  width: 12px;
+  height: 12px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  background: #082653;
+  content: "";
+}
+
+.orangeBar {
+  width: 36px;
+  height: 22px;
+  border: 2px solid #8bc6ff;
+  border-radius: 6px;
+  background: linear-gradient(180deg, rgba(177, 218, 255, 0.82), rgba(216, 237, 255, 0.9));
+}
+
+.temperatureCard {
+  padding: 28px;
+}
+
+.tempIntro {
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.iconBubble {
+  display: inline-flex;
+  width: 74px;
+  height: 74px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #b8dfff;
+  border-radius: 50%;
+  background: #eaf8ff;
+  color: #0d90d3;
+}
+
+.temperatureCard p {
+  margin: 12px 0 0;
+  color: #31506f;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.controls {
+  margin: 42px 0 28px;
+  justify-content: flex-start;
+}
+
+.controls button {
+  min-width: 74px;
+  border-radius: 12px;
+}
+
+.controls .activeControl {
+  border-color: #0795d2;
+  background: #079bd7;
+  color: #ffffff;
+}
+
+.controls .sourceControl {
+  margin-left: auto;
+  min-width: 190px;
+}
+
+.weatherSummary {
+  display: grid;
+  min-height: 96px;
+  align-items: center;
+  grid-template-columns: 58px auto 1fr;
+  gap: 12px;
+  border: 1px solid #d7e3ec;
+  border-radius: 9px;
+  padding: 18px 22px;
+  color: #ffae18;
+}
+
+.weatherSummary svg,
+.weatherSummary strong,
+.weatherSummary span,
+.weatherSummary small {
+  animation: temperatureFadeIn 520ms ease both;
+}
+
+.weatherSummary svg,
+.weatherSummary strong {
+  animation-delay: 0ms;
+}
+
+.weatherSummary span {
+  animation-delay: 120ms;
+}
+
+.weatherSummary small {
+  animation-delay: 240ms;
+}
+
+.weatherSummary strong {
+  color: #0b2a5b;
+  font-size: 28px;
+}
+
+.weatherSummary span {
+  color: #0b2a5b;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.weatherSummary small {
+  grid-column: 2 / -1;
+  color: #536f8a;
+  font-size: 11px;
+}
+
+.recommendation {
+  display: flex;
+  gap: 16px;
+  margin-top: 24px;
+  border: 1px solid #c4e9d0;
+  border-radius: 9px;
+  background: #eaf8ee;
+  color: #31ad3f;
+  padding: 18px 22px;
+}
+
+.recommendation strong {
+  color: #145f2d;
+  font-size: 12px;
+}
+
+@keyframes temperatureFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .weatherSummary svg,
+  .weatherSummary strong,
+  .weatherSummary span,
+  .weatherSummary small {
+    animation: none;
+  }
+}
+
+.recommendation p {
+  margin-top: 8px;
+  color: #165331;
+}
+
+@media (max-width: 1060px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .card,
+  .temperatureCard {
+    padding: 20px;
+  }
+
+  .cardHeader,
+  .controls {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .controls .sourceControl {
+    margin-left: 0;
+  }
+
+  .chart {
+    height: 300px;
+    padding-right: 44px;
+    padding-left: 38px;
+  }
+
+  .gridLines {
+    right: 44px;
+    left: 38px;
+  }
+
+  .bars,
+  .lineChart {
+    right: 58px;
+    left: 52px;
+  }
+
+  .lineChart {
+    width: calc(100% - 110px);
+  }
+
+  .months {
+    right: 44px;
+    left: 38px;
+    font-size: 11px;
+  }
+
+  .bars {
+    gap: 14px;
+  }
+
+  .leftScale,
+  .rightScale {
+    font-size: 12px;
+  }
+
+  .legend {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+}

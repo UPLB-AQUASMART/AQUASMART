@@ -1,6 +1,16 @@
 /* eslint-disable */
 /* Aquifer setup, sensors, well picker, scene loading, event wiring, and animation loop. */
 
+const MODFLOW_GRID_LIMITS = {
+  minRows: 5,
+  maxRows: 50,
+  minColumns: 5,
+  maxColumns: 50,
+  maxCells: 2500,
+  minGridSizeM: 5,
+  maxGridSizeM: 250,
+};
+
 function hideModflowTransition(delay = 260) {
   if (!modflowTransitionEl) return;
   window.clearInterval(modflowTransitionTimer);
@@ -41,14 +51,91 @@ function formatStreamLeakage(value) {
   return leakage.toFixed(4);
 }
 
-function calculateGridAreaKm2() {
-  const rows = Number(scenarioInputs.rows.value);
-  const columns = Number(scenarioInputs.columns.value);
-  const gridSizeM = Number(scenarioInputs.gridSize.value);
-  if (![rows, columns, gridSizeM].every(Number.isFinite)) {
-    return 0;
+function clampInteger(value, min, max) {
+  const number = Math.round(Number(value));
+  if (!Number.isFinite(number)) return min;
+  return Math.min(max, Math.max(min, number));
+}
+
+function clampNumber(value, min, max) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return min;
+  return Math.min(max, Math.max(min, number));
+}
+
+function validateScenarioGridInputs({ writeValues = false } = {}) {
+  const rawRows = Number(scenarioInputs.rows.value);
+  const rawColumns = Number(scenarioInputs.columns.value);
+  const rawGridSizeM = Number(scenarioInputs.gridSize.value);
+  let rows = clampInteger(
+    scenarioInputs.rows.value,
+    MODFLOW_GRID_LIMITS.minRows,
+    MODFLOW_GRID_LIMITS.maxRows,
+  );
+  let columns = clampInteger(
+    scenarioInputs.columns.value,
+    MODFLOW_GRID_LIMITS.minColumns,
+    MODFLOW_GRID_LIMITS.maxColumns,
+  );
+  const gridSizeM = clampNumber(
+    scenarioInputs.gridSize.value,
+    MODFLOW_GRID_LIMITS.minGridSizeM,
+    MODFLOW_GRID_LIMITS.maxGridSizeM,
+  );
+  const messages = [];
+
+  if (rawRows !== rows) {
+    messages.push(
+      `Rows must be ${MODFLOW_GRID_LIMITS.minRows}-${MODFLOW_GRID_LIMITS.maxRows}.`,
+    );
   }
-  return (rows * columns * gridSizeM * gridSizeM) / 1_000_000;
+  if (rawColumns !== columns) {
+    messages.push(
+      `Columns must be ${MODFLOW_GRID_LIMITS.minColumns}-${MODFLOW_GRID_LIMITS.maxColumns}.`,
+    );
+  }
+  if (rawGridSizeM !== gridSizeM) {
+    messages.push(
+      `Grid size must be ${MODFLOW_GRID_LIMITS.minGridSizeM}-${MODFLOW_GRID_LIMITS.maxGridSizeM} m.`,
+    );
+  }
+
+  if (rows * columns > MODFLOW_GRID_LIMITS.maxCells) {
+    if (rows >= columns) {
+      rows = Math.max(
+        MODFLOW_GRID_LIMITS.minRows,
+        Math.floor(MODFLOW_GRID_LIMITS.maxCells / columns),
+      );
+    } else {
+      columns = Math.max(
+        MODFLOW_GRID_LIMITS.minColumns,
+        Math.floor(MODFLOW_GRID_LIMITS.maxCells / rows),
+      );
+    }
+    messages.push(
+      `Grid capped at ${MODFLOW_GRID_LIMITS.maxCells.toLocaleString()} cells for responsive MODFLOW runs.`,
+    );
+  }
+
+  if (writeValues) {
+    scenarioInputs.rows.value = String(rows);
+    scenarioInputs.columns.value = String(columns);
+    scenarioInputs.gridSize.value = String(gridSizeM);
+  }
+
+  return {
+    rows,
+    columns,
+    gridSizeM,
+    cellCount: rows * columns,
+    areaKm2: (rows * columns * gridSizeM * gridSizeM) / 1_000_000,
+    valid: messages.length === 0,
+    message: messages[0] || "",
+  };
+}
+
+function calculateGridAreaKm2() {
+  return validateScenarioGridInputs().areaKm2;
 }
 
 function formatGridArea(value) {
@@ -62,6 +149,7 @@ function formatGridArea(value) {
 }
 
 function updateAquiferSetupReadouts() {
+  const gridValidation = validateScenarioGridInputs();
   const groundwaterElevation = Number(
     scenarioInputs.groundwaterElevation.value,
   );
@@ -91,6 +179,15 @@ function updateAquiferSetupReadouts() {
   rechargeRateValueEl.textContent = `${Number(
     scenarioInputs.rechargeRate.value,
   ).toLocaleString()} m³/day`;
+  if (gridValidation.message) {
+    aquiferSetupStatusEl.textContent = gridValidation.message;
+  } else if (
+    aquiferSetupStatusEl.textContent.startsWith("Grid capped at") ||
+    aquiferSetupStatusEl.textContent.includes(" must be ")
+  ) {
+    aquiferSetupStatusEl.textContent =
+      "Configure the selected aquifer before generating the top view.";
+  }
 }
 
 function syncAquiferSetupChoiceCards() {
@@ -110,6 +207,7 @@ function syncAquiferSetupChoiceCards() {
 
 function readScenarioConfig(region = pendingTopViewRegion) {
   const level = region?.level || 1;
+  const grid = validateScenarioGridInputs({ writeValues: true });
   return {
     layerIndex: level - 1,
     layerName: region?.type || `Layer ${level}`,
@@ -126,10 +224,10 @@ function readScenarioConfig(region = pendingTopViewRegion) {
         }
       : null,
     grid: {
-      rows: Number(scenarioInputs.rows.value),
-      columns: Number(scenarioInputs.columns.value),
-      areaKm2: Number(scenarioInputs.area.value),
-      gridSizeM: Number(scenarioInputs.gridSize.value),
+      rows: grid.rows,
+      columns: grid.columns,
+      areaKm2: grid.areaKm2,
+      gridSizeM: grid.gridSizeM,
       layers: Number(scenarioInputs.layers.value),
     },
     boundary: {
@@ -681,6 +779,10 @@ for (const input of [
   scenarioInputs.gridSize,
 ]) {
   input.addEventListener("input", updateAquiferSetupReadouts);
+  input.addEventListener("change", () => {
+    validateScenarioGridInputs({ writeValues: true });
+    updateAquiferSetupReadouts();
+  });
 }
 scenarioInputs.groundwaterElevation.addEventListener(
   "input",

@@ -1,0 +1,508 @@
+.section {
+  margin-bottom: 56px;
+}
+
+.sectionTitle {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 0 0 16px;
+  color: #0f76c8;
+  text-align: center;
+}
+
+.sectionTitle h2 {
+  margin: 0;
+  color: #0b2a5b;
+  font-size: clamp(20px, 4vw, 28px);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.sectionTitle p {
+  margin: 8px 0 0;
+  color: #516c8c;
+  font-size: clamp(8px, 1.6vw, 12px);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.95fr) minmax(0, 1.2fr);
+  gap: 28px;
+}
+
+.visualCard,
+.projectionCard {
+  border: 1px solid #d3e3ef;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 18px 44px rgba(57, 94, 120, 0.08);
+  padding: 24px;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.cardHeader h3 {
+  margin: 0;
+  color: #0b2a5b;
+  font-size: clamp(15px, 2vw, 18px);
+  font-weight: 800;
+}
+
+.rangeButton {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #c4ddee;
+  border-radius: 12px;
+  background: #f4fbff;
+  color: #0b2a5b;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 0 14px;
+}
+
+.viewSwitch {
+  position: relative;
+  display: grid;
+  width: 126px;
+  min-height: 38px;
+  grid-template-columns: repeat(2, 1fr);
+  border: 1px solid #c4ddee;
+  border-radius: 999px;
+  background: #f4fbff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  isolation: isolate;
+  overflow: hidden;
+  padding: 3px;
+}
+
+.viewSwitch::before {
+  position: absolute;
+  z-index: 0;
+  top: 3px;
+  bottom: 3px;
+  left: 3px;
+  width: calc(50% - 3px);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #1fb3e4, #0f86cf);
+  box-shadow: 0 8px 18px rgba(16, 132, 205, 0.25);
+  content: "";
+  transform: translateX(0);
+  transition:
+    transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 220ms ease;
+}
+
+.viewSwitch[data-view="3d"]::before {
+  transform: translateX(100%);
+}
+
+.viewSwitch button {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  min-width: 0;
+  min-height: 30px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  color: #456582;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+  padding: 0 12px;
+  transition:
+    color 220ms ease,
+    transform 180ms ease;
+}
+
+.viewSwitch button:hover {
+  color: #0b2a5b;
+}
+
+.viewSwitch button:active {
+  transform: scale(0.96);
+}
+
+.viewSwitch button[aria-pressed="true"] {
+  color: #ffffff;
+}
+
+.viewSwitch button:focus-visible,
+.rangeButton:focus-visible {
+  outline: 3px solid rgba(18, 150, 210, 0.28);
+  outline-offset: 3px;
+}
+
+.rainfallModel {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+  animation: rainfallModelIn 720ms ease both;
+}
+
+.modelReadout {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 2px 12px;
+  border: 1px solid #c6e0f2;
+  border-radius: 12px;
+  background: #f3fbff;
+  padding: 12px 14px;
+}
+
+.modelReadout span {
+  color: #0b2a5b;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.modelReadout strong {
+  grid-row: 1 / 3;
+  grid-column: 2;
+  color: #0b2a5b;
+  font-family: "Rubik", sans-serif;
+  font-size: clamp(26px, 4vw, 36px);
+  line-height: 0.9;
+}
+
+.modelReadout small {
+  color: #516c8c;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.timeSlider {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+  border: 1px solid #c6e0f2;
+  border-radius: 12px;
+  background: #f7fcff;
+  padding: 12px 14px 10px;
+}
+
+.timeSlider label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  color: #456582;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.timeSlider label strong {
+  color: #0b2a5b;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.timeSlider input {
+  width: 100%;
+  accent-color: #1098d5;
+  cursor: pointer;
+}
+
+.timeTicks {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  color: #6a829b;
+  font-size: 10px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.modelStage {
+  position: relative;
+  min-height: 338px;
+}
+
+.modelStage3d {
+  min-height: 338px;
+}
+
+.helper {
+  margin: 18px 0 14px;
+  color: #0b2a5b;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.dayPicker {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 14px;
+}
+
+.dayPicker button {
+  display: grid;
+  min-height: 56px;
+  border: 1px solid #cfdde8;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #0b2a5b;
+  cursor: pointer;
+  place-items: center;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.dayPicker button:hover {
+  border-color: #1296d2;
+  transform: translateY(-1px);
+}
+
+.dayPicker strong {
+  font-size: 13px;
+}
+
+.dayPicker span {
+  color: #456582;
+  font-size: 13px;
+}
+
+.dayPicker .activeDay {
+  border-color: #1296d2;
+  background: #1098d5;
+  color: #ffffff;
+}
+
+.activeDay span {
+  color: #ffffff;
+}
+
+.projectionTransition .barColumn,
+.projectionTransition .xAxisLabels,
+.projectionTransition .timeSlider,
+.projectionTransition .note {
+  animation: precipitationFadeIn 680ms ease both;
+}
+
+.projectionTransition .barColumn:nth-of-type(2) {
+  animation-delay: 0ms;
+}
+
+.projectionTransition .barColumn:nth-of-type(3) {
+  animation-delay: 120ms;
+}
+
+.projectionTransition .barColumn:nth-of-type(4) {
+  animation-delay: 240ms;
+}
+
+.projectionTransition .barColumn:nth-of-type(5) {
+  animation-delay: 360ms;
+}
+
+.projectionTransition .barColumn:nth-of-type(6) {
+  animation-delay: 480ms;
+}
+
+.projectionTransition .barColumn:nth-of-type(7) {
+  animation-delay: 600ms;
+}
+
+.projectionTransition .xAxisLabels {
+  animation-delay: 760ms;
+}
+
+.projectionTransition .timeSlider {
+  animation-delay: 940ms;
+}
+
+.projectionTransition .note {
+  animation-delay: 1060ms;
+}
+
+.barChart {
+  position: relative;
+  display: grid;
+  height: 170px;
+  align-items: end;
+  grid-template-columns: repeat(6, minmax(42px, 1fr));
+  gap: clamp(10px, 2.4vw, 24px);
+  margin-top: 32px;
+  padding: 0 22px 8px;
+}
+
+.barChart .gridLines {
+  position: absolute;
+  inset: 0;
+}
+
+.gridLines span {
+  position: absolute;
+  width: 100%;
+  border-top: 1px solid #dce9f2;
+}
+
+.barColumn {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  min-width: 0;
+  height: 100%;
+  flex-direction: column;
+  justify-content: flex-end;
+  text-align: center;
+}
+
+.barColumn strong {
+  color: #0b2a5b;
+  font-size: 12px;
+  margin-bottom: 7px;
+  white-space: nowrap;
+}
+
+.barColumn span {
+  display: block;
+  width: 34px;
+  margin: 0 auto;
+  border-radius: 4px 4px 0 0;
+  background: linear-gradient(180deg, #0d9bda, #0e82cf);
+  transition:
+    box-shadow 220ms ease,
+    filter 220ms ease,
+    transform 220ms ease;
+}
+
+.activeHour span {
+  box-shadow:
+    0 0 0 4px rgba(16, 152, 213, 0.12),
+    0 8px 18px rgba(16, 132, 205, 0.28);
+  filter: saturate(1.2);
+  transform: translateY(-2px);
+}
+
+.activeHour strong,
+.activeHourLabel {
+  color: #1098d5;
+}
+
+.xAxisLabels {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(42px, 1fr));
+  gap: clamp(10px, 2.4vw, 24px);
+  margin: 8px 22px 0;
+  color: #456582;
+  font-size: clamp(10px, 0.9vw, 11px);
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+}
+
+.xAxisLabels span {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  font-variant-numeric: tabular-nums;
+  text-overflow: clip;
+  white-space: nowrap;
+}
+
+.note {
+  display: flex;
+  min-height: 36px;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #c6e0f2;
+  border-radius: 10px;
+  background: #edf8ff;
+  color: #0b2a5b;
+  font-size: 12px;
+  font-weight: 700;
+  margin-top: 14px;
+  padding: 0 14px;
+}
+
+@keyframes precipitationFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes rainfallModelIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .projectionTransition .barColumn,
+  .projectionTransition .xAxisLabels,
+  .projectionTransition .timeSlider,
+  .projectionTransition .note,
+  .rainfallModel {
+    animation: none;
+  }
+}
+
+@media (max-width: 1060px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .visualCard,
+  .projectionCard {
+    padding: 18px;
+  }
+
+  .modelStage {
+    min-height: 318px;
+  }
+
+  .cardHeader {
+    align-items: flex-start;
+  }
+
+  .viewSwitch {
+    width: 116px;
+    min-height: 36px;
+  }
+
+  .timeSlider label {
+    display: grid;
+    gap: 3px;
+  }
+
+  .dayPicker {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .barChart {
+    gap: 10px;
+    padding-inline: 0;
+  }
+
+  .xAxisLabels {
+    gap: 10px;
+    margin-inline: 0;
+    font-size: 10px;
+  }
+}

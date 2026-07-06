@@ -1,0 +1,246 @@
+.field2d {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 338px;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #d5e6f2;
+  border-radius: 14px;
+  isolation: isolate;
+  background:
+    linear-gradient(180deg, rgba(223, 242, 250, 0.08), rgba(47, 73, 41, 0.1)),
+    url("/assets/rainfall-field-cross-section.png") center / cover no-repeat;
+}
+
+.field2d::after {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0) 45%),
+    radial-gradient(ellipse at 50% 53%, rgba(187, 228, 73, 0.08), transparent 36%);
+  content: "";
+  pointer-events: none;
+}
+
+.rainLayer {
+  position: absolute;
+  inset: -18% -8%;
+  z-index: 4;
+  background-image:
+    linear-gradient(104deg, transparent 0 44%, rgba(77, 172, 229, 0.34) 45% 47%, transparent 48% 100%),
+    linear-gradient(104deg, transparent 0 46%, rgba(100, 190, 239, 0.2) 47% 48%, transparent 49% 100%);
+  background-position: 0 0, 18px 26px;
+  background-size:
+    var(--rain-spacing-primary, 24px) 86px,
+    var(--rain-spacing-secondary, 34px) 118px;
+  opacity: calc(var(--rain-opacity, 0.72) * 0.74);
+  transform: skewX(-11deg);
+  animation: rainfallStreaks var(--rain-speed, 840ms) linear infinite;
+  transition: opacity 360ms ease;
+}
+
+.surfaceWater {
+  position: absolute;
+  right: 0;
+  bottom: 39.7%;
+  left: 0;
+  z-index: 3;
+  height: calc(2px + var(--water-level) * 0.24);
+  background:
+    linear-gradient(180deg, rgba(199, 246, 255, 0.58), rgba(72, 173, 225, 0.4)),
+    repeating-linear-gradient(174deg, rgba(255, 255, 255, 0.22) 0 2px, transparent 2px 22px);
+  border-top: 1px solid rgba(209, 248, 255, 0.7);
+  box-shadow:
+    0 -2px 10px rgba(124, 211, 245, 0.22),
+    0 3px 12px rgba(42, 132, 184, 0.18);
+  opacity: calc(var(--water-opacity, 1) * 0.74);
+  mix-blend-mode: screen;
+  transition:
+    height 480ms ease,
+    opacity 300ms ease;
+}
+
+.soilMoisture {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  height: calc(16% + var(--water-level) * 0.42);
+  background:
+    radial-gradient(ellipse at 24% 12%, rgba(159, 223, 245, 0.25), transparent 34%),
+    radial-gradient(ellipse at 74% 18%, rgba(91, 177, 220, 0.18), transparent 36%),
+    linear-gradient(180deg, rgba(98, 196, 231, 0), rgba(56, 150, 197, 0.24));
+  border-top: 1px solid rgba(140, 215, 238, 0.2);
+  opacity: calc(var(--water-opacity, 1) * 0.72);
+  mix-blend-mode: soft-light;
+  transition:
+    height 480ms ease,
+    opacity 300ms ease;
+}
+
+.precipitationRuler {
+  position: absolute;
+  top: 26px;
+  bottom: 22px;
+  left: 18px;
+  z-index: 5;
+  display: grid;
+  width: 74px;
+  grid-template-rows: repeat(5, 1fr);
+  color: #0b2a5b;
+  filter: drop-shadow(0 2px 4px rgba(255, 255, 255, 0.55));
+  font-size: 12px;
+  font-weight: 800;
+  pointer-events: none;
+}
+
+.precipitationRuler b {
+  position: absolute;
+  top: -5px;
+  left: 0;
+  width: 92px;
+  color: #42617d;
+  font-size: 11px;
+  line-height: 1;
+}
+
+.precipitationRuler::before {
+  position: absolute;
+  top: 28px;
+  bottom: 10px;
+  left: 44px;
+  width: 2px;
+  border-radius: 999px;
+  background: rgba(11, 42, 91, 0.86);
+  content: "";
+}
+
+.precipitationRuler span {
+  position: relative;
+  display: block;
+  padding-top: 24px;
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.8),
+    0 -1px 0 rgba(255, 255, 255, 0.65);
+}
+
+.precipitationRuler span::after {
+  position: absolute;
+  top: 29px;
+  right: 7px;
+  width: 24px;
+  border-top: 2px solid rgba(11, 42, 91, 0.86);
+  content: "";
+}
+
+.waterLevelMarker {
+  position: absolute;
+  right: 18px;
+  bottom: calc(39.7% + var(--water-level) * 0.24);
+  z-index: 5;
+  display: grid;
+  gap: 2px;
+  min-width: 180px;
+  max-width: 220px;
+  border: 1px solid rgba(184, 226, 247, 0.8);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.84);
+  box-shadow: 0 10px 22px rgba(42, 102, 138, 0.12);
+  color: #0b2a5b;
+  opacity: var(--water-opacity, 1);
+  padding: 7px 10px;
+  transform: translateY(50%);
+  transition:
+    bottom 480ms ease,
+    opacity 300ms ease;
+}
+
+.waterLevelMarker::before {
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  width: min(260px, 52vw);
+  border-top: 2px solid rgba(27, 143, 222, 0.8);
+  box-shadow: 0 0 10px rgba(52, 169, 232, 0.28);
+  content: "";
+}
+
+.waterLevelMarker strong {
+  font-family: "Rubik", sans-serif;
+  font-size: 13px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.waterLevelMarker span {
+  color: #42617d;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+@keyframes rainfallStreaks {
+  from {
+    background-position: 0 -42px;
+  }
+
+  to {
+    background-position: 0 42px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rainLayer {
+    animation: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .field2d {
+    min-height: 318px;
+  }
+
+  .precipitationRuler {
+    top: 24px;
+    bottom: 18px;
+    left: 12px;
+    width: 58px;
+    font-size: 10px;
+  }
+
+  .precipitationRuler b {
+    width: 76px;
+    font-size: 10px;
+  }
+
+  .precipitationRuler::before {
+    left: 36px;
+  }
+
+  .precipitationRuler span::after {
+    right: 4px;
+    width: 18px;
+  }
+
+  .waterLevelMarker {
+    right: 10px;
+    min-width: 164px;
+    max-width: 172px;
+    padding: 6px 8px;
+  }
+
+  .waterLevelMarker::before {
+    width: min(154px, 43vw);
+  }
+
+  .waterLevelMarker strong {
+    font-size: 10.5px;
+  }
+
+  .waterLevelMarker span {
+    font-size: 9px;
+  }
+}

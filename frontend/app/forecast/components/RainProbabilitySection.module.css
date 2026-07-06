@@ -1,0 +1,460 @@
+.grid {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.75fr) minmax(0, 1.35fr);
+  gap: 28px;
+  margin-bottom: 56px;
+}
+
+.chanceCard,
+.chartCard {
+  border: 1px solid #d3e3ef;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 18px 44px rgba(57, 94, 120, 0.08);
+  padding: 24px;
+}
+
+.factorContent,
+.chartContent {
+  will-change: opacity;
+}
+
+.factorContent > .chanceHeader,
+.factorContent .detailRow,
+.factorContent .greenNote,
+.chartContent .cardHeader,
+.chartContent .legend,
+.chartContent .svgWrap {
+  animation: factorFadeIn 680ms ease both;
+}
+
+.factorContent > .chanceHeader {
+  animation-delay: 0ms;
+}
+
+.factorContent .detailRow:nth-child(1) {
+  animation-delay: 130ms;
+}
+
+.factorContent .detailRow:nth-child(2) {
+  animation-delay: 260ms;
+}
+
+.factorContent .detailRow:nth-child(3) {
+  animation-delay: 390ms;
+}
+
+.factorContent .greenNote {
+  animation-delay: 540ms;
+}
+
+.chartContent .cardHeader {
+  animation-delay: 720ms;
+}
+
+.chartContent .legend {
+  animation-delay: 880ms;
+}
+
+.chartContent .svgWrap {
+  animation-delay: 1040ms;
+  animation-duration: 820ms;
+}
+
+.chanceHeader {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  padding: 4px 0 26px;
+}
+
+.percentBubble {
+  display: inline-flex;
+  width: 74px;
+  height: 74px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #b8dfff;
+  border-radius: 50%;
+  background: #eaf8ff;
+  color: #116fca;
+}
+
+.chanceHeader h3,
+.chartCard h3 {
+  margin: 0;
+  color: #0b2a5b;
+  font-size: clamp(15px, 2vw, 18px);
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 1.15;
+}
+
+.chanceHeader p {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 12px 0 0;
+  color: #31506f;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.chanceHeader strong {
+  color: #126fc8;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.05;
+}
+
+.detailRow {
+  display: grid;
+  align-items: center;
+  grid-template-columns: 34px minmax(110px, 0.5fr) minmax(0, 1fr);
+  gap: 16px;
+  min-height: 62px;
+  border-bottom: 1px solid #d6e4ef;
+  color: #0b2a5b;
+}
+
+.detailRow:first-child {
+  border-top: 1px solid #d6e4ef;
+}
+
+.detailRow svg {
+  width: 24px;
+  height: 24px;
+  border: 1px solid #b8d8ef;
+  border-radius: 50%;
+  background: #eff9ff;
+  color: transparent;
+}
+
+.detailRow strong {
+  font-size: 12px;
+}
+
+.detailRow span {
+  color: #244565;
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.sourceText {
+  display: inline;
+  width: fit-content;
+  border-bottom: 1px solid currentColor;
+}
+
+.dropdown {
+  position: relative;
+  z-index: 3;
+  margin: 0 0 18px;
+}
+
+.dropdownButton {
+  display: grid;
+  width: 100%;
+  min-height: 58px;
+  align-items: center;
+  grid-template-columns: minmax(0, 1fr) auto 26px;
+  gap: 14px;
+  border: 1px solid #afd6ef;
+  border-radius: 14px;
+  background: #f6fcff;
+  color: #0b2a5b;
+  padding: 0 22px;
+  text-align: left;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.dropdownButton strong {
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dropdownButton span {
+  color: #516c8c;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.dropdownButton svg {
+  color: #087dd0;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: calc(100% - 1px);
+  right: 0;
+  left: 0;
+  overflow: hidden;
+  border: 1px solid #afd6ef;
+  border-top: 0;
+  border-radius: 0 0 14px 14px;
+  background: #f6fcff;
+  box-shadow: 0 20px 34px rgba(57, 94, 120, 0.16);
+}
+
+.dropdown:has(.dropdownMenu) .dropdownButton {
+  border-radius: 14px 14px 0 0;
+}
+
+.dropdownMenu button {
+  display: flex;
+  width: 100%;
+  min-height: 54px;
+  align-items: center;
+  border: 0;
+  border-top: 1px solid #d6e7f2;
+  background: transparent;
+  color: #0b2a5b;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 0 22px;
+  text-align: left;
+}
+
+.dropdownMenu button:hover,
+.dropdownMenu button:focus-visible {
+  background: #edf8ff;
+}
+
+.dropdownMenu .selectedOption {
+  color: #9ba8b5;
+}
+
+.greenNote {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 22px;
+  border: 1px solid #c4e9d0;
+  border-radius: 9px;
+  background: #eaf8ee;
+  color: #145f2d;
+  font-size: 12px;
+  line-height: 1.35;
+  padding: 18px 22px;
+}
+
+.greenNote svg {
+  flex: 0 0 auto;
+  color: #31ad3f;
+}
+
+.greenNote strong {
+  display: block;
+  color: #145f2d;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.greenNote p {
+  margin: 0;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.cardHeader button {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #c4ddee;
+  border-radius: 12px;
+  background: #f4fbff;
+  color: #0b2a5b;
+  font-weight: 800;
+  padding: 0 14px;
+}
+
+.legend {
+  display: flex;
+  justify-content: flex-end;
+  gap: 34px;
+  margin: 18px 0;
+  color: #335275;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend i,
+.maxCircle,
+.avgCircle,
+.minCircle {
+  border-radius: 50%;
+}
+
+.legend i {
+  width: 12px;
+  height: 12px;
+}
+
+.maxDot,
+.maxCircle {
+  fill: #247ef2;
+  background: #247ef2;
+}
+
+.avgDot,
+.avgCircle {
+  fill: #26bfa7;
+  background: #26bfa7;
+}
+
+.minDot,
+.minCircle {
+  fill: #b36cff;
+  background: #b36cff;
+}
+
+.svgWrap {
+  overflow: visible;
+}
+
+.svgWrap svg {
+  width: 100%;
+  height: 270px;
+  overflow: visible;
+}
+
+.gridLine {
+  stroke: #dce9f2;
+}
+
+.maxLine,
+.avgLine,
+.minLine {
+  fill: none;
+  stroke-width: 4;
+}
+
+.maxLine {
+  stroke: #247ef2;
+}
+
+.avgLine {
+  stroke: #26bfa7;
+}
+
+.minLine {
+  stroke: #b36cff;
+}
+
+.svgWrap text {
+  fill: #0b2a5b;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.xLabels {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  color: #0b2a5b;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.xLabels small {
+  display: block;
+  color: #456582;
+  font-weight: 500;
+}
+
+@keyframes factorFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .factorContent > .chanceHeader,
+  .factorContent .detailRow,
+  .factorContent .greenNote,
+  .chartContent .cardHeader,
+  .chartContent .legend,
+  .chartContent .svgWrap {
+    animation: none;
+  }
+}
+
+@media (max-width: 1060px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .chanceCard,
+  .chartCard {
+    padding: 18px;
+  }
+
+  .chanceHeader {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .chanceHeader p {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .chanceHeader h3 {
+    font-size: 18px;
+  }
+
+  .chanceHeader strong {
+    font-size: 28px;
+  }
+
+  .dropdownButton {
+    grid-template-columns: minmax(0, 1fr) auto 22px;
+    padding-inline: 16px;
+  }
+
+  .dropdownButton span {
+    font-size: 14px;
+  }
+
+  .detailRow {
+    grid-template-columns: 26px 1fr;
+  }
+
+  .detailRow span {
+    grid-column: 2;
+  }
+
+  .legend {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .greenNote {
+    align-items: flex-start;
+    padding: 16px;
+  }
+}

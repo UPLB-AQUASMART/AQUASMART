@@ -66,7 +66,7 @@ function GridDimensionsRow() {
           <NumericInput
             id="scenario-rows"
             min="5"
-            max="120"
+            max="50"
             step="1"
             defaultValue="10"
           />
@@ -76,7 +76,7 @@ function GridDimensionsRow() {
           <NumericInput
             id="scenario-columns"
             min="5"
-            max="120"
+            max="50"
             step="1"
             defaultValue="10"
           />
@@ -112,8 +112,8 @@ function GridLayerRow() {
           Grid Size (m):
           <NumericInput
             id="scenario-grid-size"
-            min="1"
-            max="1000"
+            min="5"
+            max="250"
             step="1"
             defaultValue="10"
           />
