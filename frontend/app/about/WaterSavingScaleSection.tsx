@@ -155,7 +155,8 @@ export function WaterSavingScaleSection() {
         <img
           className={styles.image}
           ref={imageRef}
-          src="https://assets.codepen.io/2479807/field.jpeg"
+          // src="https://assets.codepen.io/2479807/field.jpeg"
+          src="https://www.twl-irrigation.com/wp-content/uploads/2021/12/Crop-Irrigation.jpg"
           alt="Green agricultural field"
         />
       </div>

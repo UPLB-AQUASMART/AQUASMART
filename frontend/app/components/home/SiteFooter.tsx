@@ -4,14 +4,16 @@ import styles from "./SiteFooter.module.css";
 
 export function SiteFooter({
   className,
+  dark = false,
   reveal = false,
 }: {
   className?: string;
+  dark?: boolean;
   reveal?: boolean;
 }) {
   return (
     <footer
-      className={`${styles["site-footer"]}${reveal ? ` ${revealStyles["scroll-reveal"]}` : ""}${className ? ` ${className}` : ""}`}
+      className={`${styles["site-footer"]}${dark ? ` ${styles["site-footer-dark"]}` : ""}${reveal ? ` ${revealStyles["scroll-reveal"]}` : ""}${className ? ` ${className}` : ""}`}
       id="contact"
     >
       <div className={styles["footer-upper"]}>
