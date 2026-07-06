@@ -71,9 +71,9 @@ export default function AboutPage() {
         className={`${styles.narrativeSection} ${revealStyles["scroll-reveal"]}`}
         id="about-narrative"
       >
-        <div className={styles.narrativeWatermark} aria-hidden="true">
+        {/* <div className={styles.narrativeWatermark} aria-hidden="true">
           AQUA
-        </div>
+        </div> */}
         <div className={styles.narrativeShell}>
           <div className={styles.narrativeCopy}>
             <span className={styles.narrativeEyebrow}>AQUASMART Mini</span>
@@ -95,9 +95,9 @@ export default function AboutPage() {
               relatable experiences for students, teachers, farmers, local
               officials, and communities.
             </p>
-            <a className={styles.narrativeCta} href="#contact">
+            {/* <a className={styles.narrativeCta} href="#contact">
               Connect With Us <span aria-hidden="true">-&gt;</span>
-            </a>
+            </a> */}
           </div>
 
           <div className={styles.narrativeList}>
