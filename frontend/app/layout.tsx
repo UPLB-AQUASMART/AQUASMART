@@ -4,6 +4,8 @@ import "./globals.css";
 
 import { ScrollToTopButton } from "@/app/components/ScrollToTopButton";
 import { SmoothScrollProvider } from "@/app/components/SmoothScrollProvider";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   title: "AQUASMART Mini",
@@ -23,6 +25,8 @@ window.addEventListener("DOMContentLoaded", function () { window.scrollTo(0, 0);
         </Script>
         <SmoothScrollProvider>{children}</SmoothScrollProvider>
         <ScrollToTopButton />
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
