@@ -40,6 +40,8 @@
 }
 
 .recommendationCard {
+  display: flex;
+  flex-direction: column;
   min-height: 684px;
   padding: 28px;
 }
@@ -58,6 +60,26 @@
   gap: 22px;
   margin: 36px 0;
   color: #ffad18;
+}
+
+.iconSun {
+  color: #ffad18;
+}
+
+.iconRain {
+  color: #0f8ed8;
+}
+
+.iconThunder {
+  color: #7867d9;
+}
+
+.iconCloud {
+  color: #6f8da7;
+}
+
+.iconFog {
+  color: #8aa9b8;
 }
 
 .todayWeather strong {
@@ -126,6 +148,47 @@
 
 .recommendations li:last-child {
   margin-bottom: 0;
+}
+
+.saveButton {
+  display: inline-flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: auto;
+  border: 1px solid #b8d8ef;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #f6fcff, #eaf8ff);
+  color: #0b2a5b;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 0 18px;
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.saveButton:hover {
+  border-color: #1296d2;
+  box-shadow: 0 10px 22px rgba(16, 132, 205, 0.13);
+  transform: translateY(-1px);
+}
+
+.saveButton:focus-visible {
+  outline: 3px solid rgba(18, 150, 210, 0.28);
+  outline-offset: 3px;
+}
+
+.saveButton.saved {
+  border-color: #a7dfb5;
+  background: linear-gradient(180deg, #effaf2, #e0f5e7);
+  color: #145f2d;
 }
 
 .etoCard {
@@ -241,9 +304,41 @@
 }
 
 @media (max-width: 780px) {
+  .section {
+    margin-top: 0;
+  }
+
+  .titleBlock {
+    margin-bottom: 28px;
+  }
+
+  .layout {
+    gap: 18px;
+  }
+
   .etoCard,
   .recommendationCard {
-    padding: 20px;
+    overflow: hidden;
+    padding: 20px 16px;
+  }
+
+  .todayWeather {
+    gap: 16px;
+    margin: 28px 0;
+  }
+
+  .todayWeather svg {
+    width: 48px;
+    height: 48px;
+  }
+
+  .todayWeather strong {
+    font-size: 24px;
+  }
+
+  .outlook,
+  .recommendations {
+    padding: 16px;
   }
 
   .metricGrid {
@@ -251,17 +346,49 @@
   }
 
   .metric {
-    grid-template-columns: 48px minmax(0, 1fr) auto;
+    min-height: auto;
+    grid-template-columns: 44px minmax(0, 1fr);
+    padding: 12px;
+  }
+
+  .metric strong {
+    grid-column: 2;
+    justify-self: start;
   }
 
   .visualPanel,
   .visualImage {
-    min-height: 290px;
+    min-height: 240px;
   }
 
   .etoNote {
     align-items: flex-start;
     border-radius: 16px;
     padding: 16px;
+  }
+
+  .saveButton {
+    margin-top: 18px;
+  }
+}
+
+@media (max-width: 420px) {
+  .todayWeather {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .etoHeader {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .etoHeader strong {
+    font-size: 26px;
+  }
+
+  .visualPanel,
+  .visualImage {
+    min-height: 210px;
   }
 }

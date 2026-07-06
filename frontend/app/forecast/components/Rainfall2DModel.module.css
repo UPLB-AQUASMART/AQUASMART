@@ -201,6 +201,7 @@
 @media (max-width: 700px) {
   .field2d {
     min-height: 318px;
+    background-position: center top;
   }
 
   .precipitationRuler {
@@ -242,5 +243,44 @@
 
   .waterLevelMarker span {
     font-size: 9px;
+  }
+}
+
+@media (max-width: 420px) {
+  .field2d {
+    min-height: 286px;
+  }
+
+  .precipitationRuler {
+    left: 8px;
+    width: 50px;
+  }
+
+  .precipitationRuler b {
+    width: 68px;
+    font-size: 9px;
+  }
+
+  .precipitationRuler::before {
+    left: 31px;
+  }
+
+  .precipitationRuler span {
+    padding-top: 25px;
+  }
+
+  .precipitationRuler span::after {
+    right: 3px;
+    width: 15px;
+  }
+
+  .waterLevelMarker {
+    right: 8px;
+    min-width: 136px;
+    max-width: 148px;
+  }
+
+  .waterLevelMarker::before {
+    width: min(110px, 34vw);
   }
 }

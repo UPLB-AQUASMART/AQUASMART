@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
-import { CloudSun, Droplets } from "lucide-react";
+import { Bookmark, Check, Cloud, CloudFog, CloudLightning, CloudRain, Droplets, Sun } from "lucide-react";
+import { useState } from "react";
 import { etoMetrics } from "./dashboardData";
 import type { EtoDemandData } from "./openMeteoWeather";
 import styles from "./EtoDemandSection.module.css";
@@ -8,11 +11,42 @@ type EtoDemandSectionProps = {
   data?: EtoDemandData;
 };
 
+function getWeatherIconClass(condition = "Sunny") {
+  const normalized = condition.toLowerCase();
+
+  if (normalized.includes("thunder")) return styles.iconThunder;
+  if (normalized.includes("rain") || normalized.includes("drizzle") || normalized.includes("shower")) {
+    return styles.iconRain;
+  }
+  if (normalized.includes("fog")) return styles.iconFog;
+  if (normalized.includes("cloud") || normalized.includes("overcast")) return styles.iconCloud;
+  return styles.iconSun;
+}
+
+function WeatherConditionIcon({ condition = "Sunny", size }: { condition?: string; size: number }) {
+  const normalized = condition.toLowerCase();
+  const className = getWeatherIconClass(condition);
+
+  if (normalized.includes("thunder")) {
+    return <CloudLightning aria-hidden="true" className={className} size={size} />;
+  }
+  if (normalized.includes("rain") || normalized.includes("drizzle") || normalized.includes("shower")) {
+    return <CloudRain aria-hidden="true" className={className} size={size} />;
+  }
+  if (normalized.includes("fog")) return <CloudFog aria-hidden="true" className={className} size={size} />;
+  if (normalized.includes("cloud") || normalized.includes("overcast")) {
+    return <Cloud aria-hidden="true" className={className} size={size} />;
+  }
+  return <Sun aria-hidden="true" className={className} size={size} />;
+}
+
 export function EtoDemandSection({ data }: EtoDemandSectionProps) {
+  const [isRecommendationSaved, setIsRecommendationSaved] = useState(false);
   const metrics = etoMetrics.map((metric) => ({
     ...metric,
     value: data?.metrics.find((item) => item.label === metric.label)?.value ?? metric.value,
   }));
+  const condition = data?.condition ?? "Sunny";
 
   return (
     <section className={styles.section} aria-labelledby="eto-demand-title">
@@ -28,10 +62,10 @@ export function EtoDemandSection({ data }: EtoDemandSectionProps) {
         <aside className={styles.recommendationCard}>
           <h3>Today&apos;s Data Recommendation</h3>
           <div className={styles.todayWeather}>
-            <CloudSun aria-hidden="true" size={60} />
+            <WeatherConditionIcon condition={condition} size={60} />
             <div>
               <strong>
-                {data?.temperature ?? "22°"} <span>{data?.condition ?? "Sunny"}</span>
+                {data?.temperature ?? "22°"} <span>{condition}</span>
               </strong>
               <small>{data?.dateLabel ?? "Today, Friday, 1 Nov"}</small>
             </div>
@@ -55,6 +89,18 @@ export function EtoDemandSection({ data }: EtoDemandSectionProps) {
               ))}
             </ol>
           </div>
+          <button
+            className={`${styles.saveButton}${isRecommendationSaved ? ` ${styles.saved}` : ""}`}
+            type="button"
+            onClick={() => setIsRecommendationSaved(true)}
+          >
+            {isRecommendationSaved ? (
+              <Check aria-hidden="true" size={18} strokeWidth={2.6} />
+            ) : (
+              <Bookmark aria-hidden="true" size={18} strokeWidth={2.4} />
+            )}
+            {isRecommendationSaved ? "Recommendation saved" : "Save recommendation"}
+          </button>
         </aside>
 
         <article className={styles.etoCard}>

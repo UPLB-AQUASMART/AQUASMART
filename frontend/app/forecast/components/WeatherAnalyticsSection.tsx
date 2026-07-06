@@ -1,6 +1,6 @@
 "use client";
 
-import { Leaf, Sun, Thermometer } from "lucide-react";
+import { Cloud, CloudFog, CloudLightning, CloudRain, Leaf, Sun, Thermometer } from "lucide-react";
 import {
   monthlyHumidity,
   monthlyPrecipitation,
@@ -16,6 +16,35 @@ type WeatherAnalyticsSectionProps = {
   data?: ClimateOverviewData;
 };
 
+function getWeatherIconClass(condition = "Sunny") {
+  const normalized = condition.toLowerCase();
+
+  if (normalized.includes("thunder")) return styles.iconThunder;
+  if (normalized.includes("rain") || normalized.includes("drizzle") || normalized.includes("shower")) {
+    return styles.iconRain;
+  }
+  if (normalized.includes("fog")) return styles.iconFog;
+  if (normalized.includes("cloud") || normalized.includes("overcast")) return styles.iconCloud;
+  return styles.iconSun;
+}
+
+function WeatherConditionIcon({ condition = "Sunny", size }: { condition?: string; size: number }) {
+  const normalized = condition.toLowerCase();
+  const className = getWeatherIconClass(condition);
+
+  if (normalized.includes("thunder")) {
+    return <CloudLightning aria-hidden="true" className={className} size={size} />;
+  }
+  if (normalized.includes("rain") || normalized.includes("drizzle") || normalized.includes("shower")) {
+    return <CloudRain aria-hidden="true" className={className} size={size} />;
+  }
+  if (normalized.includes("fog")) return <CloudFog aria-hidden="true" className={className} size={size} />;
+  if (normalized.includes("cloud") || normalized.includes("overcast")) {
+    return <Cloud aria-hidden="true" className={className} size={size} />;
+  }
+  return <Sun aria-hidden="true" className={className} size={size} />;
+}
+
 export function WeatherAnalyticsSection({ data }: WeatherAnalyticsSectionProps) {
   const [temperatureUnit, setTemperatureUnit] = useState<"C" | "F">("C");
   const chartHeight = 300;
@@ -28,6 +57,7 @@ export function WeatherAnalyticsSection({ data }: WeatherAnalyticsSectionProps) 
   const currentTemperatureF = Math.round((currentTemperatureC * 9) / 5 + 32);
   const currentTemperature =
     temperatureUnit === "C" ? currentTemperatureC : currentTemperatureF;
+  const condition = data?.condition ?? "Sunny";
   const precipitationMax = Math.max(40, ...precipitation);
   const temperatureMin = -10;
   const temperatureMax = 40;
@@ -179,9 +209,9 @@ export function WeatherAnalyticsSection({ data }: WeatherAnalyticsSectionProps) 
           </button>
         </div>
         <div className={styles.weatherSummary} key={temperatureUnit}>
-          <Sun aria-hidden="true" size={48} />
+          <WeatherConditionIcon condition={condition} size={48} />
           <strong>{currentTemperature}°</strong>
-          <span>{data?.condition ?? "Sunny"}</span>
+          <span>{condition}</span>
           <small>{data?.todayLabel ?? "Today, Friday, 1 Nov"}</small>
         </div>
         <div className={styles.recommendation}>

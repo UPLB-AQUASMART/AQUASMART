@@ -62,4 +62,32 @@
   .field3d {
     min-height: 318px;
   }
+
+  .depthBadge {
+    top: 12px;
+    left: 12px;
+    max-width: 190px;
+    padding: 8px 10px;
+  }
+
+  .depthBadge strong {
+    font-size: 18px;
+  }
+
+  .volumeBadge {
+    right: 12px;
+    bottom: 12px;
+    max-width: calc(100% - 24px);
+  }
+}
+
+@media (max-width: 420px) {
+  .field3d {
+    min-height: 286px;
+  }
+
+  .depthBadge,
+  .volumeBadge {
+    font-size: 10px;
+  }
 }

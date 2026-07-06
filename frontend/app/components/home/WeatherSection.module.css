@@ -914,6 +914,11 @@
   .week-card {
     max-width: 520px;
   }
+
+  .week-card.detail-mode {
+    width: 100%;
+    max-width: 520px;
+  }
 }
 
 @media (max-width: 720px) {
@@ -997,6 +1002,12 @@
 
   .week-card {
     gap: 12px;
+    padding: 16px;
+  }
+
+  .week-card.detail-mode {
+    width: 100%;
+    min-height: auto;
     padding: 16px;
   }
 
@@ -1211,6 +1222,11 @@
 
   .week-card {
     gap: 12px;
+    border-radius: 22px;
+    padding: 14px;
+  }
+
+  .week-card.detail-mode {
     border-radius: 22px;
     padding: 14px;
   }

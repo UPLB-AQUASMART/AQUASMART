@@ -65,13 +65,28 @@
 @media (max-width: 760px) {
   .dashboard {
     padding-inline: 14px;
+    padding-top: 56px;
+    padding-bottom: 64px;
   }
 
   .header {
     flex-direction: column;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .titleGroup {
+    align-items: flex-start;
+    gap: 12px;
   }
 
   .sourcePill {
     white-space: normal;
+  }
+}
+
+@media (max-width: 420px) {
+  .dashboard {
+    padding-inline: 10px;
   }
 }
