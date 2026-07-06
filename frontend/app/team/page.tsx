@@ -93,7 +93,7 @@ export default function TeamPage() {
           <div className={styles["hero-content"]}>
             <span className={styles.eyebrow}>The Team</span>
             <h1 id="team-page-title">
-              The Experts Behind <span>AQUASMART mini</span>
+              The Experts Behind <span>AQUASMART Mini</span>
             </h1>
             <p>
               A collaborative team of academic researchers, technical
@@ -113,7 +113,7 @@ export default function TeamPage() {
       <section className={styles["core-section"]} aria-labelledby="core-team-title">
         <div className={styles["section-heading"]}>
           <span>Core team</span>
-          <h2 id="core-team-title">The experts building AQUASMART mini</h2>
+          <h2 id="core-team-title">The experts building AQUASMART Mini</h2>
           <p>
             Engineering, field operations, data science, communications, and
             water-quality work joined into one climate-smart platform.
