@@ -1,89 +1,134 @@
 import Image from "next/image";
+import { Handshake, LineChart, Sprout, Users } from "lucide-react";
 
 import revealStyles from "./ScrollReveal.module.css";
 import styles from "./PartnersSection.module.css";
 
-const sponsorships = [
+const partnerOutcomes = [
   {
-    id: "egu",
-    logo: "/assets/partners/partner-1.png",
-    logoAlt: "European Geosciences Union",
-    image: "/assets/partners/egu-news.png",
-    imageAlt: "EGU Public Engagement Grants news card",
-    description: (
-      <>
-        The <strong>European Geosciences Union</strong> (EGU) is the leading organisation for Earth,
-        planetary and space science research in Europe. With our partner organisations worldwide, we
-        foster fundamental geoscience research, alongside applied research that addresses key societal
-        and environmental challenges.
-      </>
-    ),
+    icon: Sprout,
+    title: "Field Impact",
+    body: "Support groundwater literacy, sensor-led learning, and sustainable irrigation practices in farming communities.",
   },
   {
-    id: "gwyn",
+    icon: LineChart,
+    title: "Research Visibility",
+    body: "Help translate monitoring, modeling, and water-quality insights into public-facing educational tools.",
+  },
+  {
+    icon: Users,
+    title: "Youth Engagement",
+    body: "Connect young researchers, students, and practitioners through hands-on groundwater and climate adaptation outreach.",
+  },
+  {
+    icon: Handshake,
+    title: "Institutional Collaboration",
+    body: "Build shared programs with academic, development, food systems, and geoscience partners.",
+  },
+];
+
+const miniPartners = [
+  {
+    name: "European Geosciences Union",
+    logo: "/assets/partners/partner-1.png",
+    href: "https://www.egu.eu/",
+  },
+  {
+    name: "Food and Agriculture Organization of the United Nations",
+    logo: "/assets/partners/partner-2.png",
+    href: "https://www.fao.org/home/en",
+  },
+  {
+    name: "Nestle",
+    logo: "/assets/partners/partner-3.png",
+    href: "https://www.nestle.com/",
+  },
+  {
+    name: "UNESCO",
+    logo: "/assets/partners/partner-4.png",
+    href: "https://www.unesco.org/en",
+  },
+  {
+    name: "Youth Impact",
+    logo: "/assets/partners/partner-5.png",
+    href: "#partners",
+  },
+  {
+    name: "World Food Forum Global Youth Action",
+    logo: "/assets/partners/partner-6.png",
+    href: "https://www.world-food-forum.org/",
+  },
+  {
+    name: "Swiss Water Partnership Youth",
+    logo: "/assets/partners/partner-7.png",
+    href: "https://www.swisswaterpartnership.ch/youth/",
+  },
+  {
+    name: "Groundwater Youth Network",
     logo: "/assets/partners/partner-8.png",
-    logoAlt: "Groundwater Youth Network",
-    image: "/assets/partners/gwyn-photo.png",
-    imageAlt: "Groundwater Youth Network gathering",
-    description: (
-      <>
-        The <strong>Groundwater Youth Network</strong> (GWYN) is a youth led network aiming to provide
-        a coordination mechanism between pre-existing youth organizations focused on water, and more
-        specifically groundwater. The network will place an emphasis on inclusiveness and diversity in
-        order to facilitate the global exchange of ideas, to contribute to groundwater resilience around
-        the world.
-      </>
-    ),
+    href: "#partners",
   },
 ];
 
 export function PartnersSection() {
   return (
-    <section className={`${styles.sponsors} ${revealStyles["scroll-reveal"]}`} id="partners">
-      <h2 className={styles.sponsorships}>Sponsorships</h2>
-
-      <article className={`${styles.sponsorRow} ${styles.eguRow}`}>
-        <div className={styles.sponsorDescription}>
-          <Image
-            className={styles.eguLogo}
-            src={sponsorships[0].logo}
-            alt={sponsorships[0].logoAlt}
-            width={267}
-            height={117}
-            priority={false}
-          />
-          <p>{sponsorships[0].description}</p>
+    <section className={`${styles.partners} ${revealStyles["scroll-reveal"]}`} id="partners">
+      <div className={styles.inner}>
+        <div className={styles.header}>
+          <span className={styles.kicker}>Sponsors & Partners</span>
+          <h2>
+            Don&apos;t Just Fund a Model.
+            <span>Move Groundwater Learning Forward.</span>
+          </h2>
+          <p>
+            AQUASMART Mini brings together research institutions, food systems
+            partners, youth networks, and geoscience communities to make
+            groundwater science easier to understand, teach, and act on.
+          </p>
         </div>
 
-        <Image
-          className={styles.sponsorImage}
-          src={sponsorships[0].image}
-          alt={sponsorships[0].imageAlt}
-          width={534}
-          height={462}
-        />
-      </article>
+        <div className={styles.outcomeGrid} aria-label="Partnership outcomes">
+          {partnerOutcomes.map((item) => {
+            const Icon = item.icon;
 
-      <article className={`${styles.sponsorRow} ${styles.gwynRow}`}>
-        <Image
-          className={styles.sponsorImage}
-          src={sponsorships[1].image}
-          alt={sponsorships[1].imageAlt}
-          width={533}
-          height={462}
-        />
-
-        <div className={`${styles.sponsorDescription} ${styles.gwynDescription}`}>
-          <Image
-            className={styles.gwynLogo}
-            src={sponsorships[1].logo}
-            alt={sponsorships[1].logoAlt}
-            width={210}
-            height={100}
-          />
-          <p>{sponsorships[1].description}</p>
+            return (
+              <article className={styles.outcomeCard} key={item.title}>
+                <span className={styles.iconBox} aria-hidden="true">
+                  <Icon size={26} strokeWidth={2.1} />
+                </span>
+                <h3>{item.title}</h3>
+                <p>{item.body}</p>
+              </article>
+            );
+          })}
         </div>
-      </article>
+
+        <div className={styles.logoBlock}>
+          <span className={styles.logoLabel}>Past Sponsors & Partners</span>
+          <div className={styles.logoGrid}>
+            {miniPartners.map((partner) => (
+              <a
+                className={styles.logoCard}
+                href={partner.href}
+                key={partner.name}
+                rel={partner.href.startsWith("http") ? "noopener noreferrer" : undefined}
+                target={partner.href.startsWith("http") ? "_blank" : undefined}
+              >
+                <Image
+                  src={partner.logo}
+                  alt={partner.name}
+                  width={260}
+                  height={120}
+                />
+              </a>
+            ))}
+          </div>
+        </div>
+
+        <a className={styles.cta} href="/contact">
+          Partner With AQUASMART Mini <span aria-hidden="true">-&gt;</span>
+        </a>
+      </div>
     </section>
   );
 }
