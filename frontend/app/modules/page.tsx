@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 
 import { SiteFooter } from "@/app/components/home/SiteFooter";
 import { SiteNav } from "@/app/components/home/SiteNav";
 import { learningModules } from "@/app/data/home";
+import { LearningModuleCard } from "./components/LearningModuleCard";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -32,18 +32,7 @@ export default function ModulesPage() {
 
         <div className={styles["materials-grid"]}>
           {learningModules.map((module) => (
-            <article className={styles.card} key={module.code}>
-              <div className={styles.photo}>
-                <Image src={module.image} alt="" fill sizes="(max-width: 900px) 100vw, 388px" />
-              </div>
-              <div className={styles.desc}>
-                <div className={styles["module-title-row"]}>
-                  <h2>{module.code}</h2>
-                  <span>{module.title}</span>
-                </div>
-                <p>{module.description}</p>
-              </div>
-            </article>
+            <LearningModuleCard module={module} key={module.code} />
           ))}
         </div>
       </section>

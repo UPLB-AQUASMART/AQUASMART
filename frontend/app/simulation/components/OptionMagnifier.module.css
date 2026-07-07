@@ -1,0 +1,102 @@
+.frame {
+  --lens-size: 184px;
+  --lens-scale: 1.9;
+  --lens-x: 50%;
+  --lens-y: 50%;
+  --frame-width: 1px;
+  --frame-height: 1px;
+  position: relative;
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.content {
+  display: block;
+}
+
+.lens {
+  position: absolute;
+  z-index: 5;
+  top: calc(var(--lens-y) - (var(--lens-size) / 2));
+  left: calc(var(--lens-x) - (var(--lens-size) / 2));
+  display: block;
+  width: var(--lens-size);
+  height: var(--lens-size);
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.88);
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+
+.lens::after {
+  position: absolute;
+  right: 18px;
+  bottom: -24px;
+  width: 10px;
+  height: 54px;
+  border-radius: 999px;
+  background: #1296d2;
+  box-shadow: 0 8px 14px rgba(15, 118, 200, 0.18);
+  content: "";
+  transform: rotate(-38deg);
+  transform-origin: top center;
+}
+
+.lensViewport {
+  position: absolute;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+  border: 3px solid rgba(18, 150, 210, 0.9);
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow:
+    0 18px 38px rgba(15, 118, 200, 0.2),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.9);
+}
+
+.lensContent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: var(--frame-width);
+  height: var(--frame-height);
+  min-width: 0;
+  transform:
+    translate(
+      calc((var(--lens-size) / 2) - var(--lens-x)),
+      calc((var(--lens-size) / 2) - var(--lens-y))
+    )
+    scale(var(--lens-scale));
+  transform-origin: var(--lens-x) var(--lens-y);
+}
+
+.frameActive {
+  cursor: none;
+}
+
+.frameActive .lens {
+  opacity: 1;
+  transform: scale(1);
+}
+
+@media (hover: none), (pointer: coarse) {
+  .frameActive {
+    cursor: pointer;
+  }
+
+  .lens {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .frame {
+    --lens-size: 138px;
+    --lens-scale: 1.75;
+  }
+}

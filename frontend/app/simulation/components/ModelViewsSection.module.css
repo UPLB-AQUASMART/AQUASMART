@@ -1,0 +1,479 @@
+.section {
+  width: min(1440px, 100vw);
+  margin: 0 auto;
+  padding: 16px 24px;
+  background: #f5fafc;
+  color: #0b2a5b;
+}
+
+.shell {
+  display: grid;
+  gap: 22px;
+  border: 1px solid #d3e3ef;
+  border-radius: 10px;
+  padding: 24px 28px;
+  background: #ffffff;
+  box-shadow: 0 18px 44px rgba(57, 94, 120, 0.08);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.header svg {
+  width: 31px;
+  height: 31px;
+  color: #0f76c8;
+}
+
+.header h2 {
+  margin: 0;
+  color: #0b2a5b;
+  font-size: clamp(20px, 4vw, 28px);
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 1;
+}
+
+.content {
+  display: grid;
+  grid-template-columns: minmax(320px, 456px) minmax(0, 1fr);
+  gap: 28px;
+  align-items: stretch;
+}
+
+.viewToggle {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.flipToggle {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.explainer,
+.previewPanel {
+  border: 1px solid #d3e3ef;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 18px 44px rgba(57, 94, 120, 0.08);
+}
+
+.explainer {
+  display: grid;
+  padding: 32px;
+}
+
+.explainerPane {
+  display: none;
+  align-content: start;
+  gap: 24px;
+}
+
+.infoBlock {
+  display: grid;
+  gap: 10px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid #d3e3ef;
+}
+
+.infoBlock:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.infoTitle {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.infoTitle svg {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
+  color: #0f76c8;
+}
+
+.infoTitle h4 {
+  margin: 0;
+  color: #0b2a5b;
+  font-size: clamp(15px, 2vw, 18px);
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.infoBlock p,
+.infoBlock li {
+  margin: 0;
+  color: #516c8c;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.infoBlock ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.infoBlock li {
+  position: relative;
+  padding-left: 15px;
+}
+
+.infoBlock li::before {
+  position: absolute;
+  top: 0.62em;
+  left: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #1296d2;
+  content: "";
+}
+
+.previewPanel {
+  display: grid;
+  overflow: hidden;
+  grid-template-rows: minmax(390px, 1fr) auto;
+}
+
+.previewStage {
+  display: grid;
+  min-height: 390px;
+}
+
+.preview {
+  display: none;
+  align-content: center;
+  justify-items: center;
+  gap: 12px;
+  min-height: 390px;
+  margin: 0;
+  padding: 16px 24px 18px;
+  background: #ffffff;
+}
+
+:global(#model-view-side):checked ~ .content .sidePane,
+:global(#model-view-three):checked ~ .content .threePane,
+:global(#model-view-top):checked ~ .content .topPane {
+  display: grid;
+}
+
+.preview figcaption {
+  color: #0b2a5b;
+  font-size: clamp(20px, 4vw, 28px);
+  font-weight: 800;
+  line-height: 1;
+  text-align: center;
+}
+
+.flipCard {
+  display: block;
+  width: min(100%, 780px);
+  min-height: 318px;
+  border-radius: 16px;
+  cursor: pointer;
+  outline: none;
+  perspective: 1400px;
+}
+
+.flipInner {
+  position: relative;
+  display: block;
+  min-height: 318px;
+  border-radius: 16px;
+  transform-style: preserve-3d;
+  transition: transform 560ms cubic-bezier(0.2, 0.75, 0.25, 1);
+}
+
+.flipFace {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  overflow: hidden;
+  align-content: center;
+  justify-items: center;
+  border: 1px solid #d3e3ef;
+  border-radius: 16px;
+  padding: 22px;
+  background: #ffffff;
+  backface-visibility: hidden;
+  box-shadow: 0 18px 44px rgba(57, 94, 120, 0.08);
+}
+
+.flipFront {
+  gap: 12px;
+}
+
+.flipBack {
+  transform: rotateY(180deg);
+}
+
+.flipToggle:checked + .flipCard .flipInner {
+  transform: rotateY(180deg);
+}
+
+.flipCard:hover .flipFace {
+  border-color: #1296d2;
+  box-shadow: 0 20px 44px rgba(16, 132, 205, 0.13);
+}
+
+.flipToggle:focus-visible + .flipCard {
+  outline: 3px solid rgba(8, 120, 237, 0.28);
+  outline-offset: 4px;
+}
+
+.modelImageSlot {
+  display: grid;
+  min-width: 0;
+  place-items: center;
+}
+
+.modelImageSlot img {
+  width: 100%;
+  max-height: 240px;
+  object-fit: contain;
+  filter: drop-shadow(0 16px 22px rgba(11, 31, 58, 0.12));
+}
+
+.flipHint {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #b8d8ef;
+  border-radius: 999px;
+  padding: 0 12px;
+  background: #ffffff;
+  color: #0b2a5b;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+  text-align: center;
+}
+
+.optionsPanel {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  gap: 12px;
+  align-content: center;
+  justify-items: center;
+}
+
+.optionList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px;
+}
+
+.optionCard {
+  display: grid;
+  min-width: 0;
+  gap: 7px;
+  justify-items: center;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.optionCard strong {
+  color: #0b2a5b;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 1.2;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.optionCard img {
+  width: 100%;
+  max-height: 210px;
+  object-fit: contain;
+}
+
+.optionList .optionCard:nth-child(2) img {
+  max-height: 180px;
+}
+
+.thumbnails {
+  display: grid;
+  grid-template-columns: 42px repeat(3, minmax(150px, 1fr)) 42px;
+  gap: 16px;
+  align-items: center;
+  padding: 10px 24px 12px;
+  border-top: 1px solid #d3e3ef;
+  background: #ffffff;
+}
+
+.arrowButton,
+.thumbnail {
+  border: 1px solid #d3e3ef;
+  background: #ffffff;
+  color: #0f76c8;
+  cursor: pointer;
+}
+
+.arrowButton {
+  display: none;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 50%;
+  box-shadow: 0 6px 16px rgba(8, 66, 140, 0.09);
+}
+
+.arrowButton svg {
+  width: 24px;
+  height: 24px;
+}
+
+.thumbnail {
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  min-width: 0;
+  height: 110px;
+  border-radius: 10px;
+  padding: 10px 12px;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.thumbnail,
+.arrowButton {
+  cursor: pointer;
+}
+
+.thumbnail span {
+  color: #0b2a5b;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.thumbnail img {
+  width: 100%;
+  min-width: 0;
+  height: 70px;
+  object-fit: contain;
+}
+
+:global(#model-view-side):checked ~ .content .sideTab,
+:global(#model-view-three):checked ~ .content .threeTab,
+:global(#model-view-top):checked ~ .content .topTab {
+  border-color: #1296d2;
+  box-shadow: 0 0 0 1px #1296d2;
+}
+
+:global(#model-view-side):focus-visible ~ .content .sideTab,
+:global(#model-view-three):focus-visible ~ .content .threeTab,
+:global(#model-view-top):focus-visible ~ .content .topTab {
+  outline: 3px solid rgba(8, 120, 237, 0.28);
+  outline-offset: 3px;
+}
+
+:global(#model-view-side):checked ~ .content .sidePrev,
+:global(#model-view-side):checked ~ .content .sideNext,
+:global(#model-view-three):checked ~ .content .threePrev,
+:global(#model-view-three):checked ~ .content .threeNext,
+:global(#model-view-top):checked ~ .content .topPrev,
+:global(#model-view-top):checked ~ .content .topNext {
+  display: grid;
+}
+
+.thumbnail:hover {
+  transform: translateY(-1px);
+}
+
+@media (max-width: 1180px) {
+  .content {
+    grid-template-columns: 1fr;
+  }
+
+  .modelImageSlot img {
+    max-height: 250px;
+  }
+}
+
+@media (max-width: 760px) {
+  .section {
+    padding: 12px 14px;
+  }
+
+  .shell {
+    padding: 18px;
+  }
+
+  .explainer {
+    padding: 24px;
+  }
+
+  .preview {
+    padding: 16px;
+  }
+
+  .previewPanel {
+    grid-template-rows: minmax(480px, 1fr) auto;
+  }
+
+  .previewStage,
+  .preview {
+    min-height: 480px;
+  }
+
+  .flipCard,
+  .flipInner {
+    min-height: 400px;
+  }
+
+  .flipFace {
+    padding: 16px;
+  }
+
+  .modelImageSlot img {
+    max-height: 250px;
+  }
+
+  .optionCard img,
+  .optionList .optionCard:nth-child(2) img {
+    max-height: 145px;
+  }
+
+  .thumbnails {
+    grid-template-columns: 42px minmax(150px, 1fr) 42px;
+  }
+
+  .thumbnail {
+    display: none;
+  }
+
+  :global(#model-view-side):checked ~ .content .sideTab,
+  :global(#model-view-three):checked ~ .content .threeTab,
+  :global(#model-view-top):checked ~ .content .topTab {
+    display: grid;
+  }
+}
