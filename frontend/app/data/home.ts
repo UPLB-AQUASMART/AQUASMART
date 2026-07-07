@@ -25,6 +25,9 @@ export type LearningModule = {
   title: string;
   description: string;
   image: string;
+  category: string;
+  date: string;
+  pdfHref: string;
 };
 
 export const navItems = [
@@ -34,7 +37,7 @@ export const navItems = [
   { label: "Modules", href: "/modules" },
   { label: "Weather", href: "/forecast" },
   { label: "Team", href: "/team" },
-  { label: "Contact", href: "/#contact" },
+  { label: "Contact", href: "/contact" },
   { label: "Partners", href: "/#partners" },
 ];
 
@@ -161,6 +164,9 @@ export const learningModules: LearningModule[] = [
     description:
       "Understand how groundwater levels are measured, interpreted, and translated into practical irrigation insights.",
     image: "/figma/drawdown-state-head.png",
+    category: "Groundwater",
+    date: "May 15, 2025",
+    pdfHref: "#",
   },
   {
     code: "AQS 102",
@@ -168,6 +174,9 @@ export const learningModules: LearningModule[] = [
     description:
       "Learn how field sensors collect pH, salinity, temperature, EC, and TDS data for real-time farm decisions.",
     image: "/figma/drawdown-card.png",
+    category: "AI & Technology",
+    date: "May 10, 2025",
+    pdfHref: "#",
   },
   {
     code: "AQS 103",
@@ -175,6 +184,9 @@ export const learningModules: LearningModule[] = [
     description:
       "Explore how rainfall and evapotranspiration forecasts support climate-responsive water management.",
     image: "/assets/weather-preview-light-rain.png",
+    category: "Climate Resilience",
+    date: "April 28, 2025",
+    pdfHref: "#",
   },
   {
     code: "AQS 104",
@@ -182,6 +194,9 @@ export const learningModules: LearningModule[] = [
     description:
       "Study how pump-to-crop water movement, soil moisture, and crop needs shape irrigation recommendations.",
     image: "/assets/field.png",
+    category: "Field Studies",
+    date: "April 12, 2025",
+    pdfHref: "#",
   },
   {
     code: "AQS 105",
@@ -189,6 +204,9 @@ export const learningModules: LearningModule[] = [
     description:
       "Review key water-quality indicators and how they affect crop health, salinity risk, and sustainable use.",
     image: "/assets/weather-clouds.png",
+    category: "Water Quality",
+    date: "March 30, 2025",
+    pdfHref: "#",
   },
   {
     code: "AQS 106",
@@ -196,6 +214,9 @@ export const learningModules: LearningModule[] = [
     description:
       "See how monitoring data, model outputs, and alerts come together in clear dashboards for farm action.",
     image: "/assets/field.png",
+    category: "AI & Technology",
+    date: "March 15, 2025",
+    pdfHref: "#",
   },
 ];
 
@@ -225,7 +246,7 @@ export const footerColumns = [
       { label: "About", href: "/#about" },
       { label: "Reports & Research", href: "/#simulations" },
       { label: "Team", href: "/team" },
-      { label: "Contact", href: "/#contact" },
+      { label: "Contact", href: "/contact" },
     ],
   },
   {
