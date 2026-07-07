@@ -9,10 +9,18 @@
   position: relative;
   overflow: hidden;
   min-height: 100vh;
-  padding: clamp(130px, 12vw, 168px) clamp(20px, 5vw, 72px) 92px;
+  padding: clamp(148px, 12vw, 176px) clamp(24px, 5vw, 76px) 92px;
   background:
-    radial-gradient(circle at 8% 22%, rgba(31, 163, 201, 0.15), transparent 28%),
-    radial-gradient(circle at 88% 82%, rgba(34, 197, 94, 0.11), transparent 26%),
+    radial-gradient(
+      circle at 8% 22%,
+      rgba(31, 163, 201, 0.15),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 88% 82%,
+      rgba(34, 197, 94, 0.11),
+      transparent 26%
+    ),
     linear-gradient(180deg, #f5fafc 0%, #ffffff 58%, #f8fcfe 100%);
 }
 
@@ -50,51 +58,134 @@
   height: 240px;
 }
 
-.intro,
+.heroLayout,
 .explorer {
   position: relative;
   z-index: 1;
-  width: min(1280px, 100%);
+  width: min(1210px, 100%);
   margin: 0 auto;
 }
 
-.intro {
+.heroLayout {
   display: grid;
-  grid-template-columns: minmax(0, 0.95fr) minmax(360px, 0.75fr);
-  gap: clamp(36px, 6vw, 82px);
-  align-items: start;
+  grid-template-columns: minmax(0, 0.94fr) minmax(370px, 0.78fr);
+  gap: clamp(42px, 6vw, 84px);
+  align-items: center;
 }
 
-.intro h1 {
-  margin: 0;
+.heroCopy {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 50px;
+  background: #dff5fb;
+  color: #147d9c;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  padding: 10px 14px;
+  text-transform: uppercase;
+}
+
+.heroCopy h1 {
+  max-width: 680px;
+  margin: 25px 0 20px;
   color: var(--navy);
   font-family: "Sora", sans-serif;
-  font-size: clamp(42px, 5.4vw, 76px);
-  font-weight: 700;
+  font-size: clamp(54px, 6vw, 82px);
+  font-weight: 800;
   letter-spacing: 0;
-  line-height: 1.14;
+  line-height: 1.02;
 }
 
-.intro h1 span {
+.heroCopy h1 span {
   display: block;
-  color: var(--green);
+  color: #4eaed1;
 }
 
-.intro p {
+.heroCopy p {
+  max-width: 610px;
   margin: 0;
-  border-left: 1px solid rgba(11, 31, 58, 0.14);
-  color: #334155;
-  font-size: clamp(17px, 1.7vw, 23px);
+  color: #52667b;
+  font-size: 17px;
   font-weight: 500;
-  line-height: 1.45;
-  padding-left: clamp(26px, 4vw, 42px);
+  line-height: 1.75;
+}
+
+.heroVisual {
+  position: relative;
+  height: clamp(390px, 39vw, 510px);
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.82);
+  border-radius: 44px;
+  background:
+    radial-gradient(circle at 30% 30%, #dff6fd, transparent 48%),
+    linear-gradient(145deg, #1fa3c9, #0b1f3a);
+  box-shadow:
+    0 34px 75px rgba(11, 31, 58, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  isolation: isolate;
+}
+
+.heroVisual::after {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: inherit;
+  box-shadow: inset 0 0 80px rgba(255, 255, 255, 0.08);
+  content: "";
+  pointer-events: none;
+}
+
+.heroCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.visualLabel,
+.visualCaption {
+  position: absolute;
+  z-index: 2;
+  display: inline-flex;
+  border: 1px solid rgba(255, 255, 255, 0.52);
+  border-radius: 999px;
+  background: rgba(11, 31, 58, 0.62);
+  box-shadow: 0 8px 24px rgba(11, 31, 58, 0.14);
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  padding: 10px 13px;
+  text-transform: uppercase;
+  backdrop-filter: blur(12px);
+}
+
+.visualLabel {
+  top: 22px;
+  left: 22px;
+}
+
+.visualCaption {
+  right: 22px;
+  bottom: 22px;
 }
 
 .explorer {
   display: grid;
   grid-template-columns: minmax(360px, 0.74fr) minmax(0, 1fr);
   gap: clamp(44px, 7vw, 86px);
-  margin-top: clamp(68px, 8vw, 116px);
+  margin-top: clamp(86px, 9vw, 128px);
 }
 
 .memberList {
@@ -144,7 +235,11 @@
   overflow: hidden;
   border-radius: 20px;
   background:
-    radial-gradient(circle at 30% 22%, rgba(223, 246, 253, 0.95), transparent 34%),
+    radial-gradient(
+      circle at 30% 22%,
+      rgba(223, 246, 253, 0.95),
+      transparent 34%
+    ),
     linear-gradient(145deg, #0b1f3a, #1fa3c9);
   box-shadow: 0 18px 36px rgba(11, 31, 58, 0.12);
 }
@@ -161,7 +256,7 @@
   place-items: center;
   color: #ffffff;
   font-family: "Sora", sans-serif;
-  font-size: clamp(34px, 4vw, 54px);
+  font-size: 32px;
   font-weight: 800;
   letter-spacing: -0.04em;
 }
@@ -175,14 +270,14 @@
 .memberMeta strong {
   color: var(--navy);
   font-family: "Sora", sans-serif;
-  font-size: clamp(22px, 2.2vw, 30px);
+  font-size: 18px;
   font-weight: 800;
   line-height: 1.1;
 }
 
 .memberMeta span {
   color: #64748b;
-  font-size: clamp(15px, 1.35vw, 18px);
+  font-size: 14px;
   font-weight: 600;
   line-height: 1.35;
 }
@@ -211,18 +306,18 @@
   margin: 0;
   color: var(--navy);
   font-family: "Sora", sans-serif;
-  font-size: clamp(38px, 4.4vw, 58px);
+  font-size: 32px;
   font-weight: 800;
   letter-spacing: 0;
-  line-height: 1.05;
+  line-height: 1.14;
 }
 
 .role {
   margin: 12px 0 24px;
   color: #64748b;
-  font-size: clamp(18px, 1.7vw, 24px);
+  font-size: 17px;
   font-weight: 600;
-  line-height: 1.35;
+  line-height: 1.45;
 }
 
 .tags {
@@ -248,9 +343,9 @@
   display: grid;
   gap: 22px;
   color: #0f172a;
-  font-size: clamp(17px, 1.65vw, 24px);
+  font-size: 17px;
   font-weight: 400;
-  line-height: 1.45;
+  line-height: 1.65;
 }
 
 .bioText p {
@@ -281,15 +376,32 @@
 }
 
 @media (max-width: 980px) {
-  .intro,
+  .heroLayout,
   .explorer {
     grid-template-columns: 1fr;
   }
 
-  .intro p,
   .detailPanel {
     border-left: 0;
     padding-left: 0;
+  }
+
+  .heroCopy {
+    max-width: 720px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .heroCopy h1,
+  .heroCopy p {
+    margin-right: auto;
+    margin-left: auto;
+  }
+
+  .heroVisual {
+    width: min(610px, 100%);
+    height: 410px;
+    margin: 0 auto;
   }
 
   .detailPanel {
@@ -304,8 +416,17 @@
     padding: 112px 18px 68px;
   }
 
-  .intro h1 {
-    font-size: clamp(36px, 11vw, 52px);
+  .heroCopy h1 {
+    font-size: clamp(42px, 12vw, 58px);
+  }
+
+  .heroCopy p {
+    font-size: 16px;
+  }
+
+  .heroVisual {
+    height: min(92vw, 380px);
+    border-radius: 30px;
   }
 
   .memberButton {
@@ -319,15 +440,47 @@
   }
 
   .memberMeta strong {
-    font-size: 20px;
+    font-size: 24px;
   }
 
   .memberMeta span {
-    font-size: 14px;
+    font-size: 12px;
   }
 
   .detailPanel h2 {
-    font-size: clamp(32px, 10vw, 44px);
+    font-size: 24px;
+  }
+
+  .initialsAvatar {
+    font-size: 24px;
+  }
+
+  .role,
+  .bioText {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 420px) {
+  .badge,
+  .visualLabel,
+  .visualCaption {
+    font-size: 9px;
+  }
+
+  .visualLabel,
+  .visualCaption {
+    padding: 8px 10px;
+  }
+
+  .visualLabel {
+    top: 14px;
+    left: 14px;
+  }
+
+  .visualCaption {
+    right: 14px;
+    bottom: 14px;
   }
 }
 
