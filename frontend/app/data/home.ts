@@ -80,6 +80,9 @@ export const parameterNames = [
   "Salinity",
   "Electrical Conductivity",
   "TDS",
+  "DO",
+  "Groundwater Level",
+  "Soil Moisture",
 ];
 
 export const parameterCards = [
@@ -112,6 +115,24 @@ export const parameterCards = [
     image: "/assets/5.gif",
     description:
       "TDS: Monitors suspended particles that affect clarity, flow, and irrigation quality",
+  },
+  {
+    active: "DO",
+    image: "/assets/3.gif",
+    description:
+      "DO: amount of free,non-compound oxygen molecules present in water",
+  },
+  {
+    active: "Groundwater Level",
+    image: "/assets/5.gif",
+    description:
+      "GL: upper surface or elevation where the soil, sand, and rock in the ground are completely saturated with water",
+  },
+  {
+    active: "Soil Moisture",
+    image: "/assets/3.gif",
+    description:
+      "SM: amount of water stored in the spaces between soil particles",
   },
 ];
 

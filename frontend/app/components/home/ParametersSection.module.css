@@ -40,7 +40,6 @@
   position: relative;
   display: flex;
   width: min(1320px, 100%);
-  aspect-ratio: 1320 / 622;
   overflow: hidden;
   border-radius: 20px;
   background: #111111;
@@ -117,7 +116,8 @@
   position: relative;
   z-index: 4;
   display: flex;
-  width: 100%;
+  box-sizing: border-box;
+  width: min(945px, calc(100vw - 120px));
   flex-direction: column;
   gap: clamp(20px, 2.1vw, 30px);
   padding: clamp(28px, 4.85vw, 64px) clamp(28px, 4.55vw, 60px);
@@ -293,8 +293,6 @@
   }
 
   .parameters-card {
-    aspect-ratio: auto;
-    min-height: 420px;
     border-radius: 16px;
   }
 
@@ -303,6 +301,7 @@
   }
 
   .parameters-card-content {
+    width: calc(100vw - 40px);
     gap: 18px;
     padding: 28px 22px;
   }
@@ -367,8 +366,7 @@
   }
 
   .parameters-card {
-    aspect-ratio: auto;
-    min-height: clamp(440px, 116vw, 620px);
+    width: 100%;
   }
 
   .parameters-card-content {
@@ -396,10 +394,11 @@
   }
 
   .parameters-card {
-    min-height: 500px;
+    width: 100%;
   }
 
   .parameters-card-content {
+    width: calc(100vw - 32px);
     padding: 24px 18px;
   }
 

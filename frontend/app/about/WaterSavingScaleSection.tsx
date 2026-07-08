@@ -157,9 +157,8 @@ export function WaterSavingScaleSection() {
           ref={imageRef}
           // src="https://assets.codepen.io/2479807/field.jpeg"
           // src="https://www.twl-irrigation.com/wp-content/uploads/2021/12/Crop-Irrigation.jpg"
-          // src="https://www.agrivi.com/wp-content/uploads/2022/08/wepik-photo-mode-2022729-171433.jpeg"
+          src="https://www.agrivi.com/wp-content/uploads/2022/08/wepik-photo-mode-2022729-171433.jpeg"
           alt="Green agricultural field"
-          src="https://blogmedia.testbook.com/blog/wp-content/uploads/2023/08/surface-irrigation-compressed-e2b5850c.webp"
         />
       </div>
 
