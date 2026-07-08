@@ -26,7 +26,7 @@ export function WaterSavingScaleSection() {
     ).matches;
 
     if (prefersReducedMotion) {
-      number.textContent = "97";
+      number.textContent = "70";
       gsap.set(`.${styles.heading}`, { color: "#91a052" });
       gsap.set(imagePanelRef.current, { xPercent: 50 });
       gsap.set(imageRef.current, { xPercent: -40 });
@@ -55,7 +55,7 @@ export function WaterSavingScaleSection() {
 
       timeline
         .to(counter, {
-          value: 97,
+          value: 70,
           duration: 90,
           snap: { value: 1 },
           onUpdate: () => {
@@ -156,8 +156,10 @@ export function WaterSavingScaleSection() {
           className={styles.image}
           ref={imageRef}
           // src="https://assets.codepen.io/2479807/field.jpeg"
-          src="https://www.twl-irrigation.com/wp-content/uploads/2021/12/Crop-Irrigation.jpg"
+          // src="https://www.twl-irrigation.com/wp-content/uploads/2021/12/Crop-Irrigation.jpg"
+          // src="https://www.agrivi.com/wp-content/uploads/2022/08/wepik-photo-mode-2022729-171433.jpeg"
           alt="Green agricultural field"
+          src="https://blogmedia.testbook.com/blog/wp-content/uploads/2023/08/surface-irrigation-compressed-e2b5850c.webp"
         />
       </div>
 

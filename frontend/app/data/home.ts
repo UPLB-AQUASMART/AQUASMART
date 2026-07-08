@@ -66,12 +66,12 @@ export const goals: GoalItem[] = [
     highlight: "Real-time",
     body: "Provides real-time data for efficient use and notifications.",
   },
-  {
-    icon: "notifications",
-    title: "SMS Notifications",
-    highlight: "SMS",
-    body: "Text notifications to notify farmers of irrigation reminders and related concerns.",
-  },
+  // {
+  //   icon: "notifications",
+  //   title: "SMS Notifications",
+  //   highlight: "SMS",
+  //   body: "Text notifications to notify farmers of irrigation reminders and related concerns.",
+  // },
 ];
 
 export const parameterNames = [
