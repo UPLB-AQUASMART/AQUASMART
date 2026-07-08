@@ -68,6 +68,13 @@ type Coordinates = {
   longitude: number;
 };
 
+export type WeatherLoadStatus =
+  | "requesting-location"
+  | "loading-weather"
+  | "ready"
+  | "location-unavailable"
+  | "weather-unavailable";
+
 type ForecastApiResponse = {
   timezone?: string;
   current?: {
@@ -95,11 +102,6 @@ type HistoricalApiResponse = {
     relative_humidity_2m_mean?: Array<number | null>;
     precipitation_sum?: Array<number | null>;
   };
-};
-
-const fallbackCoordinates: Coordinates = {
-  latitude: 14.5995,
-  longitude: 120.9842,
 };
 
 const hourlyRainLabels = [0, 4, 8, 12, 16, 20];
@@ -590,6 +592,7 @@ export function useOpenMeteoWeather() {
   const [data, setData] = useState<ForecastPageWeatherData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<WeatherLoadStatus>("requesting-location");
 
   useEffect(() => {
     const controller = new AbortController();
@@ -597,14 +600,24 @@ export function useOpenMeteoWeather() {
     async function loadWeather() {
       setIsLoading(true);
       setError(null);
+      setStatus("requesting-location");
 
-      let coordinates = fallbackCoordinates;
-      let isFallbackLocation = false;
+      let coordinates: Coordinates;
+      const isFallbackLocation = false;
 
       try {
         coordinates = await getBrowserLocation();
-      } catch {
-        isFallbackLocation = true;
+      } catch (locationError) {
+        if (!controller.signal.aborted) {
+          setStatus("location-unavailable");
+          setError(
+            locationError instanceof Error
+              ? locationError.message
+              : "User location is unavailable.",
+          );
+          setIsLoading(false);
+        }
+        return;
       }
 
       const today = new Date();
@@ -612,13 +625,16 @@ export function useOpenMeteoWeather() {
       const historyEnd = addDays(today, -1);
 
       try {
+        setStatus("loading-weather");
         const [forecastResponse, historyResponse] = await Promise.all([
           fetchJson<ForecastApiResponse>(forecastUrl(coordinates), controller.signal),
           fetchJson<HistoricalApiResponse>(historicalUrl(coordinates, toDateKey(historyStart), toDateKey(historyEnd)), controller.signal),
         ]);
         setData(mapForecastData(forecastResponse, historyResponse, isFallbackLocation));
+        setStatus("ready");
       } catch (weatherError) {
         if (!controller.signal.aborted) {
+          setStatus("weather-unavailable");
           setError(weatherError instanceof Error ? weatherError.message : "Unable to load Open-Meteo data.");
         }
       } finally {
@@ -633,5 +649,5 @@ export function useOpenMeteoWeather() {
     return () => controller.abort();
   }, []);
 
-  return { data, isLoading, error };
+  return { data, isLoading, error, status };
 }
