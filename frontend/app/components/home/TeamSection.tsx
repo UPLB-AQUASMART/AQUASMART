@@ -2,7 +2,7 @@
 
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { coreTeam } from "@/app/data/team";
 import revealStyles from "./ScrollReveal.module.css";
@@ -20,6 +20,19 @@ function getInitials(name: string) {
   }
 
   return `${parts[0]?.[0] ?? ""}${parts.at(-1)?.[0] ?? ""}`.toUpperCase();
+}
+
+function TeamPhoto({ name, image }: { name: string; image?: string | null }) {
+  const [failed, setFailed] = useState(false);
+  const showImage = Boolean(image) && !failed;
+
+  return showImage ? (
+    <img src={image ?? ""} alt={name} onError={() => setFailed(true)} />
+  ) : (
+    <span className={styles["team-initials-avatar"]} aria-hidden="true">
+      {getInitials(name)}
+    </span>
+  );
 }
 
 export function TeamSection() {
@@ -48,7 +61,13 @@ export function TeamSection() {
       return Math.max(1, viewport.clientWidth - paddingLeft - paddingRight);
     };
 
-    const getScrollDistance = () => Math.max(0, track.scrollWidth - getViewportContentWidth());
+    const getScrollDistance = () => {
+      const lastSlide = track.lastElementChild as HTMLElement | null;
+      const lastSlideAlignedDistance = lastSlide?.offsetLeft ?? 0;
+      const rightEdgeDistance = track.scrollWidth - getViewportContentWidth();
+
+      return Math.max(0, lastSlideAlignedDistance || rightEdgeDistance);
+    };
     const getPinDistance = () => Math.max(1, getScrollDistance() + window.innerHeight * 0.18);
     let horizontalTween: gsap.core.Tween | null = null;
 
@@ -92,8 +111,12 @@ export function TeamSection() {
       ref={teamSectionRef}
     >
       <div className={styles["team-header-group"]}>
-        <div className={styles["team-tag"]}>Meet the team</div>
-        <h2>The Experts Behind AQUASMART</h2>
+        {/* <div className={styles["team-tag"]}>Meet the Team</div> */}
+        <h2>
+          Behind
+          <br />
+          <span className={styles["team-heading-accent"]}>AQUASMART Mini</span>
+        </h2>
       </div>
 
       <div
@@ -106,19 +129,9 @@ export function TeamSection() {
             const title = member.role ?? member.focus ?? "";
 
             return (
-              <article
-                className={`${styles["team-carousel-card"]} ${styles["is-active"]}`}
-                key={member.name}
-              >
-                <div className={styles["team-image-box"]}>
-                  <div className={styles["team-blob-shape"]} />
-                  {member.image ? (
-                    <img src={member.image} alt={member.name} />
-                  ) : (
-                    <span className={styles["team-initials-avatar"]} aria-hidden="true">
-                      {getInitials(member.name)}
-                    </span>
-                  )}
+              <article className={styles["team-slide"]} key={member.name}>
+                <div className={styles["team-photo-box"]}>
+                  <TeamPhoto name={member.name} image={member.image} />
                 </div>
                 <div className={styles["team-info-area"]}>
                   <span className={styles["team-role-label"]}>{title}</span>
