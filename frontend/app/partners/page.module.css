@@ -1,0 +1,124 @@
+.page {
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: #f5fafc;
+  color: #0b1f3a;
+}
+
+.spotlight {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(
+      circle at 12% 85%,
+      rgba(34, 197, 94, 0.08),
+      transparent 45%
+    ),
+    radial-gradient(
+      circle at 88% 20%,
+      rgba(31, 163, 201, 0.1),
+      transparent 45%
+    ),
+    linear-gradient(155deg, #f7fafc 0%, #eef4f8 55%, #f7fafc 100%);
+  padding: clamp(64px, 8vw, 100px) clamp(24px, 6vw, 96px);
+  scroll-margin-top: 96px;
+}
+
+.spotlight::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(10, 22, 38, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(10, 22, 38, 0.05) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse at center, black 0%, transparent 75%);
+  pointer-events: none;
+}
+
+.inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(40px, 5vw, 88px);
+  max-width: 1200px;
+  margin: 0 auto;
+  align-items: start;
+}
+
+.heading {
+  margin: 0 0 32px;
+  color: #0f1d2e;
+  font-family: "Sora", sans-serif;
+  font-size: clamp(32px, 3.6vw, 46px);
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.accent {
+  color: #1fa3c9;
+}
+
+.partnerList {
+  display: grid;
+  gap: 36px;
+}
+
+.logoRow {
+  display: flex;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.logoRow img {
+  height: auto;
+  max-height: 64px;
+  width: auto;
+  object-fit: contain;
+}
+
+.partnerBlock p {
+  margin: 0;
+  color: rgba(15, 29, 46, 0.62);
+  font-size: 14.5px;
+  line-height: 1.75;
+}
+
+.newsCard {
+  position: relative;
+  display: block;
+  min-height: 460px;
+  overflow: hidden;
+  border-radius: 20px;
+  box-shadow: 0 24px 48px rgba(15, 29, 46, 0.16);
+  text-decoration: none;
+  transition:
+    transform 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.newsCard:hover {
+  box-shadow: 0 28px 56px rgba(15, 29, 46, 0.22);
+  transform: translateY(-4px);
+}
+
+.newsImage {
+  object-fit: cover;
+}
+
+@media (max-width: 900px) {
+  .inner {
+    grid-template-columns: 1fr;
+  }
+
+  .newsCard {
+    min-height: 360px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .newsCard {
+    transition: none;
+  }
+}

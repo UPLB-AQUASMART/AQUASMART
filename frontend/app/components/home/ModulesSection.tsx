@@ -57,10 +57,7 @@ export function ModulesSection() {
     return (index - centerIndex) * step;
   };
 
-  // Lines up the carousel track's first set of cards with the exact
-  // screen position the spread-out deck cards land in, so the swap
-  // from "deck" to "carousel" is a single matched-position cut instead
-  // of a cross-fade between two differently-positioned layouts.
+  
   const getAlignedTrackX = () => {
     const { cardWidth, step, centerIndex } = getCardMetrics();
     const viewportCenterX = window.innerWidth / 2;

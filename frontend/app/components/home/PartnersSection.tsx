@@ -1,89 +1,73 @@
 import Image from "next/image";
+import type { CSSProperties } from "react";
 
-import revealStyles from "./ScrollReveal.module.css";
 import styles from "./PartnersSection.module.css";
 
-const sponsorships = [
+const partners = [
   {
-    id: "egu",
+    name: "EGU",
     logo: "/assets/partners/partner-1.png",
-    logoAlt: "European Geosciences Union",
-    image: "/assets/partners/egu-news.png",
-    imageAlt: "EGU Public Engagement Grants news card",
-    description: (
-      <>
-        The <strong>European Geosciences Union</strong> (EGU) is the leading organisation for Earth,
-        planetary and space science research in Europe. With our partner organisations worldwide, we
-        foster fundamental geoscience research, alongside applied research that addresses key societal
-        and environmental challenges.
-      </>
-    ),
+    defaultLogo: "/assets/partners/partner-1-default.png",
+    logoWidth: 240,
+    description:
+      "EGU, the European Geosciences Union, is Europe's premier geosciences union, dedicated to the pursuit of excellence in the Earth, planetary, and space sciences for the benefit of humanity, worldwide. It was established in September 2002 as a merger of the European Geophysical Society (EGS) and the European Union of Geosciences (EUG), and has headquarters in Munich, Germany.",
   },
   {
-    id: "gwyn",
+    name: "GWYN",
     logo: "/assets/partners/partner-8.png",
-    logoAlt: "Groundwater Youth Network",
-    image: "/assets/partners/gwyn-photo.png",
-    imageAlt: "Groundwater Youth Network gathering",
-    description: (
-      <>
-        The <strong>Groundwater Youth Network</strong> (GWYN) is a youth led network aiming to provide
-        a coordination mechanism between pre-existing youth organizations focused on water, and more
-        specifically groundwater. The network will place an emphasis on inclusiveness and diversity in
-        order to facilitate the global exchange of ideas, to contribute to groundwater resilience around
-        the world.
-      </>
-    ),
+    defaultLogo: "/assets/partners/partner-8-default.png",
+    logoWidth: 190,
+    description:
+      "The Groundwater Youth Network (GWYN) is a youth led network aiming to provide a coordination mechanism between pre-existing youth organizations focused on water, and more specifically groundwater. The network will place an emphasis on inclusiveness and diversity in order to facilitate the global exchange of ideas, to contribute to groundwater resilience around the world.",
   },
 ];
 
 export function PartnersSection() {
   return (
-    <section className={`${styles.sponsors} ${revealStyles["scroll-reveal"]}`} id="partners">
-      <h2 className={styles.sponsorships}>Sponsorships</h2>
-
-      <article className={`${styles.sponsorRow} ${styles.eguRow}`}>
-        <div className={styles.sponsorDescription}>
-          <Image
-            className={styles.eguLogo}
-            src={sponsorships[0].logo}
-            alt={sponsorships[0].logoAlt}
-            width={267}
-            height={117}
-            priority={false}
-          />
-          <p>{sponsorships[0].description}</p>
+    <section className={styles.partners} id="partners">
+      <div className={styles.inner}>
+        <div className={styles.header}>
+          <span className={styles.kicker}>Collaboration</span>
+          <h2>
+            Our <span>Partners</span>
+          </h2>
+          <p>
+            AQUASMART Mini works alongside research and water-management
+            organizations to keep our models grounded in real science and
+            real fields.
+          </p>
         </div>
 
-        <Image
-          className={styles.sponsorImage}
-          src={sponsorships[0].image}
-          alt={sponsorships[0].imageAlt}
-          width={534}
-          height={462}
-        />
-      </article>
-
-      <article className={`${styles.sponsorRow} ${styles.gwynRow}`}>
-        <Image
-          className={styles.sponsorImage}
-          src={sponsorships[1].image}
-          alt={sponsorships[1].imageAlt}
-          width={533}
-          height={462}
-        />
-
-        <div className={`${styles.sponsorDescription} ${styles.gwynDescription}`}>
-          <Image
-            className={styles.gwynLogo}
-            src={sponsorships[1].logo}
-            alt={sponsorships[1].logoAlt}
-            width={210}
-            height={100}
-          />
-          <p>{sponsorships[1].description}</p>
+        <div className={styles.partnerGrid}>
+          {partners.map((partner) => (
+            <div
+              aria-label={partner.description}
+              className={styles.partnerLogo}
+              key={partner.name}
+              style={{ "--logo-width": `${partner.logoWidth}px` } as CSSProperties}
+              tabIndex={0}
+            >
+              <div className={styles.logoFrame}>
+                <Image
+                  className={`${styles.logoImage} ${styles.defaultLogo}`}
+                  src={partner.defaultLogo}
+                  alt={`${partner.name} logo`}
+                  width={531}
+                  height={199}
+                />
+                <Image
+                  aria-hidden="true"
+                  className={`${styles.logoImage} ${styles.hoverLogo}`}
+                  src={partner.logo}
+                  alt=""
+                  width={531}
+                  height={199}
+                />
+              </div>
+            </div>
+          ))}
         </div>
-      </article>
+      </div>
     </section>
   );
 }
