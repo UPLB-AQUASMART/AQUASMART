@@ -14,7 +14,7 @@ export const coreTeam: TeamMember[] = [
     name: "Leunell Chris M. Buela",
     role: "Project Manager & Technical Lead",
     image: "/assets/team/team-buela.png",
-    bio: "Leunell Chris Buela is an Assistant Professor at the University of the Philippines Los Baños working at the intersection of water science, climate adaptation, and sustainable agri-food systems. His work focuses on groundwater and surface water modeling, flood and drought risk assessment, and climate-resilient irrigation and precision agriculture. He currently leads and contributes to multiple national and international projects on groundwater monitoring, contaminant transport, integrated water resources management, and AI-supported decision tools for agriculture, including the AQUASMART initiative.",
+    bio: "Leunell Chris Buela is an Assistant Professor at the University of the Philippines Los Baños working at the intersection of water science, climate adaptation, and sustainable agri-food systems. His work focuses on groundwater and surface water modeling, flood and drought risk assessment, and climate-resilient irrigation and precision agriculture. He currently leads and contributes to multiple national and international projects on groundwater monitoring, contaminant transport, integrated water resources management, and AI-supported decision tools for agriculture, including the AQUASMART initiative. He is a member of the World Food Forum Young Scientists Group and actively engages in science–policy processes to advance climate-smart, people-centered water management. ",
     tags: ["Water Science", "Climate Adaptation", "AI Tools"],
     lead: true,
     linkedin: "https://www.linkedin.com/in/lmbuela/?skipRedirect=true",

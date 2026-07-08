@@ -10,6 +10,10 @@
 .inner {
   position: relative;
   z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 0.85fr);
+  gap: clamp(48px, 7vw, 96px);
+  align-items: center;
   width: min(1280px, 100%);
   margin: 0 auto;
 }
@@ -56,68 +60,58 @@
 }
 
 .partnerGrid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  margin-top: clamp(56px, 6vw, 84px);
-}
+  --partner-gap: clamp(12px, 7.5vw, 24px);
 
-.partnerColumn {
-  display: grid;
-  align-content: start;
-  gap: 28px;
-  padding: 0 clamp(28px, 3vw, 48px);
-}
-
-.partnerColumn:first-child {
-  padding-left: 0;
-}
-
-.partnerColumn:not(:first-child) {
-  border-left: 1px solid rgba(15, 29, 46, 0.1);
-}
-
-.logoMark {
   display: flex;
-  min-height: 84px;
   align-items: center;
+  justify-content: flex-end;
+  gap: var(--partner-gap);
 }
 
-.logoWordmark {
-  font-family: "Sora", sans-serif;
-  font-size: 40px;
-  font-weight: 800;
-  letter-spacing: 0.01em;
-  line-height: 1;
-}
-
-.logoWordmark .accent {
-  color: #1fa3c9;
-}
-
-.logoTagline {
+.partnerLogo {
   display: block;
-  margin-top: 8px;
-  color: rgba(15, 29, 46, 0.45);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
+  width: min(var(--logo-width), 42vw);
+  border-radius: 4px;
+  outline: none;
 }
 
-.partnerColumn h3 {
-  margin: 0;
-  color: #0f1d2e;
-  font-family: "Sora", sans-serif;
-  font-size: 19px;
-  font-weight: 800;
+.partnerLogo:focus-visible {
+  outline: 3px solid rgba(31, 163, 201, 0.28);
+  outline-offset: 8px;
 }
 
-.partnerColumn p {
-  margin: 0;
-  color: rgba(15, 29, 46, 0.6);
-  font-size: 15px;
-  font-weight: 500;
-  line-height: 1.7;
+.logoFrame {
+  position: relative;
+  aspect-ratio: 531 / 199;
+  width: 100%;
+}
+
+.logoImage {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  transition: opacity 180ms ease;
+}
+
+.defaultLogo {
+  opacity: 1;
+}
+
+.hoverLogo {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+
+.partnerLogo:hover .defaultLogo,
+.partnerLogo:focus-visible .defaultLogo {
+  opacity: 0;
+}
+
+.partnerLogo:hover .hoverLogo,
+.partnerLogo:focus-visible .hoverLogo {
+  opacity: 1;
 }
 
 @media (max-width: 720px) {
@@ -129,18 +123,18 @@
     font-size: clamp(34px, 11vw, 48px);
   }
 
-  .partnerGrid {
+  .inner {
     grid-template-columns: 1fr;
-    gap: 40px;
+    gap: 44px;
   }
 
-  .partnerColumn {
-    padding: 0;
+  .partnerGrid {
+    --partner-gap: 32px;
+
+    justify-content: flex-start;
   }
 
-  .partnerColumn:not(:first-child) {
-    border-left: none;
-    padding-top: 32px;
-    border-top: 1px solid rgba(15, 29, 46, 0.1);
+  .partnerLogo {
+    width: min(var(--logo-width), calc((100% - var(--partner-gap)) / 2));
   }
 }
