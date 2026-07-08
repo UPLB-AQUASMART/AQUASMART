@@ -75,7 +75,7 @@ const navLinks = [
   { label: "Weather", href: "/weather" },
   { label: "Team", href: "/team" },
   { label: "Contact", href: "/contact" },
-  { label: "Partners", href: "/partners" },
+  { label: "Sponsors", href: "/partners" },
   { label: "Modules", href: "/partners" },
 ];
 

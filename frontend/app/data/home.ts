@@ -38,7 +38,7 @@ export const navItems = [
   { label: "Weather", href: "/forecast" },
   { label: "Team", href: "/team" },
   { label: "Contact", href: "/contact" },
-  { label: "Partners", href: "/#partners" },
+  { label: "Partners", href: "/partners" },
 ];
 
 export const goals: GoalItem[] = [
@@ -261,6 +261,6 @@ export const footerColumns = [
   },
   {
     title: "Partners",
-    links: partners.map((partner) => ({ label: partner, href: "/#partners" })),
+    links: partners.map((partner) => ({ label: partner, href: "/partners" })),
   },
 ];
