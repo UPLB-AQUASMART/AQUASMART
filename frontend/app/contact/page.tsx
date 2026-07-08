@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { Globe2, Mail, MapPin, Send } from "lucide-react";
+import { Globe2, Mail, MapPin } from "lucide-react";
 
 import { SiteFooter } from "@/app/components/home/SiteFooter";
 import { SiteNav } from "@/app/components/home/SiteNav";
+import { ContactForm } from "./ContactForm";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -30,14 +31,6 @@ const contactDetails = [
     label: "Partners",
     value: "UNESCO, FAO, Nestle, SWP, EuroGeosciences",
   },
-];
-
-const inquiryTypes = [
-  "Research Collaboration",
-  "Partnership Inquiry",
-  "Data Access Request",
-  "Learning Module Inquiry",
-  "General Inquiry",
 ];
 
 export default function ContactPage() {
@@ -112,66 +105,7 @@ export default function ContactPage() {
               possible.
             </p>
 
-            <form
-              className={styles.form}
-              action="mailto:aquasmart.philippines@gmail.com"
-              method="post"
-              encType="text/plain"
-            >
-              <div className={styles.formRow}>
-                <label className={styles.field}>
-                  <span>First Name</span>
-                  <input name="firstName" placeholder="Juan" type="text" />
-                </label>
-                <label className={styles.field}>
-                  <span>Last Name</span>
-                  <input name="lastName" placeholder="Dela Cruz" type="text" />
-                </label>
-              </div>
-
-              <label className={styles.field}>
-                <span>Email Address</span>
-                <input
-                  name="email"
-                  placeholder="juan@example.com"
-                  required
-                  type="email"
-                />
-              </label>
-
-              <label className={styles.field}>
-                <span>Organization / Affiliation</span>
-                <input
-                  name="organization"
-                  placeholder="University, LGU, NGO, farm, or company"
-                  type="text"
-                />
-              </label>
-
-              <label className={styles.field}>
-                <span>Subject</span>
-                <select name="subject" defaultValue="Research Collaboration">
-                  {inquiryTypes.map((type) => (
-                    <option key={type}>{type}</option>
-                  ))}
-                </select>
-              </label>
-
-              <label className={styles.field}>
-                <span>Message</span>
-                <textarea
-                  name="message"
-                  placeholder="Tell us about your inquiry, research interest, or collaboration idea."
-                  required
-                  rows={5}
-                />
-              </label>
-
-              <button className={styles.submitButton} type="submit">
-                Send Message
-                <Send size={18} strokeWidth={2.3} />
-              </button>
-            </form>
+            <ContactForm />
           </section>
         </div>
       </section>
