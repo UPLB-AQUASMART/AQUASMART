@@ -188,6 +188,7 @@ const forecastMetricIcons: Record<string, string> = {
 
 const WEATHER_DISSOLVE_MS = 260;
 const WEATHER_TRANSITION_MS = 1180;
+const TEST_SUNNY_FORECAST_INDEX = 6;
 
 type WeatherTransitionPhase = "idle" | "leaving" | "entering";
 
@@ -248,8 +249,26 @@ export function WeatherSection({
   const transitionTimersRef = useRef<Array<ReturnType<typeof setTimeout>>>([]);
   const sourceForecast = forecastItems?.length ? forecastItems : defaultForecast;
   const sourceDetails = forecastDetails?.length ? forecastDetails : defaultForecastDetails;
-  const weeklyForecast = sourceForecast;
-  const detailForecast = sourceDetails;
+  const weeklyForecast = sourceForecast.map((item, index) =>
+    index === TEST_SUNNY_FORECAST_INDEX ? { ...item, icon: "sun" as const } : item,
+  );
+  const detailForecast = sourceDetails.map((item, index) =>
+    index === TEST_SUNNY_FORECAST_INDEX
+      ? {
+          ...item,
+          title: "Sunny Weather",
+          chance: "with 0% chance of rain",
+          bullets: [
+            "Testing sunny transition state for the final forecast day.",
+            "Low rainfall is expected for this selected day.",
+            "Monitor soil moisture before planning irrigation.",
+          ],
+          recommendation:
+            "Sunny conditions can raise ETO demand, so monitor soil moisture before irrigation.",
+          status: "Sunny",
+        }
+      : item,
+  );
   const safeActiveIndex = Math.min(activeIndex, weeklyForecast.length - 1);
   const activeForecast = weeklyForecast[safeActiveIndex] ?? weeklyForecast[0];
   const activeDetail = detailForecast[safeActiveIndex] ?? detailForecast[0] ?? defaultForecastDetails[0];

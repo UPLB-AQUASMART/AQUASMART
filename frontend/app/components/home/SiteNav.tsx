@@ -47,7 +47,10 @@ export function SiteNav({ activeLabel = "Home" }: { activeLabel?: string }) {
         >
           All Sims
         </Link>
-        <span className={styles["simulation-dropdown-divider"]} aria-hidden="true" />
+        <span
+          className={styles["simulation-dropdown-divider"]}
+          aria-hidden="true"
+        />
         <div className={styles["simulation-dropdown-options"]}>
           {simulationOptions.map((option) => (
             <Link href={option.href} key={option.label} onClick={closeMenu}>
@@ -64,7 +67,11 @@ export function SiteNav({ activeLabel = "Home" }: { activeLabel?: string }) {
         key="Simulation"
       >
         {isHomePage ? (
-          <Link className={triggerClassName} href={simulationItem.href} onClick={closeMenu}>
+          <Link
+            className={triggerClassName}
+            href={simulationItem.href}
+            onClick={closeMenu}
+          >
             {simulationItem.label}
           </Link>
         ) : (
@@ -88,19 +95,30 @@ export function SiteNav({ activeLabel = "Home" }: { activeLabel?: string }) {
       className={`${styles["site-nav"]}${isMenuOpen ? ` ${styles["menu-open"]}` : ""}`}
       style={glassBlurStyle}
     >
-      <Link className={styles["nav-logo"]} href="/#home" aria-label="AQUASMART Mini home" onClick={closeMenu}>
+      <Link
+        className={styles["nav-logo"]}
+        href="/#home"
+        aria-label="AQUASMART Mini home"
+        onClick={closeMenu}
+      >
         <img src="/assets/logo_2.png" alt="AQUASMART Mini" />
       </Link>
       <button
         className={styles["nav-menu-toggle"]}
         type="button"
-        aria-label={isMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+        aria-label={
+          isMenuOpen ? "Close navigation menu" : "Open navigation menu"
+        }
         aria-controls="home-mobile-menu"
         aria-expanded={isMenuOpen}
         onClick={() => setIsMenuOpen((open) => !open)}
       >
         <span>Menu</span>
-        {isMenuOpen ? <X size={18} strokeWidth={1.8} /> : <Menu size={18} strokeWidth={1.8} />}
+        {isMenuOpen ? (
+          <X size={18} strokeWidth={1.8} />
+        ) : (
+          <Menu size={18} strokeWidth={1.8} />
+        )}
       </button>
       <nav className={styles["nav-links"]} aria-label="Primary navigation">
         {navItems.map((item) =>

@@ -41,7 +41,7 @@
 .nav-logo img {
   width: 100%;
   height: clamp(52px, 4.2vw, 62px);
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
 }
 

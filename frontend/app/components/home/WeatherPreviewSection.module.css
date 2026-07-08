@@ -87,7 +87,7 @@
   display: grid;
   width: 100%;
   grid-template-columns: minmax(0, 0.92fr) minmax(330px, 0.78fr);
-  align-items: end;
+  align-items: center;
   gap: clamp(28px, 4vw, 56px);
 }
 
@@ -165,18 +165,19 @@
 
 .forecast-cta {
   display: inline-flex;
-  min-height: 52px;
+  min-height: 62px;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 10px;
   margin-top: clamp(26px, 3.4vw, 42px);
   border-radius: 999px;
   background: #3aa24d;
+  box-shadow: 0 12px 28px rgba(58, 162, 77, 0.18);
   color: #ffffff;
-  font-size: clamp(14px, 1.55vw, 18px);
-  font-weight: 700;
+  font-size: clamp(16px, 1.65vw, 21px);
+  font-weight: 800;
   line-height: 1;
-  padding: 0 clamp(22px, 2.5vw, 32px);
+  padding: 0 clamp(28px, 3vw, 42px);
   text-decoration: none;
   transition:
     background-color 180ms ease,
@@ -268,10 +269,10 @@
   }
 
   .forecast-cta {
-    min-height: 46px;
+    min-height: 52px;
     margin-top: 28px;
-    font-size: 14px;
-    padding: 0 24px;
+    font-size: 15px;
+    padding: 0 26px;
   }
 }
 
