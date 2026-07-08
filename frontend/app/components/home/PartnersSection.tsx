@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import type { CSSProperties } from "react";
 
 import styles from "./PartnersSection.module.css";
@@ -31,6 +32,14 @@ export function PartnersSection() {
           <h2>
             Our <span>Partners</span>
           </h2>
+          <Link
+            className={styles["weather-heading"]}
+            href="/partners"
+            aria-label="Open real-time weather forecast page"
+          >
+            <span>Our</span>
+            <strong>Sponsors</strong>
+          </Link>
           <p>
             AQUASMART Mini works alongside research and water-management
             organizations to keep our models grounded in real science and

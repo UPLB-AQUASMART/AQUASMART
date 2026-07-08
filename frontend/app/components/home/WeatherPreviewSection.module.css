@@ -18,13 +18,12 @@
   z-index: -1;
   width: min(70vw, 995px);
   aspect-ratio: 995 / 789;
-  background:
-    repeating-radial-gradient(
-      circle at 50% 50%,
-      transparent 0 111px,
-      rgba(11, 31, 58, 0.12) 112px,
-      transparent 113px
-    );
+  background: repeating-radial-gradient(
+    circle at 50% 50%,
+    transparent 0 111px,
+    rgba(11, 31, 58, 0.12) 112px,
+    transparent 113px
+  );
   opacity: 0.72;
   pointer-events: none;
 }
@@ -157,11 +156,11 @@
 }
 
 .weather-description p:first-of-type {
-  margin-top: clamp(24px, 3vw, 36px);
+  margin-top: clamp(12px, 3vw, 24px);
 }
 
 .weather-description p + p {
-  margin-top: clamp(18px, 2.4vw, 28px);
+  margin-top: clamp(12px, 2.4vw, 17px);
 }
 
 .forecast-cta {
