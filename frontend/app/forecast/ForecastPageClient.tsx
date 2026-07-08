@@ -281,7 +281,11 @@ export function ForecastPageClient() {
   }, [isLoading, isUnavailable, showSplash]);
 
   const forecastContent = (
-    <div className={styles["forecast-ready"]}>
+    <div
+      className={`${styles["forecast-ready"]}${
+        isSplashLeaving ? ` ${styles["forecast-ready-entering"]}` : ""
+      }`}
+    >
       <WeatherSection
         forecastDetails={data?.details}
         forecastItems={data?.forecast}
@@ -290,11 +294,19 @@ export function ForecastPageClient() {
     </div>
   );
 
-  if (showSplash) {
-    return (
-      <div className={styles["forecast-transition-shell"]}>
-        {isSplashLeaving && !isUnavailable ? forecastContent : null}
-        <div className={styles["forecast-splash-layer"]}>
+  return (
+    <div
+      className={`${styles["forecast-transition-shell"]}${
+        showSplash ? "" : ` ${styles["forecast-transition-complete"]}`
+      }`}
+    >
+      {(isSplashLeaving || !showSplash) && !isUnavailable ? forecastContent : null}
+      {showSplash ? (
+        <div
+          className={`${styles["forecast-splash-layer"]}${
+            isSplashLeaving ? ` ${styles["forecast-splash-layer-leaving"]}` : ""
+          }`}
+        >
           <ForecastSplash
             error={error}
             isLeaving={isSplashLeaving}
@@ -304,9 +316,7 @@ export function ForecastPageClient() {
             status={status}
           />
         </div>
-      </div>
-    );
-  }
-
-  return forecastContent;
+      ) : null}
+    </div>
+  );
 }

@@ -488,6 +488,10 @@
   background: #f5fafc;
 }
 
+.forecast-transition-complete {
+  overflow: visible;
+}
+
 .forecast-splash-layer {
   position: absolute;
   z-index: 5;
@@ -495,7 +499,11 @@
   pointer-events: none;
 }
 
-.forecast-ready {
+.forecast-splash-layer-leaving {
+  pointer-events: none;
+}
+
+.forecast-ready-entering {
   animation: forecastReadyIn 840ms cubic-bezier(0.2, 0.85, 0.22, 1) 120ms both;
 }
 
