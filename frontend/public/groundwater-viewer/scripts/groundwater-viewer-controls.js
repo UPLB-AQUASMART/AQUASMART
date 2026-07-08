@@ -309,6 +309,7 @@ async function fetchScenarioTopView(config) {
     "/api/simulation/top-view",
     "http://localhost:8000/simulation/top-view",
   ];
+  const errors = [];
   for (const url of apiCandidates) {
     try {
       const response = await fetch(url, {
@@ -322,16 +323,40 @@ async function fetchScenarioTopView(config) {
       let detail = `HTTP ${response.status}`;
       try {
         const payload = await response.json();
-        detail = payload.detail || payload.error || detail;
+        detail = payload.detail || payload.error || payload.message || detail;
       } catch {
         // Keep the status-only detail when the response body is not JSON.
       }
-      console.warn(`Scenario API unavailable at ${url}: ${detail}`);
+      const message =
+        typeof detail === "string" ? detail : JSON.stringify(detail);
+      errors.push(`${url}: ${message}`);
+      console.warn(`Scenario API unavailable at ${url}: ${message}`);
     } catch (error) {
+      errors.push(
+        `${url}: ${error instanceof Error ? error.message : String(error)}`,
+      );
       console.warn(`Scenario API unavailable at ${url}`, error);
     }
   }
-  return null;
+  throw new Error(errors.join(" | ") || "No scenario API returned data.");
+}
+
+async function fetchFirstJson(candidates) {
+  let lastError = null;
+  for (const url of candidates) {
+    try {
+      const response = await fetch(url, { cache: "no-store" });
+      if (response.ok) {
+        return await response.json();
+      }
+      lastError = new Error(`HTTP ${response.status} from ${url}`);
+      console.warn(lastError.message);
+    } catch (error) {
+      lastError = error;
+      console.warn(`Could not load JSON from ${url}`, error);
+    }
+  }
+  throw lastError || new Error("No JSON sources configured.");
 }
 
 async function runScenarioAndOpenTopView() {
@@ -354,10 +379,16 @@ async function runScenarioAndOpenTopView() {
       hideModflowTransition(520);
     } else {
       aquiferSetupStatusEl.textContent =
-        "The model run did not return a result. Check the backend connection and try again.";
+        "The model run returned an unexpected response.";
       hideModflowTransition(0);
       revealPanel();
     }
+  } catch (error) {
+    const detail =
+      error instanceof Error ? error.message : "Unknown scenario run error.";
+    aquiferSetupStatusEl.textContent = `MODFLOW run failed: ${detail}`;
+    hideModflowTransition(0);
+    revealPanel();
   } finally {
     scenarioRunButton.disabled = false;
   }
@@ -394,11 +425,13 @@ function openTopView(region, config = activeScenarioConfig) {
     sectionTitleEl.textContent = `${region.type} Top View`;
     sectionWellLocationEl.textContent = `MODFLOW Layer ${activeTopLayer + 1}`;
     planViewModelEl.textContent = `${modflowTopViewData.source.solver} ${modflowTopViewData.source.state} result`;
-    planViewDetailsEl.textContent = `${modflowTopViewData.grid.cells.length} ${gridType} cells rendered from FloPy head, contour, well, stream, and specific-discharge output for ${layer.name}. ${config ? `${config.grid.rows} × ${config.grid.columns} setup, ${config.boundary.direction.replaceAll("-", " ")} boundary.` : ""}`;
+    planViewDetailsEl.textContent = `${modflowTopViewData.grid.cells.length} ${gridType} cells rendered from FloPy head, contour, well, river, and specific-discharge output for ${layer.name}. ${config ? `${config.grid.rows} × ${config.grid.columns} setup, ${config.boundary.direction.replaceAll("-", " ")} boundary.` : ""}`;
     sectionViewEl.setAttribute(
       "aria-label",
       `${region.type} MODFLOW plan view`,
     );
+    revealPanel();
+    menuPanelEl.scrollTop = 0;
   });
 }
 
@@ -599,32 +632,18 @@ function addWellPicker(wells) {
 
 async function loadScene() {
   try {
-    const response = await fetch(
+    const data = await fetchFirstJson([
+      "/api/simulation/demo-scene",
+      "http://localhost:8000/simulation/demo-scene",
       `/generated/demo_groundwater_scene.json?v=${Date.now()}`,
-      {
-        cache: "no-store",
-      },
-    );
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-
-    const data = await response.json();
+    ]);
     sceneData = data;
     try {
-      const topViewResponse = await fetch(
+      modflowTopViewData = await fetchFirstJson([
+        "/api/simulation/top-view/base",
+        "http://localhost:8000/simulation/top-view/base",
         `/generated/modflow_topview.json?v=${Date.now()}`,
-        {
-          cache: "no-store",
-        },
-      );
-      if (topViewResponse.ok) {
-        modflowTopViewData = await topViewResponse.json();
-      } else {
-        console.warn(
-          `MODFLOW plan-view data returned HTTP ${topViewResponse.status}`,
-        );
-      }
+      ]);
     } catch (topViewError) {
       console.warn(
         "MODFLOW plan-view data could not be loaded",
@@ -764,6 +783,7 @@ for (const radio of scenarioRechargeZoneRadios) {
     if (!radio.checked) return;
     scenarioInputs.rechargeZone.value = radio.value;
     syncAquiferSetupChoiceCards();
+    drawSectionView();
   });
 }
 for (const radio of scenarioLeakageDirectionRadios) {
@@ -794,8 +814,15 @@ scenarioInputs.riverElevation.addEventListener(
 );
 scenarioInputs.rechargeRate.addEventListener(
   "input",
-  updateAquiferSetupReadouts,
+  () => {
+    updateAquiferSetupReadouts();
+    drawSectionView();
+  },
 );
+scenarioInputs.rechargeEnabled.addEventListener("change", () => {
+  updateAquiferSetupReadouts();
+  drawSectionView();
+});
 document
   .querySelector("#sensor-specs-close")
   .addEventListener("click", hideSensorSpecs);

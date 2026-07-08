@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
 import revealStyles from "./ScrollReveal.module.css";
 import styles from "./WeatherPreviewSection.module.css";
@@ -28,12 +29,33 @@ export function WeatherPreviewSection() {
       <div className={styles["radial-accent"]} aria-hidden="true" />
       <div className={styles["radial-accent-bottom"]} aria-hidden="true" />
 
-      <Link className={styles["weather-heading"]} href="/forecast" aria-label="Open real-time weather forecast page">
-        <span>Real-time</span>
-        <strong>Weather Forecast</strong>
-      </Link>
-
       <div className={styles["weather-preview-content"]}>
+        <div className={styles["weather-description"]}>
+          <Link
+            className={styles["weather-heading"]}
+            href="/forecast"
+            aria-label="Open real-time weather forecast page"
+          >
+            <span>Real-time</span>
+            <strong>Weather Forecast</strong>
+          </Link>
+          <p>
+            AQUASMART pulls live rainfall, temperature, and evapotranspiration
+            data throughout the day and turns it into an irrigation-ready
+            forecast, so you know not just whether it will rain, but whether
+            your field actually needs water.
+          </p>
+          <p>
+            Each forecast is paired with your field&apos;s own salinity and pH
+            readings, so recommendations reflect real conditions on the ground,
+            not just the sky above it.
+          </p>
+          <Link className={styles["forecast-cta"]} href="/forecast">
+            <span>View full forecast</span>
+            <ArrowRight size={25} strokeWidth={2.8} aria-hidden="true" />
+          </Link>
+        </div>
+
         <Link className={styles["forecast-preview-card"]} href="/forecast" aria-label="Open forecast page">
           {previewImages.map((image, index) => (
             <Image
@@ -42,33 +64,11 @@ export function WeatherPreviewSection() {
               fill
               key={image.src}
               priority={index === 0}
-              sizes="(max-width: 900px) 100vw, 54vw"
+              sizes="(max-width: 900px) 100vw, 45vw"
               src={image.src}
             />
           ))}
         </Link>
-
-        <div className={styles["weather-description"]}>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-            tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim  
-            veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea  
-            commodo consequat. Duis aute irure dolor in reprehenderit in voluptate  
-            velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint  occaecat 
-            cupidatat non proident, sunt in culpa qui officia deserunt  mollit anim id 
-            est laborum Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-            tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim  
-            veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea  
-            commodo consequat. 
-  
-          </p>
-          <p>
-            Open the full weather page to compare sunny, light-rain, and
-            heavy-rain scenarios, review the weekly forecast card, and see
-            irrigation guidance based on rainfall, salinity, and pH readings.
-          </p>
-        </div>
       </div>
     </section>
   );

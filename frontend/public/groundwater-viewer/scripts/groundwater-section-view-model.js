@@ -71,6 +71,7 @@ function drawSectionView() {
   );
   const discharge01 =
     sectionDischarge / Number(sectionDischargeInput.max);
+  const rechargeFactor = rechargeDrawdownFactor();
   const wellX = activeSectionWell.x_m;
   const aquiferBands = getAquiferBandsAtWell(
     activeSectionWell,
@@ -87,7 +88,8 @@ function drawSectionView() {
       soilProfile,
       influenceRadius:
         (4500 + discharge01 * 12000) * soilProfile.influence,
-      maxDrawdown: discharge01 * 130 * soilProfile.depth,
+      maxDrawdown:
+        discharge01 * 130 * soilProfile.depth * rechargeFactor,
     };
   }
 

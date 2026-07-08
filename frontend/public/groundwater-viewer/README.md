@@ -29,11 +29,17 @@ The header and fullscreen iframe wrapper are outside this folder:
 
 ## Data And Assets
 
-- `../generated/demo_groundwater_scene.json`
-  - 3D/2D scene input data.
+- `/api/simulation/demo-scene`
+  - Primary same-origin route for 3D/2D scene input data.
+  - Proxies to FastAPI `/simulation/demo-scene`.
 
-- `../generated/modflow_topview.json`
-  - Base top-view MODFLOW/FloPy result data.
+- `/api/simulation/top-view/base`
+  - Primary same-origin route for base top-view MODFLOW/FloPy result data.
+  - Proxies to FastAPI `/simulation/top-view/base`.
+
+- `/generated/demo_groundwater_scene.json` and `/generated/modflow_topview.json`
+  - Static fallback data when the Python API is unavailable during local
+    prototyping.
 
 - `assets/`
   - Pipe screen, soil, and river images used by the viewer.

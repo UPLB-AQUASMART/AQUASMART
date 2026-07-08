@@ -85,6 +85,6 @@ export const planLegendItems = [
   ["head", "Hydraulic head: low to high"],
   ["contour", "Equal-head contour"],
   ["flow", "Groundwater flow"],
-  ["well", "MODFLOW MAW well"],
-  ["stream", "SFR stream cells"],
+  ["well", "MODFLOW well cells"],
+  ["stream", "River/stream cells"],
 ] as const;

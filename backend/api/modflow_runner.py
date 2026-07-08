@@ -21,8 +21,9 @@ SOIL_PROPERTIES = {
     "clay": {"k": 0.05, "k33": 0.005, "sy": 0.05},
 }
 
-LAYER_NAMES = ("Upper Aquifer", "Confining Layer", "Lower Aquifer")
+LAYER_NAMES = ("Upper Aquifer", "Middle Aquifer", "Lower Aquifer")
 STREAMBED_CONDUCTANCE_M2_DAY = 0.0001
+MAX_RECHARGE_DRAWDOWN_REDUCTION = 0.7
 
 
 class ModflowExecutionError(RuntimeError):
@@ -360,12 +361,24 @@ def _add_wells(model: Any, scenario: Any, nlay: int, nrow: int, ncol: int) -> No
     ]
     if not screened_layers:
         screened_layers = [min(int(scenario.layerIndex), nlay - 1)]
-    rate = -float(scenario.dischargeM3Day) / len(screened_layers)
+    effective_discharge = _effective_pumping_discharge(scenario)
+    rate = -effective_discharge / len(screened_layers)
     stress_period_data = [
         ((layer, row, col), rate)
         for layer in screened_layers
     ]
     flopy.mf6.ModflowGwfwel(model, stress_period_data=stress_period_data, pname="WEL")
+
+
+def _effective_pumping_discharge(scenario: Any) -> float:
+    return float(scenario.dischargeM3Day) * _recharge_drawdown_factor(scenario)
+
+
+def _recharge_drawdown_factor(scenario: Any) -> float:
+    if not scenario.recharge.enabled or scenario.recharge.rateMmDay <= 0:
+        return 1.0
+    normalized_recharge = min(1.0, max(0.0, float(scenario.recharge.rateMmDay) / 1000.0))
+    return 1.0 - normalized_recharge * MAX_RECHARGE_DRAWDOWN_REDUCTION
 
 
 def _well_row_col(scenario: Any, nrow: int, ncol: int) -> tuple[int, int]:
@@ -437,6 +450,11 @@ def _export_frontend_json(
             "solver": "MODFLOW 6",
             "processor": f"FloPy {flopy.__version__}",
             "state": "scenario steady state",
+            "gridPackage": "DIS",
+            "wellPackage": "WEL",
+            "riverPackage": "RIV",
+            "rechargeDrawdownFactor": round(_recharge_drawdown_factor(scenario), 4),
+            "effectivePumpingM3Day": round(_effective_pumping_discharge(scenario), 3),
         },
         "domain": {
             "xmin": 0.0,
@@ -506,7 +524,8 @@ def _well_summary(scenario: Any, nrow: int, ncol: int, delr: float, delc: float)
         "name": scenario.wellName,
         "x": round((col + 0.5) * delr, 2),
         "y": round((nrow - row - 0.5) * delc, 2),
-        "rate": round(-float(scenario.dischargeM3Day), 2),
+        "rate": round(-_effective_pumping_discharge(scenario), 2),
+        "requestedRate": round(-float(scenario.dischargeM3Day), 2),
         "connections": [
             {"layer": layer - 1, "cell": _cell_index(row, col, ncol)}
             for layer in scenario.screens

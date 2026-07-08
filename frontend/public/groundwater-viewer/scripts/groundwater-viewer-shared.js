@@ -191,6 +191,20 @@ const STREAMBED_THICKNESS_M = 1;
 const STREAMBED_CONDUCTANCE_M2_DAY =
   (STREAMBED_HYDRAULIC_CONDUCTIVITY_M_DAY * STREAMBED_CONTACT_AREA_M2) /
   STREAMBED_THICKNESS_M;
+const MAX_RECHARGE_DRAWDOWN_REDUCTION = 0.7;
+
+function rechargeDrawdownFactor({
+  enabled = scenarioInputs.rechargeEnabled?.checked,
+  rate = Number(scenarioInputs.rechargeRate?.value || 0),
+  maxRate = Number(scenarioInputs.rechargeRate?.max || 1000),
+} = {}) {
+  if (!enabled || rate <= 0 || maxRate <= 0) {
+    return 1;
+  }
+  const normalizedRecharge = Math.min(1, Math.max(0, rate / maxRate));
+  return 1 - normalizedRecharge * MAX_RECHARGE_DRAWDOWN_REDUCTION;
+}
+
 const aquiferLevelNames = {
   "Upper Aquifer": "Level 1",
   "Middle Aquifer": "Level 2",

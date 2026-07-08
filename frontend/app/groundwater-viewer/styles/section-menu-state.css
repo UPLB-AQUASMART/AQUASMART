@@ -12,6 +12,14 @@
   font-weight: 600;
 }
 
+.section-scope-note {
+  margin: -8px 0 14px;
+  color: #52647f;
+  font-size: 11px;
+  font-style: italic;
+  line-height: 1.35;
+}
+
 .metric-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

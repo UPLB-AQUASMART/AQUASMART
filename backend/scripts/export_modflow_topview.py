@@ -11,7 +11,7 @@ import flopy
 import numpy as np
 
 
-LAYER_NAMES = ("Upper Aquifer", "Confining Layer", "Lower Aquifer")
+LAYER_NAMES = ("Upper Aquifer", "Middle Aquifer", "Lower Aquifer")
 
 
 def parse_args() -> argparse.Namespace:

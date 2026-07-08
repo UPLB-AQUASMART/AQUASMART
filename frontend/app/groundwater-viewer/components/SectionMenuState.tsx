@@ -13,6 +13,9 @@ export function SectionMenuState() {
         </div>
       </header>
       <p className="section-panel-eyebrow">Latest water quality readings</p>
+      <p className="section-scope-note">
+        Conceptual section drawdown. Top view runs FloPy/MODFLOW after setup.
+      </p>
       <MetricGrid />
       <SectionControls />
       <AquiferSetupPanel />

@@ -5,7 +5,7 @@ export function PlanViewSummary() {
     <div className="plan-view-summary" id="plan-view-summary" hidden>
       <strong id="plan-view-model">MODFLOW 6 steady-state result</strong>
       <span id="plan-view-details">
-        FloPy processed DISV head and specific-discharge output.
+        FloPy processed head and specific-discharge output.
       </span>
       <p className="plan-scenario-status" id="plan-scenario-status">
         Scenario configuration active

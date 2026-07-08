@@ -3,6 +3,7 @@ import json
 import os
 import traceback
 from collections import OrderedDict
+from pathlib import Path
 from time import perf_counter
 from typing import Any
 
@@ -16,6 +17,8 @@ from .modflow_runner import ModflowExecutionError, modflow_diagnostics, run_top_
 
 load_dotenv()
 
+BACKEND_ROOT = Path(__file__).resolve().parents[1]
+GENERATED_DIR = BACKEND_ROOT / "generated"
 SIMULATION_CACHE_SIZE = int(os.getenv("SIMULATION_CACHE_SIZE", "32"))
 MAX_GRID_ROWS = int(os.getenv("MAX_GRID_ROWS", "50"))
 MAX_GRID_COLUMNS = int(os.getenv("MAX_GRID_COLUMNS", "50"))
@@ -66,6 +69,22 @@ def _set_cached_top_view(cache_key: str, result: dict[str, Any]) -> None:
     _top_view_cache.move_to_end(cache_key)
     while len(_top_view_cache) > SIMULATION_CACHE_SIZE:
         _top_view_cache.popitem(last=False)
+
+
+def _read_generated_json(file_name: str) -> dict[str, Any]:
+    generated_path = GENERATED_DIR / file_name
+    if not generated_path.is_file():
+        raise HTTPException(
+            status_code=404,
+            detail=f"Generated simulation file not found: {file_name}",
+        )
+    try:
+        return json.loads(generated_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as error:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Generated simulation file is not valid JSON: {file_name}",
+        ) from error
 
 
 class ScenarioGrid(BaseModel):
@@ -231,6 +250,18 @@ def simulation_modflow_health() -> dict[str, Any]:
         "status": "ok",
         "modflow": diagnostics,
     }
+
+
+@app.get("/simulation/demo-scene")
+def simulation_demo_scene() -> dict[str, Any]:
+    """Return the canonical conceptual 3D/section scene used by the viewer."""
+    return _read_generated_json("demo_groundwater_scene.json")
+
+
+@app.get("/simulation/top-view/base")
+def simulation_base_top_view() -> dict[str, Any]:
+    """Return the seed MODFLOW top-view data before a scenario run is requested."""
+    return _read_generated_json("modflow_topview.json")
 
 
 @app.post("/simulation/top-view")

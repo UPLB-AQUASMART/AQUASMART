@@ -194,6 +194,13 @@ function getTopViewScenario(
 ) {
   const dischargeRatio =
     dischargeValue / Math.max(1, Number(sectionDischargeInput.max));
+  const rechargeFactor = activeScenarioConfig?.recharge
+    ? rechargeDrawdownFactor({
+        enabled: activeScenarioConfig.recharge.enabled,
+        rate: activeScenarioConfig.recharge.rateMmDay,
+        maxRate: Number(scenarioInputs.rechargeRate?.max || 1000),
+      })
+    : rechargeDrawdownFactor();
   const screenLevel = activeTopLayer + 1;
   const soil = getSoilProfileForLevel(screenLevel);
   const screenActive = selectedScreenLevels.has(screenLevel);
@@ -208,14 +215,14 @@ function getTopViewScenario(
   const radius =
     Math.min(domainWidth, domainHeight) * (0.08 + 0.16 * soil.influence);
   const maximumDrawdown = screenActive
-    ? dischargeRatio * 9.5 * soil.depth
+    ? dischargeRatio * 9.5 * soil.depth * rechargeFactor
     : 0;
   const baselineFlowScale = Math.max(
     ...layer.qx.map((qx, index) => Math.hypot(qx, layer.qy[index])),
     1e-9,
   );
   const flowBoost = screenActive
-    ? dischargeRatio * baselineFlowScale * 1.15 * soil.depth
+    ? dischargeRatio * baselineFlowScale * 1.15 * soil.depth * rechargeFactor
     : 0;
   const adjustedHead = [];
   const adjustedQx = [];
@@ -246,6 +253,7 @@ function getTopViewScenario(
     wellX,
     wellY,
     radius,
+    rechargeFactor,
     maximumDrawdown,
     head: adjustedHead,
     qx: adjustedQx,
@@ -635,8 +643,10 @@ function drawTopView() {
   );
   sectionContext.font = "500 12px Inter, system-ui, sans-serif";
   sectionContext.fillStyle = "#52657d";
+  const gridType = data.grid.type || "MODFLOW";
+  const wellPackage = data.source?.wellPackage || "WEL";
   sectionContext.fillText(
-    `${data.source.solver} · ${data.grid.cells.length} DISV cells · ${data.wells.length} MAW wells`,
+    `${data.source.solver} · ${data.grid.cells.length} ${gridType} cells · ${data.wells.length} ${wellPackage} wells`,
     marginLeft,
     64,
   );
@@ -644,8 +654,9 @@ function drawTopView() {
   const screenState = scenario.screenActive
     ? "screen active"
     : "screen inactive";
+  const rechargeReduction = Math.round((1 - scenario.rechargeFactor) * 100);
   planScenarioStatusEl.textContent = scenario.screenActive
-    ? `${scenario.soil.label} · ${Math.round(scenario.discharge).toLocaleString()} m³/day · Level ${scenario.screenLevel} ${screenState} · estimated maximum drawdown ${scenario.maximumDrawdown.toFixed(1)} m`
+    ? `${scenario.soil.label} · ${Math.round(scenario.discharge).toLocaleString()} m³/day · Level ${scenario.screenLevel} ${screenState} · recharge reduces drawdown ${rechargeReduction}% · estimated maximum drawdown ${scenario.maximumDrawdown.toFixed(1)} m`
     : `${scenario.soil.label} · Level ${scenario.screenLevel} ${screenState} · showing the unadjusted MODFLOW result`;
   planSoilReadoutEl.textContent = scenario.soil.label;
   const screenLabels = [...selectedScreenLevels]

@@ -1,4 +1,4 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
 const DEFAULT_API_ORIGIN = "http://127.0.0.1:8000";
 
@@ -15,22 +15,16 @@ function getApiOrigins() {
   return Array.from(new Set(origins));
 }
 
-export async function POST(request: NextRequest) {
-  const scenario = await request.json();
+export async function GET() {
   let lastError = "Unable to reach the AQUASMART Python API.";
 
   for (const apiOrigin of getApiOrigins()) {
     try {
-      const response = await fetch(`${apiOrigin}/simulation/top-view`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(scenario),
+      const response = await fetch(`${apiOrigin}/simulation/top-view/base`, {
         cache: "no-store",
       });
-
       const payload = await response.json();
+
       if (response.ok || response.status !== 404) {
         return NextResponse.json(payload, {
           status: response.status,
