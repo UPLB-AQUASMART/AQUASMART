@@ -16,10 +16,10 @@
   border-radius: 100px;
   background: #dff6fd;
   color: #1fa3c9;
-  font-size: clamp(8px, 1.7vw, 14px);
+  font-size: var(--section-pill-font-size);
   font-weight: 700;
   line-height: 1;
-  padding: 16px 24px;
+  padding: var(--section-pill-padding);
 }
 
 .section-copy {
@@ -38,9 +38,9 @@
   align-items: center;
   margin: 0;
   font-family: "Sora", "Inter", sans-serif;
-  font-size: clamp(36px, 5vw, 56px);
+  font-size: var(--section-title-size);
   font-weight: 700;
-  letter-spacing: -0.04em;
+  letter-spacing: var(--section-title-letter-spacing);
   line-height: 1;
 }
 
@@ -53,7 +53,7 @@
   max-width: 1111px;
   margin: 0;
   color: #857f7f;
-  font-size: clamp(12px, 1.8vw, 17px);
+  font-size: var(--section-description-size);
   font-weight: 500;
   line-height: 1.6;
 }
@@ -293,16 +293,16 @@
 
 @media (max-width: 720px) {
   .section-pill {
-    padding: 16px 32px;
-    font-size: 18px;
+    padding: var(--section-pill-mobile-padding);
+    font-size: var(--section-pill-mobile-font-size);
   }
 
   .section-copy h2 {
-    font-size: clamp(38px, 12vw, 52px);
+    font-size: var(--section-title-mobile-size);
   }
 
   .section-copy p {
-    font-size: 16px;
+    font-size: var(--section-description-mobile-size);
   }
 
   .deck {

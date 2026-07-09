@@ -85,11 +85,11 @@
   border-radius: 50px;
   background: #dff5fb;
   color: #147d9c;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.14em;
+  font-size: var(--section-pill-font-size);
+  font-weight: 700;
+  letter-spacing: 0;
   line-height: 1;
-  padding: 10px 14px;
+  padding: var(--section-pill-padding);
   text-transform: uppercase;
 }
 
@@ -98,10 +98,10 @@
   margin: 25px 0 20px;
   color: var(--navy);
   font-family: "Sora", sans-serif;
-  font-size: clamp(54px, 6vw, 82px);
-  font-weight: 800;
-  letter-spacing: 0;
-  line-height: 1.02;
+  font-size: var(--section-title-size);
+  font-weight: 700;
+  letter-spacing: var(--section-title-letter-spacing);
+  line-height: 1;
 }
 
 .heroCopy h1 span {
@@ -331,11 +331,11 @@
   border-radius: 999px;
   background: rgba(31, 163, 201, 0.12);
   color: #147d9c;
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: 0.08em;
+  font-size: var(--section-pill-font-size);
+  font-weight: 700;
+  letter-spacing: 0;
   line-height: 1;
-  padding: 9px 14px;
+  padding: var(--section-pill-padding);
   text-transform: uppercase;
 }
 
@@ -417,7 +417,7 @@
   }
 
   .heroCopy h1 {
-    font-size: clamp(42px, 12vw, 58px);
+    font-size: var(--section-title-mobile-size);
   }
 
   .heroCopy p {
@@ -465,7 +465,7 @@
   .badge,
   .visualLabel,
   .visualCaption {
-    font-size: 9px;
+    font-size: var(--section-pill-font-size);
   }
 
   .visualLabel,

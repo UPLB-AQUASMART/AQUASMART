@@ -51,9 +51,10 @@
   margin: 0 0 32px;
   color: #0f1d2e;
   font-family: "Sora", sans-serif;
-  font-size: clamp(32px, 3.6vw, 46px);
-  font-weight: 800;
-  line-height: 1.1;
+  font-size: var(--section-title-size);
+  font-weight: 700;
+  letter-spacing: var(--section-title-letter-spacing);
+  line-height: 1;
 }
 
 .accent {

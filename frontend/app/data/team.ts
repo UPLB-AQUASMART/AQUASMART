@@ -22,13 +22,15 @@ export const coreTeam: TeamMember[] = [
   {
     name: "Daphne Canape",
     focus: "Designer & Developer",
+    image: "/assets/team/team-canape.png",
     bio: "Daphne Canape is an undergraduate Computer Science student at the University of the Philippines Los Baños, with a growing focus on bridging the gap between intuitive web experiences and data-driven insights. Her recent academic projects have centered on full-stack web development and UI/UX design, utilizing frameworks like React to build user-centric applications. Complementing her technical foundation, she has expanded her expertise into data science and predictive modeling using Python. Daphne is eager to apply her technical skills to solve real-world problems, with a specific interest in leveraging data to provide actionable insights that create meaningful business and social impact.",
     tags: ["Design", "Development"],
   },
   {
     name: "Quevin James A. Custodio",
     focus: "Model Developer",
-    bio: "Assists with model development, data organization, and technical support for AQUASMART research and simulation workflows.",
+    image: "/assets/team/team-custodio.png",
+    bio: "Quevin James Custodio is a BS Computer Science student at the University of the Philippines Los Baños with a strong passion for software engineering and full-stack web development. He has a solid foundation in modern technologies, particularly in web development, data science, system design, and intuitive digital solutions. As a full-stack developer, he is skilled in frontend and backend development, deployment, API integration, and visual data representation. His recent work focuses on building web-based systems that integrate live simulations, model rendering, and interactive visualizations to improve data understanding and analysis.",
     tags: ["Modeling", "Data"],
   },
 ];

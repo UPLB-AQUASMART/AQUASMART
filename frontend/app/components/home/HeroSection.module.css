@@ -46,10 +46,10 @@
   margin: 0;
   color: #0b1f3a;
   font-family: "Sora", sans-serif;
-  font-size: clamp(72px, 5.25vw, 90px);
-  font-weight: 800;
-  line-height: 1.02;
-  letter-spacing: -0.045em;
+  font-size: var(--section-title-size);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: var(--section-title-letter-spacing);
 }
 
 .hero-copy h1 span {
@@ -65,13 +65,13 @@
   width: min(760px, 42vw);
   margin: 0;
   color: var(--muted);
-  font-size: clamp(20px, 1.2vw, 24px);
+  font-size: var(--section-description-size);
   line-height: 1.55;
 }
 
 @media (max-width: 1100px) {
   .hero-copy h1 {
-    font-size: 54px;
+    font-size: var(--section-title-size);
   }
 }
 
@@ -83,12 +83,12 @@
 
   .hero-copy h1 {
     width: 100%;
-    font-size: 39px;
+    font-size: var(--section-title-mobile-size);
   }
 
   .hero-copy p {
     width: 100%;
-    font-size: 18px;
+    font-size: var(--section-description-mobile-size);
     line-height: 1.55;
   }
 }
@@ -135,8 +135,8 @@
   }
 
   .hero-copy h1 {
-    font-size: clamp(42px, 11vw, 72px);
-    line-height: 1.04;
+    font-size: var(--section-title-mobile-size);
+    line-height: 1;
   }
 
   .hero-copy p {
@@ -156,7 +156,7 @@
   }
 
   .hero-copy h1 {
-    font-size: clamp(38px, 12vw, 52px);
+    font-size: var(--section-title-mobile-size);
   }
 
   .hero-copy p {
@@ -189,8 +189,8 @@
   }
 
   .hero-copy h1 {
-    font-size: clamp(34px, 11vw, 48px);
-    line-height: 1.05;
+    font-size: var(--section-title-mobile-size);
+    line-height: 1;
   }
 
   .hero-copy p {

@@ -116,7 +116,7 @@
   display: inline-block;
   margin-bottom: clamp(14px, 1.5vw, 24px);
   color: #0b0b0b;
-  font-size: clamp(17px, 1.35vw, 24px);
+  font-size: var(--section-description-size);
   font-weight: 700;
   letter-spacing: 0.02em;
 }
@@ -125,17 +125,17 @@
   margin: 0 0 clamp(32px, 3.6vw, 64px);
   color: #0b0b0b;
   font-family: "Sora", sans-serif;
-  font-size: clamp(72px, 6.7vw, 120px);
-  font-weight: 800;
-  letter-spacing: -0.04em;
-  line-height: 1.08;
+  font-size: var(--section-title-size);
+  font-weight: 700;
+  letter-spacing: var(--section-title-letter-spacing);
+  line-height: 1;
 }
 
 .left p {
   max-width: 50ch;
   margin: 0;
   color: #82837f;
-  font-size: clamp(15px, 0.95vw, 18px);
+  font-size: var(--section-description-size);
   line-height: 1.7;
 }
 
