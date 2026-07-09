@@ -706,6 +706,12 @@ function openSectionView(well) {
       soilType,
     ]),
   );
+  soilHydraulicByLevel = new Map(
+    Object.entries(defaultSoilByLevel).map(([level, soilType]) => [
+      Number(level),
+      { ...getHydraulicDefaultsForSoil(soilType) },
+    ]),
+  );
   activeSoilLevel = 1;
   selectedSoilType = getSoilTypeForLevel(activeSoilLevel);
   soilTypeSelect.value = selectedSoilType;

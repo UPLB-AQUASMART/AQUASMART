@@ -15,14 +15,19 @@ const glassBlurStyle = {
 
 const simulationOptions = [
   { label: "Groundwater Simulation", href: "/simulation/groundwater" },
+  { label: "Irrigation Schedule", href: "/simulation/irrigation-schedule" },
   { label: "Spatial Drawdown Map", href: "/simulation" },
 ];
 
 export function SiteNav({ activeLabel = "Home" }: { activeLabel?: string }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSimulationOpen, setIsSimulationOpen] = useState(false);
   const pathname = usePathname();
   const isHomePage = pathname === "/";
-  const closeMenu = () => setIsMenuOpen(false);
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+    setIsSimulationOpen(false);
+  };
 
   const renderSimulationDropdown = (variant: "desktop" | "mobile") => {
     const simulationItem = navItems.find((item) => item.label === "Simulation");
@@ -63,10 +68,18 @@ export function SiteNav({ activeLabel = "Home" }: { activeLabel?: string }) {
 
     return (
       <div
-        className={`${styles["simulation-nav-item"]} ${styles[`${variant}-simulation-nav-item`]}`}
+        className={[
+          styles["simulation-nav-item"],
+          styles[`${variant}-simulation-nav-item`],
+          variant === "mobile" && isSimulationOpen
+            ? styles["simulation-open"]
+            : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
         key="Simulation"
       >
-        {isHomePage ? (
+        {variant === "desktop" && isHomePage ? (
           <Link
             className={triggerClassName}
             href={simulationItem.href}
@@ -79,6 +92,12 @@ export function SiteNav({ activeLabel = "Home" }: { activeLabel?: string }) {
             className={triggerClassName}
             type="button"
             aria-haspopup="true"
+            aria-expanded={variant === "mobile" ? isSimulationOpen : undefined}
+            onClick={
+              variant === "mobile"
+                ? () => setIsSimulationOpen((open) => !open)
+                : undefined
+            }
           >
             {simulationItem.label}
           </button>
@@ -111,7 +130,15 @@ export function SiteNav({ activeLabel = "Home" }: { activeLabel?: string }) {
         }
         aria-controls="home-mobile-menu"
         aria-expanded={isMenuOpen}
-        onClick={() => setIsMenuOpen((open) => !open)}
+        onClick={() =>
+          setIsMenuOpen((open) => {
+            const nextOpen = !open;
+            if (!nextOpen) {
+              setIsSimulationOpen(false);
+            }
+            return nextOpen;
+          })
+        }
       >
         <span>Menu</span>
         {isMenuOpen ? (

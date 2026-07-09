@@ -1,0 +1,139 @@
+.exports {
+  display: grid;
+  gap: 12px;
+  border: 1px solid #dcebf9;
+  border-radius: clamp(18px, 1.6vw, 24px);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 16px 38px rgba(25, 118, 210, 0.08);
+  padding: clamp(14px, 1.4vw, 20px);
+}
+
+.copy {
+  display: flex;
+  min-width: 0;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.icon {
+  display: inline-flex;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #d7eaff;
+  border-radius: 12px;
+  background: #f4fbff;
+  color: #1688e5;
+}
+
+.copy h2 {
+  margin: 0;
+  color: #071f78;
+  font-size: clamp(18px, 1.55vw, 26px);
+  line-height: 1.08;
+}
+
+.copy p,
+.disclaimer {
+  margin: 6px 0 0;
+  color: #5167a6;
+  font-size: clamp(12px, 0.92vw, 14px);
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.actions button {
+  display: inline-flex;
+  min-height: 42px;
+  flex: 1 1 132px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid #cfe3fb;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #071f78;
+  cursor: pointer;
+  font: inherit;
+  font-size: clamp(13px, 0.95vw, 15px);
+  font-weight: 800;
+  letter-spacing: 0;
+  padding: 0 14px;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease,
+    opacity 160ms ease;
+}
+
+.actions button:first-child {
+  background: linear-gradient(180deg, #1d97f3 0%, #0875dc 100%);
+  border-color: #0875dc;
+  color: #ffffff;
+}
+
+.actions button:hover:not(:disabled),
+.actions button:focus-visible:not(:disabled) {
+  border-color: #1788e9;
+  color: #0781df;
+  transform: translateY(-1px);
+}
+
+.actions button:first-child:hover:not(:disabled),
+.actions button:first-child:focus-visible:not(:disabled) {
+  color: #ffffff;
+}
+
+.actions button:focus-visible {
+  outline: 3px solid rgba(24, 136, 229, 0.2);
+  outline-offset: 2px;
+}
+
+.actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  transform: none;
+}
+
+.disclaimer {
+  margin-top: 0;
+  border-top: 1px solid #e6f0fb;
+  padding-top: 10px;
+}
+
+@media (max-width: 640px) {
+  .exports {
+    border-radius: 16px;
+    padding: 12px;
+  }
+
+  .copy {
+    gap: 10px;
+  }
+
+  .icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+  }
+
+  .actions {
+    gap: 8px;
+  }
+
+  .actions button {
+    min-height: 40px;
+    flex-basis: calc(50% - 4px);
+    border-radius: 10px;
+    padding: 0 10px;
+  }
+}

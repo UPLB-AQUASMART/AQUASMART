@@ -192,6 +192,9 @@ function getTopViewScenario(
   layer,
   dischargeValue = sectionDischarge,
 ) {
+  const isSolvedModflowScenario =
+    Boolean(data.scenario) ||
+    data.source?.state === "scenario steady state";
   const dischargeRatio =
     dischargeValue / Math.max(1, Number(sectionDischargeInput.max));
   const rechargeFactor = activeScenarioConfig?.recharge
@@ -214,6 +217,28 @@ function getTopViewScenario(
     (activeSectionWell.y_m / sceneData.domain.ly_m) * domainHeight;
   const radius =
     Math.min(domainWidth, domainHeight) * (0.08 + 0.16 * soil.influence);
+  if (isSolvedModflowScenario) {
+    const drawdown = Array.isArray(layer.drawdown) ? layer.drawdown : [];
+    return {
+      soil,
+      discharge: data.scenario?.dischargeM3Day ?? dischargeValue,
+      dischargeRatio,
+      screenLevel,
+      screenActive,
+      wellX: data.wells?.[0]?.x ?? wellX,
+      wellY: data.wells?.[0]?.y ?? wellY,
+      radius,
+      rechargeFactor: data.source?.rechargeDrawdownFactor ?? rechargeFactor,
+      maximumDrawdown:
+        drawdown.length > 0
+          ? Math.max(...drawdown.map((value) => Number(value) || 0))
+          : 0,
+      head: layer.head,
+      qx: layer.qx,
+      qy: layer.qy,
+      usesSolvedHeads: true,
+    };
+  }
   const maximumDrawdown = screenActive
     ? dischargeRatio * 9.5 * soil.depth * rechargeFactor
     : 0;
@@ -258,6 +283,7 @@ function getTopViewScenario(
     head: adjustedHead,
     qx: adjustedQx,
     qy: adjustedQy,
+    usesSolvedHeads: false,
   };
 }
 
@@ -655,8 +681,11 @@ function drawTopView() {
     ? "screen active"
     : "screen inactive";
   const rechargeReduction = Math.round((1 - scenario.rechargeFactor) * 100);
+  const drawdownSourceLabel = scenario.usesSolvedHeads
+    ? "MODFLOW maximum drawdown"
+    : "estimated maximum drawdown";
   planScenarioStatusEl.textContent = scenario.screenActive
-    ? `${scenario.soil.label} · ${Math.round(scenario.discharge).toLocaleString()} m³/day · Level ${scenario.screenLevel} ${screenState} · recharge reduces drawdown ${rechargeReduction}% · estimated maximum drawdown ${scenario.maximumDrawdown.toFixed(1)} m`
+    ? `${scenario.soil.label} · ${Math.round(scenario.discharge).toLocaleString()} m³/day · Level ${scenario.screenLevel} ${screenState} · recharge reduces drawdown ${rechargeReduction}% · ${drawdownSourceLabel} ${scenario.maximumDrawdown.toFixed(1)} m`
     : `${scenario.soil.label} · Level ${scenario.screenLevel} ${screenState} · showing the unadjusted MODFLOW result`;
   planSoilReadoutEl.textContent = scenario.soil.label;
   const screenLabels = [...selectedScreenLevels]

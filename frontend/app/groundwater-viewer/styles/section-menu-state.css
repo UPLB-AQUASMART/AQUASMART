@@ -222,10 +222,52 @@
 }
 
 .soil-description {
-  margin-top: 14px;
+  margin-top: 10px;
   color: #0b1f3a;
   font-size: 9px;
   line-height: 1.2;
+}
+
+.soil-hydraulic-grid {
+  display: grid;
+  margin-top: 9px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.soil-hydraulic-grid label {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+  color: #52647f;
+  font-size: 8px;
+  font-weight: 700;
+}
+
+.soil-hydraulic-grid input {
+  width: 100%;
+  min-width: 0;
+  height: 24px;
+  border: 1px solid #b8dbe5;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #0b1f3a;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 5px;
+}
+
+.soil-hydraulic-grid small {
+  color: #1fa3c9;
+  font-size: 7px;
+  font-weight: 600;
+}
+
+.soil-hydraulic-note {
+  margin: 6px 0 0;
+  color: #52647f;
+  font-size: 8px;
+  line-height: 1.25;
 }
 
 .pipe-screen-preview {

@@ -296,8 +296,9 @@ def _hydraulic_conductivity(scenario: Any, nlay: int) -> tuple[np.ndarray, np.nd
     for layer in range(nlay):
         soil_name = scenario.soilsByLevel.get(str(layer + 1), "loam")
         props = SOIL_PROPERTIES.get(soil_name, SOIL_PROPERTIES["loam"])
-        hk[layer] = props["k"]
-        vk[layer] = props["k33"]
+        custom_props = _custom_hydraulic_properties(scenario, layer)
+        hk[layer] = custom_props.get("k", props["k"])
+        vk[layer] = custom_props.get("k33", props["k33"])
     return hk, vk
 
 
@@ -305,8 +306,26 @@ def _specific_yield(scenario: Any, nlay: int) -> np.ndarray:
     sy = np.zeros(nlay, dtype=float)
     for layer in range(nlay):
         soil_name = scenario.soilsByLevel.get(str(layer + 1), "loam")
-        sy[layer] = SOIL_PROPERTIES.get(soil_name, SOIL_PROPERTIES["loam"])["sy"]
+        props = SOIL_PROPERTIES.get(soil_name, SOIL_PROPERTIES["loam"])
+        custom_props = _custom_hydraulic_properties(scenario, layer)
+        sy[layer] = custom_props.get("sy", props["sy"])
     return sy
+
+
+def _custom_hydraulic_properties(scenario: Any, layer: int) -> dict[str, float]:
+    hydraulic_by_level = getattr(scenario, "hydraulicByLevel", None) or {}
+    custom = hydraulic_by_level.get(str(layer + 1))
+    if custom is None:
+        return {}
+    if hasattr(custom, "model_dump"):
+        return custom.model_dump()
+    if isinstance(custom, dict):
+        return custom
+    return {
+        key: getattr(custom, key)
+        for key in ("k", "k33", "sy")
+        if hasattr(custom, key)
+    }
 
 
 def _add_constant_head_boundaries(model: Any, scenario: Any, nlay: int, nrow: int, ncol: int) -> None:

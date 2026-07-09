@@ -6,6 +6,7 @@ import {
   Droplet,
   Eye,
   LogOut,
+  Map as MapIcon,
   Pencil,
   Plus,
   RefreshCw,
@@ -26,13 +27,14 @@ import {
   PointElement,
   Tooltip,
 } from "chart.js";
-import Link from "next/link";
 import {
+  useEffect,
   useMemo,
   useRef,
   useState,
   type PointerEvent as ReactPointerEvent,
 } from "react";
+import "leaflet/dist/leaflet.css";
 import { Doughnut, Line } from "react-chartjs-2";
 import { SiteNav } from "@/app/components/home/SiteNav";
 import styles from "./page.module.css";
@@ -67,24 +69,6 @@ ChartJS.register(
   PointElement,
   Tooltip,
 );
-
-const navLinks = [
-  { label: "Home", href: "/home" },
-  { label: "About", href: "/about" },
-  { label: "Simulation", href: "/simulations", active: true },
-  { label: "Weather", href: "/weather" },
-  { label: "Team", href: "/team" },
-  { label: "Contact", href: "/contact" },
-  { label: "Sponsors", href: "/partners" },
-  { label: "Modules", href: "/partners" },
-];
-
-const researchCards = [
-  "/figma/groundwater-thumb-1.png",
-  "/figma/groundwater-thumb-2.png",
-  "/figma/groundwater-thumb-3.png",
-  "/figma/groundwater-thumb-4.png",
-];
 
 const safeYield = 1000;
 const maxWells = 7;
@@ -140,10 +124,13 @@ function extractPdfCells(pdfText: string) {
 
 export default function GroundwaterSimulationPage() {
   const [simulationOpen, setSimulationOpen] = useState(false);
+  const [mapOpen, setMapOpen] = useState(false);
   const [wells, setWells] = useState<Well[]>([initialWell()]);
   const [selectedWellId, setSelectedWellId] = useState<number | null>(null);
   const [importMessage, setImportMessage] = useState("");
   const [draggingWellId, setDraggingWellId] = useState<number | null>(null);
+  const leafletContainerRef = useRef<HTMLDivElement | null>(null);
+  const leafletMapRef = useRef<import("leaflet").Map | null>(null);
   const dragMoved = useRef(false);
   const scenarioCardRef = useRef<HTMLElement | null>(null);
 
@@ -280,6 +267,85 @@ export default function GroundwaterSimulationPage() {
     [averages.temperature],
   );
 
+  useEffect(() => {
+    if (!simulationOpen || !mapOpen || !leafletContainerRef.current) return;
+
+    let cancelled = false;
+
+    async function mountLeafletMap() {
+      const L = await import("leaflet");
+      if (cancelled || !leafletContainerRef.current || leafletMapRef.current) {
+        return;
+      }
+
+      const map = L.map(leafletContainerRef.current, {
+        center: [14.166, 121.243],
+        zoom: 14,
+        minZoom: 12,
+        maxZoom: 18,
+        zoomControl: false,
+        attributionControl: false,
+        scrollWheelZoom: true,
+      });
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: "&copy; OpenStreetMap contributors",
+      }).addTo(map);
+
+      L.control
+        .zoom({
+          position: "topright",
+        })
+        .addTo(map);
+
+      L.control
+        .attribution({
+          position: "bottomleft",
+          prefix: false,
+        })
+        .addAttribution("&copy; OpenStreetMap contributors")
+        .addTo(map);
+
+      const wellIcon = L.divIcon({
+        className: styles.leafletWellPin,
+        html: "<span></span>",
+        iconSize: [18, 18],
+        iconAnchor: [9, 9],
+      });
+
+      L.marker([14.166, 121.243], {
+        icon: wellIcon,
+        title: "AQUASMART groundwater well",
+      }).addTo(map);
+
+      L.circle([14.166, 121.243], {
+        radius: 420,
+        color: "#1f9d67",
+        weight: 1.5,
+        fillColor: "#68b96b",
+        fillOpacity: 0.18,
+      }).addTo(map);
+
+      leafletMapRef.current = map;
+      window.setTimeout(() => map.invalidateSize(), 80);
+    }
+
+    mountLeafletMap();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [mapOpen, simulationOpen]);
+
+  useEffect(() => {
+    if (!mapOpen) return;
+    const frame = window.requestAnimationFrame(() => {
+      leafletMapRef.current?.invalidateSize();
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [mapOpen]);
+
   function addWell() {
     if (wells.length >= maxWells) return;
     const id = Math.max(0, ...wells.map((well) => well.id)) + 1;
@@ -337,6 +403,7 @@ export default function GroundwaterSimulationPage() {
   function exitSimulation() {
     setSelectedWellId(null);
     setDraggingWellId(null);
+    setMapOpen(false);
     setSimulationOpen(false);
   }
 
@@ -558,13 +625,20 @@ export default function GroundwaterSimulationPage() {
   return (
     <main className={styles.page}>
       <div
-        className={`${styles.mapStage} ${simulationOpen ? styles.simulating : ""}`}
+        className={`${styles.mapStage} ${simulationOpen ? styles.simulating : ""} ${mapOpen ? styles.mapViewOpen : ""}`}
       >
         <img
           className={styles.map}
           src="/figma/groundwater-map-expanded.png"
           alt="Groundwater simulation field map"
         />
+        {simulationOpen && (
+          <div
+            ref={leafletContainerRef}
+            className={styles.leafletMap}
+            aria-hidden={!mapOpen}
+          />
+        )}
         <SiteNav activeLabel="Simulation" />
         <div className={styles.navClearance} aria-hidden="true" />
 
@@ -661,6 +735,16 @@ export default function GroundwaterSimulationPage() {
                   aria-label="Exit simulation"
                 >
                   <LogOut size={20} />
+                </button>
+                <button
+                  className={styles.mapToggleButton}
+                  type="button"
+                  onClick={() => setMapOpen((current) => !current)}
+                  title={mapOpen ? "Show field view" : "Show map view"}
+                  aria-label={mapOpen ? "Show field view" : "Show map view"}
+                  aria-pressed={mapOpen}
+                >
+                  <MapIcon size={22} strokeWidth={2.4} />
                 </button>
                 <button
                   className={styles.addButton}

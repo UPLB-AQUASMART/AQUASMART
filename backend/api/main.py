@@ -159,6 +159,12 @@ class ScenarioWell(BaseModel):
     pumpingRate: float = Field(ge=0, le=100000)
 
 
+class ScenarioHydraulicProperties(BaseModel):
+    k: float = Field(gt=0, le=200)
+    k33: float = Field(gt=0, le=50)
+    sy: float = Field(ge=0.01, le=0.5)
+
+
 class TopViewScenarioRequest(BaseModel):
     layerIndex: int = Field(ge=0, le=2)
     layerName: str
@@ -170,6 +176,7 @@ class TopViewScenarioRequest(BaseModel):
     recharge: ScenarioRecharge
     screens: list[int]
     soilsByLevel: dict[str, str]
+    hydraulicByLevel: dict[str, ScenarioHydraulicProperties] = Field(default_factory=dict)
     dischargeM3Day: float = Field(ge=0, le=100000)
 
     @field_validator("screens")
@@ -189,6 +196,17 @@ class TopViewScenarioRequest(BaseModel):
             raise ValueError(f"soil values must be one of {sorted(allowed)}")
         return value
 
+    @field_validator("hydraulicByLevel")
+    @classmethod
+    def validate_hydraulic_levels(
+        cls,
+        value: dict[str, ScenarioHydraulicProperties],
+    ) -> dict[str, ScenarioHydraulicProperties]:
+        invalid = [level for level in value if level not in {"1", "2", "3"}]
+        if invalid:
+            raise ValueError("hydraulicByLevel keys must be levels 1 to 3")
+        return value
+
     @model_validator(mode="after")
     def validate_layer_references(self) -> "TopViewScenarioRequest":
         if self.layerIndex >= self.grid.layers:
@@ -196,6 +214,13 @@ class TopViewScenarioRequest(BaseModel):
         invalid_screens = [screen for screen in self.screens if screen > self.grid.layers]
         if invalid_screens:
             raise ValueError("screens cannot reference layers deeper than grid.layers")
+        invalid_hydraulic_levels = [
+            level
+            for level in self.hydraulicByLevel
+            if int(level) > self.grid.layers
+        ]
+        if invalid_hydraulic_levels:
+            raise ValueError("hydraulicByLevel cannot reference layers deeper than grid.layers")
         if self.well and abs(self.well.pumpingRate - self.dischargeM3Day) > 1e-6:
             raise ValueError("well.pumpingRate must match dischargeM3Day")
         return self
