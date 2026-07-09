@@ -159,8 +159,8 @@
 .mapStage.mapViewOpen::after {
   z-index: 1;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(42, 132, 78, 0.1)),
-    radial-gradient(circle at 50% 46%, rgba(255, 255, 255, 0.18), transparent 46%);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.18)),
+    radial-gradient(circle at 50% 48%, rgba(95, 181, 111, 0.1), transparent 46%);
 }
 
 .leafletMap {
@@ -183,8 +183,9 @@
 }
 
 .leafletMap :global(.leaflet-tile-pane) {
-  filter: grayscale(1) sepia(0.28) hue-rotate(62deg) saturate(1.2)
-    brightness(1.18) contrast(0.92);
+  opacity: 0.78;
+  filter: grayscale(1) sepia(0.32) hue-rotate(62deg) saturate(1.12)
+    brightness(1.24) contrast(0.88);
 }
 
 .leafletMap::before {
@@ -192,8 +193,8 @@
   z-index: 450;
   inset: 0;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.1)),
-    radial-gradient(circle at 52% 48%, rgba(255, 255, 255, 0.24), transparent 42%);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0.16)),
+    radial-gradient(circle at 52% 48%, rgba(255, 255, 255, 0.28), transparent 42%);
   content: "";
   mix-blend-mode: screen;
   pointer-events: none;
@@ -237,6 +238,98 @@
     0 8px 18px rgba(20, 73, 46, 0.25);
 }
 
+.knownPointMarker span {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: #2f8f63;
+  color: #fff;
+  font:
+    800 12px "Sora",
+    sans-serif;
+  box-shadow:
+    0 0 0 6px rgba(47, 143, 99, 0.18),
+    0 10px 18px rgba(20, 73, 46, 0.2);
+}
+
+.knownPointLabel {
+  border: 0;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 8px 18px rgba(20, 73, 46, 0.14);
+  color: #0b1f3a;
+  font-family: "Inter", sans-serif;
+}
+
+.knownPointLabel::before {
+  border-top-color: rgba(255, 255, 255, 0.92);
+}
+
+.knownPointLabel strong,
+.knownPointLabel span {
+  display: block;
+}
+
+.knownPointLabel strong {
+  color: #0b1f3a;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.knownPointLabel span {
+  color: #2f8f63;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.idwPopup :global(.leaflet-popup-content-wrapper) {
+  overflow: hidden;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 16px 34px rgba(11, 31, 58, 0.18);
+}
+
+.idwPopup :global(.leaflet-popup-content) {
+  min-width: 220px;
+  margin: 0;
+}
+
+.idwPopup :global(.leaflet-popup-tip) {
+  background: #fff;
+}
+
+.idwPopupBody {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 16px;
+  color: #0b1f3a;
+  font-family: "Inter", sans-serif;
+}
+
+.idwPopupBody strong {
+  color: #0b1f3a;
+  font:
+    800 13px "Sora",
+    sans-serif;
+}
+
+.idwPopupBody span {
+  color: #1fa3c9;
+  font:
+    800 18px "Sora",
+    sans-serif;
+}
+
+.idwPopupBody small {
+  color: #66758f;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
 .heroContent {
   position: relative;
   z-index: 1;
@@ -252,10 +345,126 @@
 .mapViewOpen .scenarioCard,
 .mapViewOpen .exitButton,
 .mapViewOpen .mapToggleButton,
+.mapViewOpen .mapBackButton,
+.mapViewOpen .mapModeHeader,
 .mapViewOpen .addButton,
 .mapViewOpen .wellAnchor,
 .mapViewOpen .wellPopover {
   pointer-events: auto;
+}
+
+.mapModeHeader {
+  position: absolute;
+  left: clamp(28px, 4.2vw, 60px);
+  top: clamp(116px, 9vw, 132px);
+  z-index: 30;
+  width: min(438px, calc(100vw - 56px));
+  color: #0b1f3a;
+  animation: fadeUp 360ms ease both;
+}
+
+.mapModeHeader h1 {
+  margin: 0 0 8px;
+  max-width: none;
+  color: #0b1f3a;
+  font-family: "Sora", sans-serif;
+  font-size: clamp(25px, 2.4vw, 32px);
+  font-weight: 800;
+  line-height: 1.2;
+  opacity: 1;
+}
+
+.mapStage.mapViewOpen .mapModeHeader h1 {
+  opacity: 1;
+}
+
+.parameterDropdown {
+  position: relative;
+  width: 100%;
+  padding: 10px;
+}
+
+.parameterPreview {
+  display: flex;
+  width: 100%;
+  min-height: 48px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 8px;
+  background: #f5fafc;
+  color: #857f7f;
+  cursor: pointer;
+  font:
+    400 17px "Inter",
+    sans-serif;
+  line-height: 1.2;
+  text-align: left;
+  transition:
+    background 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.parameterPreview span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.parameterPreview svg {
+  flex: 0 0 auto;
+  color: #857f7f;
+  transition: transform 180ms ease;
+}
+
+.parameterDropdown.open .parameterPreview {
+  background: #f0f8fb;
+  border-radius: 8px 8px 6px 6px;
+}
+
+.parameterDropdown.open .parameterPreview svg {
+  transform: rotate(180deg);
+}
+
+.parameterMenu {
+  position: absolute;
+  z-index: 2;
+  top: 58px;
+  right: 10px;
+  left: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  padding: 20px 16px 28px;
+  border-radius: 0 0 8px 8px;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 14px 30px rgba(11, 31, 58, 0.08);
+}
+
+.parameterMenu button {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: #857f7f;
+  cursor: pointer;
+  font:
+    400 17px "Inter",
+    sans-serif;
+  line-height: 1.2;
+  text-align: left;
+  transition:
+    color 140ms ease,
+    transform 140ms ease;
+}
+
+.parameterMenu button:hover,
+.parameterMenu button:focus-visible,
+.parameterMenu .selectedParameter {
+  color: #1fa3c9;
+  transform: translateX(2px);
 }
 
 .hero h1 {
@@ -385,6 +594,35 @@
     background 160ms ease,
     box-shadow 160ms ease,
     color 160ms ease;
+}
+
+.mapBackButton {
+  position: absolute;
+  top: clamp(116px, 9vw, 132px);
+  right: clamp(96px, 10vw, 140px);
+  z-index: 31;
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border: 1px solid rgba(47, 143, 99, 0.18);
+  border-radius: 50%;
+  background: rgba(245, 250, 252, 0.94);
+  color: #2f8f63;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(20, 73, 46, 0.16);
+  transition:
+    transform 160ms ease,
+    background 160ms ease,
+    box-shadow 160ms ease,
+    color 160ms ease;
+}
+
+.mapBackButton:hover {
+  background: #fff;
+  color: #1f7a4d;
+  box-shadow: 0 0 22px rgba(104, 185, 107, 0.4);
+  transform: translateY(-2px);
 }
 
 .mapToggleButton:hover,
@@ -1055,8 +1293,38 @@
     width: 44px;
     height: 44px;
   }
+  .mapBackButton {
+    top: 116px;
+    right: 20px;
+    width: 44px;
+    height: 44px;
+  }
+  .mapModeHeader {
+    left: 10px;
+    top: 106px;
+    width: min(380px, calc(100vw - 76px));
+  }
+  .mapModeHeader h1 {
+    margin-left: 10px;
+    font-size: 24px;
+  }
+  .parameterDropdown {
+    padding: 8px 10px;
+  }
+  .parameterPreview {
+    min-height: 44px;
+    font-size: 15px;
+  }
+  .parameterMenu {
+    top: 52px;
+    gap: 11px;
+    padding: 16px 16px 22px;
+  }
+  .parameterMenu button {
+    font-size: 15px;
+  }
   .leafletMap :global(.leaflet-control-zoom) {
-    margin-top: 84px;
+    margin-top: 98px;
     margin-right: 20px;
   }
   .scenarioCard {

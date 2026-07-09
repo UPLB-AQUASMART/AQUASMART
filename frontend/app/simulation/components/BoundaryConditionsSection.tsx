@@ -114,7 +114,9 @@ export function BoundaryConditionsSection() {
 
       const carousel = carouselRef.current;
       const cardGap = carousel
-        ? Number.parseFloat(getComputedStyle(carousel).getPropertyValue("--card-gap"))
+        ? Number.parseFloat(
+            getComputedStyle(carousel).getPropertyValue("--card-gap"),
+          )
         : 0;
 
       return firstCard.offsetWidth + (Number.isFinite(cardGap) ? cardGap : 0);
@@ -214,13 +216,16 @@ export function BoundaryConditionsSection() {
           <div>
             <h2 id="boundary-title">Boundary Conditions & Model Parameters</h2>
             <p>
-              Boundary conditions define how water enters, leaves, and
-              interacts within the model. These assumptions control the flow
-              patterns and results you see from the simulation.
+              Boundary conditions define how water enters, leaves, and interacts
+              within the model. These assumptions control the flow patterns and
+              results you see from the simulation.
             </p>
           </div>
         </header>
-        <div className={styles.carousel} aria-label="Boundary conditions carousel">
+        <div
+          className={styles.carousel}
+          aria-label="Boundary conditions carousel"
+        >
           <div className={styles.track} ref={carouselRef}>
             <div className={styles.cardGroup}>
               {boundaryCards.map((card, index) => (
