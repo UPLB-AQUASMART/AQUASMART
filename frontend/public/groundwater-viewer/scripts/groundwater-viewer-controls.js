@@ -106,6 +106,18 @@ function formatStreamLeakage(value) {
   return leakage.toFixed(4);
 }
 
+function signedStreamLeakageFromControls() {
+  const direction = scenarioInputs.leakageDirection.value;
+  const magnitude = Math.abs(clampNumber(scenarioInputs.streamLeakage.value, -1, 1));
+  return direction === "negative" ? -magnitude : magnitude;
+}
+
+function writeSignedStreamLeakage(value) {
+  const leakage = clampNumber(value, -1, 1);
+  scenarioInputs.streamLeakage.value = formatStreamLeakage(leakage);
+  scenarioInputs.leakageDirection.value = leakage < 0 ? "negative" : "positive";
+}
+
 function clampInteger(value, min, max) {
   const number = Math.round(Number(value));
   if (!Number.isFinite(number)) return min;
@@ -203,7 +215,7 @@ function formatGridArea(value) {
   return value.toFixed(6);
 }
 
-function updateAquiferSetupReadouts() {
+function updateAquiferSetupReadouts({ syncStreamLeakageFromElevations = false } = {}) {
   const gridValidation = validateScenarioGridInputs();
   const groundwaterElevation = Number(
     scenarioInputs.groundwaterElevation.value,
@@ -211,10 +223,16 @@ function updateAquiferSetupReadouts() {
   const riverElevation = Number(scenarioInputs.riverElevation.value);
   const groundwaterValue = formatElevationMeters(groundwaterElevation);
   const riverValue = formatElevationMeters(riverElevation);
-  const streamLeakage = calculateStreamLeakage(
-    groundwaterElevation,
-    riverElevation,
-  );
+  let streamLeakage = signedStreamLeakageFromControls();
+  if (syncStreamLeakageFromElevations) {
+    streamLeakage = calculateStreamLeakage(
+      groundwaterElevation,
+      riverElevation,
+    );
+    writeSignedStreamLeakage(streamLeakage);
+  } else {
+    scenarioInputs.streamLeakage.value = formatStreamLeakage(streamLeakage);
+  }
   scenarioInputs.groundwaterElevation
     .closest(".aquifer-elevation-control")
     ?.querySelector(".aquifer-elevation-control__value")
@@ -223,10 +241,7 @@ function updateAquiferSetupReadouts() {
     .closest(".aquifer-elevation-control")
     ?.querySelector(".aquifer-elevation-control__value")
     ?.replaceChildren(document.createTextNode(riverValue));
-  scenarioInputs.streamLeakage.value = formatStreamLeakage(streamLeakage);
   scenarioInputs.area.value = formatGridArea(calculateGridAreaKm2());
-  scenarioInputs.leakageDirection.value =
-    streamLeakage >= 0 ? "positive" : "negative";
   for (const radio of scenarioLeakageDirectionRadios) {
     radio.checked = radio.value === scenarioInputs.leakageDirection.value;
   }
@@ -292,7 +307,7 @@ function readScenarioConfig(region = pendingTopViewRegion) {
         scenarioInputs.groundwaterElevation.value,
       ),
       riverElevation: Number(scenarioInputs.riverElevation.value),
-      streamLeakage: Number(scenarioInputs.streamLeakage.value),
+      streamLeakage: signedStreamLeakageFromControls(),
       leakageDirection: scenarioInputs.leakageDirection.value,
     },
     recharge: {
@@ -322,6 +337,7 @@ function openTopViewSetup(region) {
     statusEl.textContent = "MODFLOW plan-view data is not available.";
     return;
   }
+  scenarioInputs.boundary.value = "river";
   topViewSetupMode = true;
   pendingTopViewRegion = region;
   selectedAquiferRegion = region;
@@ -855,7 +871,11 @@ for (const radio of scenarioLeakageDirectionRadios) {
   radio.addEventListener("change", () => {
     if (!radio.checked) return;
     scenarioInputs.leakageDirection.value = radio.value;
+    scenarioInputs.streamLeakage.value = formatStreamLeakage(
+      signedStreamLeakageFromControls(),
+    );
     syncAquiferSetupChoiceCards();
+    drawSectionView();
   });
 }
 for (const input of [
@@ -871,12 +891,28 @@ for (const input of [
 }
 scenarioInputs.groundwaterElevation.addEventListener(
   "input",
-  updateAquiferSetupReadouts,
+  () => updateAquiferSetupReadouts({ syncStreamLeakageFromElevations: true }),
 );
 scenarioInputs.riverElevation.addEventListener(
   "input",
-  updateAquiferSetupReadouts,
+  () => updateAquiferSetupReadouts({ syncStreamLeakageFromElevations: true }),
 );
+scenarioInputs.streamLeakage.addEventListener("input", () => {
+  const leakage = Number(scenarioInputs.streamLeakage.value);
+  if (!Number.isFinite(leakage)) return;
+  scenarioInputs.leakageDirection.value = leakage < 0 ? "negative" : "positive";
+  for (const radio of scenarioLeakageDirectionRadios) {
+    radio.checked = radio.value === scenarioInputs.leakageDirection.value;
+  }
+  syncAquiferSetupChoiceCards();
+  drawSectionView();
+});
+scenarioInputs.streamLeakage.addEventListener("change", () => {
+  scenarioInputs.streamLeakage.value = formatStreamLeakage(
+    signedStreamLeakageFromControls(),
+  );
+  updateAquiferSetupReadouts();
+});
 scenarioInputs.rechargeRate.addEventListener(
   "input",
   () => {

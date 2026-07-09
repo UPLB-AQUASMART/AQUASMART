@@ -101,6 +101,49 @@ function drawPlanArrow(
   context.stroke();
 }
 
+function getRenderedStreamCells(data) {
+  const streamCells = Array.isArray(data.streamCells) ? data.streamCells : [];
+  if (streamCells.length === 0) return streamCells;
+
+  const isRiverBoundary =
+    data.streamBoundary?.enabled ||
+    data.scenario?.boundary?.type === "river" ||
+    data.source?.riverPackage === "RIV";
+  const isStructuredScenarioGrid =
+    data.grid?.type === "DIS" ||
+    data.source?.gridPackage === "DIS" ||
+    Number.isInteger(Number(data.scenario?.grid?.columns));
+  if (!isRiverBoundary || !isStructuredScenarioGrid) return streamCells;
+
+  const cellCount = data.grid?.cells?.length || 0;
+  const configuredColumns = Number(data.scenario?.grid?.columns);
+  if (
+    Number.isInteger(configuredColumns) &&
+    configuredColumns > 0 &&
+    cellCount > 0 &&
+    cellCount % configuredColumns === 0
+  ) {
+    const rows = cellCount / configuredColumns;
+    return Array.from(
+      { length: rows },
+      (_, row) => row * configuredColumns + configuredColumns - 1,
+    );
+  }
+
+  const cells = data.grid?.cells || [];
+  const rightEdgeX = Math.max(
+    ...cells
+      .map((cell) => Number(cell.center?.[0]))
+      .filter((value) => Number.isFinite(value)),
+  );
+  if (!Number.isFinite(rightEdgeX)) return streamCells;
+
+  return cells
+    .map((cell, index) => ({ cell, index }))
+    .filter(({ cell }) => Math.abs(Number(cell.center?.[0]) - rightEdgeX) < 1e-6)
+    .map(({ index }) => index);
+}
+
 function getTopViewLayout(width, height) {
   if (compactViewerQuery.matches) {
     const hasVisiblePanel = !menuPanelEl.classList.contains("is-hidden");
@@ -215,8 +258,11 @@ function getTopViewScenario(
   const wellY =
     data.domain.ymin +
     (activeSectionWell.y_m / sceneData.domain.ly_m) * domainHeight;
+  const influenceDischargeRatio = Math.max(0, Math.min(1, dischargeRatio));
   const radius =
-    Math.min(domainWidth, domainHeight) * (0.08 + 0.16 * soil.influence);
+    Math.min(domainWidth, domainHeight) *
+    soil.influence *
+    (0.06 + influenceDischargeRatio * 0.28);
   if (isSolvedModflowScenario) {
     const drawdown = Array.isArray(layer.drawdown) ? layer.drawdown : [];
     const baselineHead = Array.isArray(layer.baselineHead)
@@ -537,7 +583,13 @@ function drawTopView() {
     sectionContext.stroke();
   }
 
-  for (const cellIndex of data.streamCells) {
+  const foregroundLabels = [];
+  const streamBoundary = data.streamBoundary || {};
+  const streamAddsWater = streamBoundary.leakageDirection
+    ? streamBoundary.leakageDirection === "positive"
+    : Number(streamBoundary.streamLeakage) >= 0;
+  const renderedStreamCells = getRenderedStreamCells(data);
+  for (const cellIndex of renderedStreamCells) {
     const cell = data.grid.cells[cellIndex];
     if (!cell) continue;
     const points = cell.vertexIds.map((vertexId) =>
@@ -550,12 +602,42 @@ function drawTopView() {
         : sectionContext.lineTo(point.x, point.y),
     );
     sectionContext.closePath();
-    sectionContext.strokeStyle = "rgba(14, 165, 233, 0.95)";
-    sectionContext.lineWidth = 2.2;
+    sectionContext.fillStyle = streamAddsWater
+      ? "rgba(14, 165, 233, 0.16)"
+      : "rgba(20, 184, 166, 0.14)";
+    sectionContext.fill();
+    sectionContext.strokeStyle = streamAddsWater
+      ? "rgba(14, 165, 233, 0.98)"
+      : "rgba(13, 148, 136, 0.98)";
+    sectionContext.lineWidth = 3;
     sectionContext.stroke();
   }
 
-  const foregroundLabels = [];
+  if (renderedStreamCells.length > 0) {
+    const middleStreamCell =
+      data.grid.cells[renderedStreamCells[Math.floor(renderedStreamCells.length / 2)]];
+    if (middleStreamCell) {
+      const streamCenter = project(...middleStreamCell.center);
+      const leakageText = streamAddsWater
+        ? "stream recharges aquifer"
+        : "aquifer drains to stream";
+      foregroundLabels.push({
+        text: leakageText,
+        x: streamCenter.x + 8,
+        y: streamCenter.y - 12,
+        font: "800 10px Inter, system-ui, sans-serif",
+      });
+      const arrowDirection = streamAddsWater ? 1 : -1;
+      drawPlanArrow(
+        sectionContext,
+        { x: streamCenter.x, y: streamCenter.y - 22 * arrowDirection },
+        0,
+        18 * arrowDirection,
+        streamAddsWater ? "rgba(14, 165, 233, 0.95)" : "rgba(13, 148, 136, 0.95)",
+      );
+    }
+  }
+
   sectionContext.font = "700 11px Inter, system-ui, sans-serif";
   const scenarioContours = buildScenarioContours(data, scenario.head);
   for (const contour of scenarioContours) {

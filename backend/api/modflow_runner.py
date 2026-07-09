@@ -334,7 +334,8 @@ def _add_constant_head_boundaries(model: Any, scenario: Any, nlay: int, nrow: in
     for layer in range(nlay):
         for row in range(nrow):
             stress_period_data.append(((layer, row, 0), left_head))
-            stress_period_data.append(((layer, row, ncol - 1), right_head))
+            if scenario.boundary.type != "river":
+                stress_period_data.append(((layer, row, ncol - 1), right_head))
     flopy.mf6.ModflowGwfchd(model, stress_period_data=stress_period_data, pname="CHD")
 
 
@@ -352,15 +353,20 @@ def _add_recharge(model: Any, scenario: Any, nrow: int, ncol: int) -> None:
 
 
 def _stream_cells(nrow: int, ncol: int) -> list[tuple[int, int, int]]:
-    row = nrow // 2
-    return [(0, row, col) for col in range(ncol)]
+    col = ncol - 1
+    return [(0, row, col) for row in range(nrow)]
 
 
 def _add_river(model: Any, scenario: Any, stream_cells: list[tuple[int, int, int]]) -> None:
+    groundwater_stage = float(scenario.boundary.groundwaterElevation)
     river_stage = float(scenario.boundary.riverElevation)
+    stream_leakage = _signed_stream_leakage(scenario)
+    head_difference = river_stage - groundwater_stage
+    if abs(head_difference) < 0.001 and abs(stream_leakage) > 0:
+        river_stage = groundwater_stage + (1.0 if stream_leakage > 0 else -1.0)
     conductance = max(
         0.001,
-        abs(float(scenario.boundary.streamLeakage)) * 1000.0,
+        abs(stream_leakage) * 1000.0,
         STREAMBED_CONDUCTANCE_M2_DAY * 1000.0,
     )
     river_bottom = river_stage - 2.0
@@ -369,6 +375,16 @@ def _add_river(model: Any, scenario: Any, stream_cells: list[tuple[int, int, int
         for cell in stream_cells
     ]
     flopy.mf6.ModflowGwfriv(model, stress_period_data=stress_period_data, pname="RIV")
+
+
+def _signed_stream_leakage(scenario: Any) -> float:
+    leakage = float(scenario.boundary.streamLeakage)
+    direction = getattr(scenario.boundary, "leakageDirection", "")
+    if direction == "negative":
+        return -abs(leakage)
+    if direction == "positive":
+        return abs(leakage)
+    return leakage
 
 
 def _add_wells(model: Any, scenario: Any, nlay: int, nrow: int, ncol: int) -> None:
@@ -491,6 +507,14 @@ def _export_frontend_json(
         "streamCells": [_cell_index(row, col, ncol) for _, row, col in _stream_cells(nrow, ncol)]
         if scenario.boundary.type == "river"
         else [],
+        "streamBoundary": {
+            "enabled": scenario.boundary.type == "river",
+            "groundwaterElevation": float(scenario.boundary.groundwaterElevation),
+            "riverElevation": float(scenario.boundary.riverElevation),
+            "streamLeakage": _signed_stream_leakage(scenario),
+            "leakageDirection": scenario.boundary.leakageDirection,
+            "mode": "losing" if _signed_stream_leakage(scenario) >= 0 else "gaining",
+        },
         "derived": {
             "areaOfInfluenceCells": [
                 index for index, value in enumerate(active_drawdown) if value >= max(0.05, active_drawdown.max() * 0.1)

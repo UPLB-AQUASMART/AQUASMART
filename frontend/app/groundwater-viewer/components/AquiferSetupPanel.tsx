@@ -238,7 +238,7 @@ function BoundarySetupCard() {
           </small>
         </span>
       </div>
-      <select id="scenario-boundary" hidden defaultValue="constant-head">
+      <select id="scenario-boundary" hidden defaultValue="river">
         <option value="constant-head">Constant head</option>
         <option value="river">River/stream</option>
         <option value="recharge">Recharge dominated</option>
@@ -262,7 +262,6 @@ function BoundarySetupCard() {
           max="1"
           step="0.0001"
           defaultValue="0.0000"
-          readOnly
         />
       </label>
       <div className="aquifer-leakage-grid">
@@ -270,15 +269,15 @@ function BoundarySetupCard() {
           value="positive"
           label="+Positive"
           note="Stream losing water"
+          active
         />
         <LeakageOption
           value="negative"
           label="-Negative"
           note="Aquifer discharging"
-          active
         />
       </div>
-      <select id="scenario-leakage-direction" hidden defaultValue="negative">
+      <select id="scenario-leakage-direction" hidden defaultValue="positive">
         <option value="negative">Aquifer to stream</option>
         <option value="positive">Stream to aquifer</option>
       </select>
