@@ -219,24 +219,80 @@ function getTopViewScenario(
     Math.min(domainWidth, domainHeight) * (0.08 + 0.16 * soil.influence);
   if (isSolvedModflowScenario) {
     const drawdown = Array.isArray(layer.drawdown) ? layer.drawdown : [];
+    const baselineHead = Array.isArray(layer.baselineHead)
+      ? layer.baselineHead
+      : layer.head;
+    const scenarioWellX = data.wells?.[0]?.x ?? wellX;
+    const scenarioWellY = data.wells?.[0]?.y ?? wellY;
+    const solvedDischarge = Math.max(
+      1,
+      Number(
+        data.scenario?.dischargeM3Day ||
+          data.source?.effectivePumpingM3Day ||
+          sectionDischargeInput.max,
+      ),
+    );
+    const dischargeScale = Math.max(0, dischargeValue) / solvedDischarge;
+    const scaledDrawdown = drawdown.map(
+      (value) => (Number(value) || 0) * dischargeScale,
+    );
+    const solvedMaximumDrawdown =
+      scaledDrawdown.length > 0 ? Math.max(...scaledDrawdown) : 0;
+    const shouldUseFallbackDrawdown =
+      solvedMaximumDrawdown <= 0.001 && screenActive && dischargeValue > 0;
+    const maximumDrawdown = shouldUseFallbackDrawdown
+      ? dischargeRatio * 9.5 * soil.depth * rechargeFactor
+      : solvedMaximumDrawdown;
+    const baselineFlowScale = Math.max(
+      ...layer.qx.map((qx, index) => Math.hypot(qx, layer.qy[index])),
+      1e-9,
+    );
+    const flowBoost = shouldUseFallbackDrawdown
+      ? dischargeRatio * baselineFlowScale * 1.15 * soil.depth * rechargeFactor
+      : 0;
+    const adjustedHead = [];
+    const adjustedQx = [];
+    const adjustedQy = [];
+
+    for (let index = 0; index < data.grid.cells.length; index += 1) {
+      if (!shouldUseFallbackDrawdown) {
+        adjustedHead.push(Number(baselineHead[index]) - (scaledDrawdown[index] || 0));
+        adjustedQx.push(layer.qx[index]);
+        adjustedQy.push(layer.qy[index]);
+        continue;
+      }
+
+      const [cellX, cellY] = data.grid.cells[index].center;
+      const dx = scenarioWellX - cellX;
+      const dy = scenarioWellY - cellY;
+      const distance = Math.hypot(dx, dy);
+      const influence =
+        soil.type === "sand"
+          ? Math.pow(Math.max(0, 1 - distance / radius), 0.9)
+          : Math.exp(-(distance * distance) / (2 * radius * radius));
+      const directionX = distance > 1e-6 ? dx / distance : 0;
+      const directionY = distance > 1e-6 ? dy / distance : 0;
+      adjustedHead.push(Number(baselineHead[index]) - maximumDrawdown * influence);
+      adjustedQx.push(layer.qx[index] + directionX * flowBoost * influence);
+      adjustedQy.push(layer.qy[index] + directionY * flowBoost * influence);
+    }
+
     return {
       soil,
-      discharge: data.scenario?.dischargeM3Day ?? dischargeValue,
+      discharge: dischargeValue,
       dischargeRatio,
       screenLevel,
       screenActive,
-      wellX: data.wells?.[0]?.x ?? wellX,
-      wellY: data.wells?.[0]?.y ?? wellY,
+      wellX: scenarioWellX,
+      wellY: scenarioWellY,
       radius,
       rechargeFactor: data.source?.rechargeDrawdownFactor ?? rechargeFactor,
-      maximumDrawdown:
-        drawdown.length > 0
-          ? Math.max(...drawdown.map((value) => Number(value) || 0))
-          : 0,
-      head: layer.head,
-      qx: layer.qx,
-      qy: layer.qy,
+      maximumDrawdown,
+      head: adjustedHead,
+      qx: adjustedQx,
+      qy: adjustedQy,
       usesSolvedHeads: true,
+      usesFallbackDrawdown: shouldUseFallbackDrawdown,
     };
   }
   const maximumDrawdown = screenActive
@@ -681,7 +737,9 @@ function drawTopView() {
     ? "screen active"
     : "screen inactive";
   const rechargeReduction = Math.round((1 - scenario.rechargeFactor) * 100);
-  const drawdownSourceLabel = scenario.usesSolvedHeads
+  const drawdownSourceLabel = scenario.usesFallbackDrawdown
+    ? "interactive maximum drawdown"
+    : scenario.usesSolvedHeads
     ? "MODFLOW maximum drawdown"
     : "estimated maximum drawdown";
   planScenarioStatusEl.textContent = scenario.screenActive

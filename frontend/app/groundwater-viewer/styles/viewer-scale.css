@@ -4,7 +4,7 @@
   width: min(680px, calc(200vw - 64px));
   border-radius: 19px;
   padding: 30px 34px 28px;
-  transform: scale(0.65);
+  transform: scale(0.78);
   transform-origin: top left;
   z-index: 60;
 }
@@ -19,7 +19,7 @@
 }
 
 .panel.is-hidden {
-  transform: translateX(-18px) scale(0.65);
+  transform: translateX(-18px) scale(0.78);
 }
 
 .section-toolbar {
