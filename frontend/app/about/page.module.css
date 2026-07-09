@@ -81,11 +81,11 @@
   border-radius: 50px;
   background: #dff5fb;
   color: #147d9c;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.14em;
+  font-size: var(--section-pill-font-size);
+  font-weight: 700;
+  letter-spacing: 0;
   line-height: 1;
-  padding: 10px 14px;
+  padding: var(--section-pill-padding);
   text-transform: uppercase;
 }
 
@@ -94,10 +94,10 @@
   margin: 25px 0 20px;
   color: #0b1f3a;
   font-family: "Sora", sans-serif;
-  font-size: clamp(54px, 6vw, 82px);
-  font-weight: 800;
-  letter-spacing: 0;
-  line-height: 1.02;
+  font-size: var(--section-title-size);
+  font-weight: 700;
+  letter-spacing: var(--section-title-letter-spacing);
+  line-height: 1;
 }
 
 .introSection h1 span {
@@ -240,10 +240,10 @@
   margin: 0 0 28px;
   color: #ffffff;
   font-family: "Sora", sans-serif;
-  font-size: clamp(42px, 5.5vw, 72px);
-  font-weight: 800;
-  letter-spacing: 0;
-  line-height: 1.05;
+  font-size: var(--section-title-size);
+  font-weight: 700;
+  letter-spacing: var(--section-title-letter-spacing);
+  line-height: 1;
 }
 
 .narrativeCopy h2 span {
@@ -607,7 +607,7 @@
   }
 
   .introSection h1 {
-    font-size: clamp(42px, 12vw, 58px);
+    font-size: var(--section-title-mobile-size);
   }
 
   .introSection p {
@@ -624,7 +624,7 @@
   }
 
   .narrativeCopy h2 {
-    font-size: clamp(36px, 12vw, 52px);
+    font-size: var(--section-title-mobile-size);
   }
 
   .narrativeCopy p {
@@ -665,7 +665,7 @@
   .badge,
   .visualLabel,
   .visualCaption {
-    font-size: 9px;
+    font-size: var(--section-pill-font-size);
   }
 
   .visualLabel,

@@ -10,6 +10,15 @@
   --pale: #f5fafc;
   --pill: #dff6fd;
   --line: #e2e8f0;
+  --section-title-size: clamp(36px, 5vw, 56px);
+  --section-title-mobile-size: clamp(38px, 12vw, 52px);
+  --section-title-letter-spacing: -0.04em;
+  --section-pill-font-size: clamp(8px, 1.7vw, 14px);
+  --section-pill-mobile-font-size: 18px;
+  --section-pill-padding: 16px 24px;
+  --section-pill-mobile-padding: 16px 32px;
+  --section-description-size: clamp(12px, 1.8vw, 17px);
+  --section-description-mobile-size: 16px;
 }
 
 * {

@@ -129,10 +129,10 @@
   margin: 0;
   color: #ffffff;
   font-family: "Sora", sans-serif;
-  font-size: clamp(32px, 4.55vw, 60px);
-  font-weight: 600;
-  line-height: 1.08;
-  letter-spacing: 0;
+  font-size: var(--section-title-size);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: var(--section-title-letter-spacing);
 }
 
 .parameter-switches {
@@ -227,7 +227,7 @@
   margin: 0;
   padding: clamp(4px, 0.8vw, 10px) 0;
   color: #25add8;
-  font-size: clamp(14px, 1.35vw, 18px);
+  font-size: var(--section-description-size);
   font-weight: 600;
   line-height: 1.4;
   transition:
@@ -326,7 +326,7 @@
 
   .parameters-card-content h2 {
     width: 100%;
-    font-size: 30px;
+    font-size: var(--section-title-mobile-size);
   }
 
   .parameter-switches {
@@ -403,7 +403,7 @@
   }
 
   .parameters-card-content h2 {
-    font-size: clamp(28px, 9vw, 36px);
+    font-size: var(--section-title-mobile-size);
   }
 
   .parameter-switches {
@@ -467,7 +467,7 @@
   }
 
   .parameters-card-content h2 {
-    font-size: clamp(25px, 9vw, 32px);
+    font-size: var(--section-title-mobile-size);
   }
 
   .parameter-switches button.active {

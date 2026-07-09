@@ -37,10 +37,10 @@
   margin: 0;
   color: #0f1d2e;
   font-family: "Sora", sans-serif;
-  font-size: clamp(40px, 5.2vw, 68px);
-  font-weight: 800;
-  letter-spacing: 0;
-  line-height: 1.04;
+  font-size: var(--section-title-size);
+  font-weight: 700;
+  letter-spacing: var(--section-title-letter-spacing);
+  line-height: 1;
 }
 
 .header h2 span {
@@ -54,7 +54,7 @@
   max-width: 620px;
   margin: 0;
   color: rgba(15, 29, 46, 0.6);
-  font-size: clamp(15px, 1.35vw, 17px);
+  font-size: var(--section-description-size);
   font-weight: 500;
   line-height: 1.75;
 }
@@ -120,7 +120,7 @@
   }
 
   .header h2 {
-    font-size: clamp(34px, 11vw, 48px);
+    font-size: var(--section-title-mobile-size);
   }
 
   .inner {
