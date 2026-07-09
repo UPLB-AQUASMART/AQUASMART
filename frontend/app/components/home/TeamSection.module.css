@@ -71,17 +71,19 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  align-self: center;
+  /* Start-aligned (not centered) so the photo's top edge lines up with the
+     bio column's top edge — .descStage is also align-self: start, pinned
+     at the same top offset, so the two line up when the row scrolls in. */
+  align-self: start;
   gap: 12px;
   padding: clamp(48px, 6vw, 88px) 0;
-  background: #ffffff; /*temp bg for testing and debugging*/
 }
 
 .imageFrame {
   position: relative;
   overflow: hidden;
   width: 100%;
-  max-width: 320px;
+  max-width: 480px;
   margin-bottom: 8px;
   aspect-ratio: 279 / 416;
   border-radius: 8px;
@@ -148,27 +150,23 @@
    visual column; 100vh here is just the fallback before that measurement
    lands, so there's no flash of an unstyled/oversized frame. */
 .descStage {
-  position: sticky;
-  /* Keeps a fixed gap below the fixed navbar while pinned, instead of
-     butting up flush against it. */
-  top: clamp(60px, 6vw, 90px);
-  overflow: hidden;
+  position: relative;
   align-self: start;
-  height: 100vh;
+  min-height: calc(100% - clamp(48px, 6vw, 88px));
+  padding: clamp(48px, 6vw, 88px) 0;
 }
 
 /* Starts flush at the top of the frame (matching the row's visual column)
    and gets translated down via ScrollTrigger — see TeamSection.tsx — until
    it lands flush at the bottom right as the row's scroll room runs out. */
 .descInner {
+  position: sticky;
+  top: clamp(104px, 11vw, 150px);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
   max-width: 46ch;
-  height: 100%;
-  padding: clamp(48px, 6vw, 88px) 0;
-  will-change: transform;
 }
 
 .descIndex {
@@ -219,14 +217,12 @@
 
   .descStage {
     position: static;
-    height: auto;
-    overflow: visible;
+    min-height: 0;
+    padding-top: 0;
+    padding-bottom: clamp(40px, 8vw, 64px);
   }
 
   .descInner {
-    height: auto;
-    padding-top: 0;
-    padding-bottom: clamp(40px, 8vw, 64px);
-    transform: none !important;
+    position: static;
   }
 }
