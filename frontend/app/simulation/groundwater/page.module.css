@@ -147,8 +147,94 @@
   transform: none;
 }
 
+.mapStage.mapViewOpen .map {
+  opacity: 0;
+  transform: scale(1.018);
+}
+
 .mapStage.simulating::after {
   background: rgba(11, 30, 57, 0.04);
+}
+
+.mapStage.mapViewOpen::after {
+  z-index: 1;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(42, 132, 78, 0.1)),
+    radial-gradient(circle at 50% 46%, rgba(255, 255, 255, 0.18), transparent 46%);
+}
+
+.leafletMap {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  background: #f8fff6;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 620ms ease,
+    filter 620ms ease;
+}
+
+.mapViewOpen .leafletMap {
+  z-index: 2;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.leafletMap :global(.leaflet-tile-pane) {
+  filter: grayscale(1) sepia(0.28) hue-rotate(62deg) saturate(1.2)
+    brightness(1.18) contrast(0.92);
+}
+
+.leafletMap::before {
+  position: absolute;
+  z-index: 450;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.1)),
+    radial-gradient(circle at 52% 48%, rgba(255, 255, 255, 0.24), transparent 42%);
+  content: "";
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.leafletMap :global(.leaflet-control-zoom) {
+  overflow: hidden;
+  margin-top: 104px;
+  margin-right: clamp(40px, 5.6vw, 80px);
+  border: 1px solid rgba(53, 122, 70, 0.22);
+  border-radius: 8px;
+  box-shadow: 0 12px 24px rgba(20, 73, 46, 0.16);
+}
+
+.leafletMap :global(.leaflet-control-zoom a) {
+  width: 36px;
+  height: 36px;
+  border-color: rgba(53, 122, 70, 0.18);
+  background: rgba(245, 255, 244, 0.92);
+  color: #1b6d43;
+  font-size: 20px;
+  line-height: 36px;
+}
+
+.leafletMap :global(.leaflet-control-attribution) {
+  border-radius: 6px;
+  background: rgba(245, 255, 244, 0.8);
+  color: #2d6b45;
+  font-size: 10px;
+}
+
+.leafletWellPin span {
+  display: block;
+  width: 18px;
+  height: 18px;
+  border: 3px solid #f6fff6;
+  border-radius: 50%;
+  background: #1fa3c9;
+  box-shadow:
+    0 0 0 8px rgba(104, 185, 107, 0.24),
+    0 8px 18px rgba(20, 73, 46, 0.25);
 }
 
 .heroContent {
@@ -156,6 +242,20 @@
   z-index: 1;
   min-height: 675px;
   padding: clamp(40px, 5.6vw, 80px);
+}
+
+.mapViewOpen .heroContent {
+  z-index: 3;
+  pointer-events: none;
+}
+
+.mapViewOpen .scenarioCard,
+.mapViewOpen .exitButton,
+.mapViewOpen .mapToggleButton,
+.mapViewOpen .addButton,
+.mapViewOpen .wellAnchor,
+.mapViewOpen .wellPopover {
+  pointer-events: auto;
 }
 
 .hero h1 {
@@ -262,6 +362,36 @@
 .exitButton:hover {
   background: #fff;
   box-shadow: 0 0 20px rgba(70, 197, 223, 0.42);
+  transform: translateY(-2px);
+}
+
+.mapToggleButton {
+  position: absolute;
+  top: clamp(40px, 5.6vw, 80px);
+  right: clamp(40px, 5.6vw, 80px);
+  z-index: 12;
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.48);
+  border-radius: 50%;
+  background: rgba(232, 252, 232, 0.9);
+  color: #2f8f63;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(20, 73, 46, 0.18);
+  transition:
+    transform 160ms ease,
+    background 160ms ease,
+    box-shadow 160ms ease,
+    color 160ms ease;
+}
+
+.mapToggleButton:hover,
+.mapToggleButton[aria-pressed="true"] {
+  background: #f6fff6;
+  color: #1f7a4d;
+  box-shadow: 0 0 22px rgba(104, 185, 107, 0.48);
   transform: translateY(-2px);
 }
 
@@ -918,6 +1048,16 @@
   .exitButton {
     left: 20px;
     top: 32px;
+  }
+  .mapToggleButton {
+    top: 32px;
+    right: 20px;
+    width: 44px;
+    height: 44px;
+  }
+  .leafletMap :global(.leaflet-control-zoom) {
+    margin-top: 84px;
+    margin-right: 20px;
   }
   .scenarioCard {
     right: auto;
