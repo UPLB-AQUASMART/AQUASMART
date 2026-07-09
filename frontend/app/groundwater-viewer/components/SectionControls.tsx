@@ -1,4 +1,4 @@
-import { RangeInput } from "./FormControls";
+import { NumericInput, RangeInput } from "./FormControls";
 import { soilOptions } from "./constants";
 
 export function SectionControls() {
@@ -100,6 +100,44 @@ function SoilControl() {
         <p className="soil-description" id="soil-description">
           Holds a balanced amount of water and allows moderate drainage, so
           water drawdown is usually steady and controlled.
+        </p>
+        <div className="soil-hydraulic-grid" aria-label="Hydraulic properties">
+          <label>
+            <span>Kx</span>
+            <NumericInput
+              id="soil-horizontal-k"
+              min="0.001"
+              max="200"
+              step="0.001"
+              defaultValue="5"
+            />
+            <small>0.001-200 m/day</small>
+          </label>
+          <label>
+            <span>Kz</span>
+            <NumericInput
+              id="soil-vertical-k"
+              min="0.0001"
+              max="50"
+              step="0.0001"
+              defaultValue="0.5"
+            />
+            <small>0.0001-50 m/day</small>
+          </label>
+          <label>
+            <span>Sy</span>
+            <NumericInput
+              id="soil-specific-yield"
+              min="0.01"
+              max="0.5"
+              step="0.01"
+              defaultValue="0.16"
+            />
+            <small>0.01-0.5</small>
+          </label>
+        </div>
+        <p className="soil-hydraulic-note" id="soil-hydraulic-note">
+          Kx 2.5-15 m/day maps to Loam.
         </p>
       </div>
     </div>

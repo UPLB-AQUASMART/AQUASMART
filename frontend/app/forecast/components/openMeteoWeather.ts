@@ -52,11 +52,20 @@ export type EtoDemandData = {
   metrics: Array<{ label: string; value: string }>;
 };
 
+export type IrrigationWeatherDay = {
+  date: string;
+  label: string;
+  rain: number;
+  eto: number;
+  soilMoisture: number;
+};
+
 export type ForecastPageWeatherData = {
   forecast: ForecastItem[];
   details: ForecastDetail[];
   analytics: ClimateOverviewData;
   precipitation: ProjectionDay[];
+  irrigationWindow: IrrigationWeatherDay[];
   factorDayLabels: Array<{ label: string; date: string }>;
   factors: Partial<Record<string, LiveFactorData>>;
   eto: EtoDemandData;
@@ -267,8 +276,8 @@ function forecastUrl({ latitude, longitude }: Coordinates) {
     latitude: String(latitude),
     longitude: String(longitude),
     timezone: "auto",
-    forecast_days: "7",
-    past_days: "7",
+    forecast_days: "14",
+    past_days: "14",
     current: [
       "temperature_2m",
       "relative_humidity_2m",
@@ -439,6 +448,13 @@ function mapForecastData(
   const startIndex = Math.max(daily.time.findIndex((date) => date >= currentDate), 0);
   const dayIndices = daily.time.slice(startIndex, startIndex + 7).map((_, index) => startIndex + index);
   const firstDayIndex = dayIndices[0] ?? startIndex;
+  const currentDateObject = parseDateOnly(currentDate);
+  const irrigationWindowStart = toDateKey(addDays(currentDateObject, -14));
+  const irrigationWindowEnd = toDateKey(addDays(currentDateObject, 14));
+  const irrigationWindowIndices = daily.time
+    .map((date, index) => ({ date, index }))
+    .filter(({ date }) => date >= irrigationWindowStart && date <= irrigationWindowEnd)
+    .map(({ index }) => index);
   const todayRainChance = Number(daily.precipitation_probability_max?.[firstDayIndex] ?? 0);
   const todayPrecipitation = Number(daily.precipitation_sum?.[firstDayIndex] ?? current.precipitation ?? 0);
   const todayEto = Number(daily.et0_fao_evapotranspiration_sum?.[firstDayIndex] ?? 0);
@@ -505,6 +521,23 @@ function mapForecastData(
     };
   });
 
+  const irrigationWindow = irrigationWindowIndices.map((dailyIndex) => {
+    const date = daily.time?.[dailyIndex] ?? currentDate;
+    const rain = Number(daily.precipitation_sum?.[dailyIndex] ?? 0);
+    const eto = Number(daily.et0_fao_evapotranspiration_sum?.[dailyIndex] ?? 0);
+    const soilMoisture = stats(
+      hourlyValuesForDate(forecast.hourly, "soil_moisture_0_to_1cm", date),
+    ).avg;
+
+    return {
+      date,
+      label: formatDate(date, { day: "numeric", month: "short" }),
+      rain: round(rain, 1),
+      eto: round(eto, 1),
+      soilMoisture: round(soilMoisture, 2),
+    };
+  });
+
   const factorDayLabels = dayIndices.map((dailyIndex) => {
     const date = daily.time?.[dailyIndex] ?? currentDate;
     return {
@@ -537,6 +570,7 @@ function mapForecastData(
     details,
     analytics,
     precipitation: projectionDays,
+    irrigationWindow,
     factorDayLabels,
     factors: {
       "chance-of-rain": buildLiveFactor(

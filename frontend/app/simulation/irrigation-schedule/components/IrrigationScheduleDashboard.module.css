@@ -1,0 +1,56 @@
+.dashboard {
+  display: grid;
+  width: min(100%, 1508px);
+  grid-template-columns: minmax(360px, 0.92fr) minmax(0, 1.58fr);
+  gap: clamp(14px, 1.4vw, 18px);
+  align-items: start;
+  margin: 0 auto;
+  padding: clamp(102px, 7vw, 122px) clamp(10px, 2vw, 28px) 22px;
+}
+
+.analytics {
+  display: grid;
+  min-width: 0;
+  align-content: start;
+  gap: 18px;
+}
+
+.plannerColumn {
+  display: grid;
+  min-width: 0;
+  align-content: start;
+  gap: 18px;
+}
+
+.weatherAlert {
+  margin: 0;
+  border: 1px solid #ffd0d0;
+  border-radius: 12px;
+  background: #fff7f7;
+  color: #b4232f;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 14px 16px;
+}
+
+@media (max-width: 1120px) {
+  .dashboard {
+    grid-template-columns: 1fr;
+    width: min(100%, 860px);
+  }
+}
+
+@media (max-width: 640px) {
+  .dashboard {
+    gap: 12px;
+    padding: 82px 8px 16px;
+  }
+
+  .analytics {
+    gap: 12px;
+  }
+
+  .plannerColumn {
+    gap: 12px;
+  }
+}

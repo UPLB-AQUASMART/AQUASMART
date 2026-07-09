@@ -1,0 +1,8 @@
+.page {
+  min-height: 100vh;
+  background:
+    linear-gradient(180deg, rgba(240, 249, 255, 0.96), rgba(248, 252, 255, 0.98)),
+    #f6fbff;
+  color: #071f63;
+  box-shadow: none;
+}

@@ -56,7 +56,7 @@ export const metricCards = [
   },
 ];
 
-export const soilOptions = ["loam", "sand", "clay"] as const;
+export const soilOptions = ["sand", "loam", "clay"] as const;
 
 export const rechargeModes = [
   {

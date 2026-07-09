@@ -41,6 +41,61 @@ function formatElevationMeters(value) {
   })} m`;
 }
 
+function formatHydraulicValue(value) {
+  return Number(value).toLocaleString(undefined, {
+    maximumFractionDigits: 4,
+  });
+}
+
+function resetHydraulicPropertiesForLevel(level, soilType) {
+  soilHydraulicByLevel.set(level, {
+    ...getHydraulicDefaultsForSoil(soilType),
+  });
+}
+
+function readHydraulicInputValues() {
+  return {
+    k: clampNumber(soilHorizontalKInput.value, 0.001, 200),
+    k33: clampNumber(soilVerticalKInput.value, 0.0001, 50),
+    sy: clampNumber(soilSpecificYieldInput.value, 0.01, 0.5),
+  };
+}
+
+function normalizeHydraulicInputs() {
+  const properties = readHydraulicInputValues();
+  soilHorizontalKInput.value = String(properties.k);
+  soilVerticalKInput.value = String(properties.k33);
+  soilSpecificYieldInput.value = String(properties.sy);
+  applyHydraulicInputsToActiveLevel({ classify: true });
+}
+
+function writeHydraulicInputs(level = activeSoilLevel) {
+  const properties = getHydraulicPropertiesForLevel(level);
+  soilHorizontalKInput.value = String(properties.k);
+  soilVerticalKInput.value = String(properties.k33);
+  soilSpecificYieldInput.value = String(properties.sy);
+}
+
+function updateHydraulicNote(soilType = getSoilTypeForLevel(activeSoilLevel)) {
+  const range = getHydraulicRangeForSoil(soilType);
+  if (!soilHydraulicNoteEl || !range) return;
+  const properties = getHydraulicPropertiesForLevel(activeSoilLevel);
+  soilHydraulicNoteEl.textContent = `${range.label} Current Kx ${formatHydraulicValue(properties.k)} m/day.`;
+}
+
+function applyHydraulicInputsToActiveLevel({ classify = false } = {}) {
+  const properties = readHydraulicInputValues();
+  soilHydraulicByLevel.set(activeSoilLevel, properties);
+  if (classify) {
+    const inferredSoilType = classifySoilByHydraulicK(properties.k);
+    selectedSoilType = inferredSoilType;
+    soilTypeByLevel.set(activeSoilLevel, inferredSoilType);
+  }
+  updateSoilControl({ writeHydraulicValues: false });
+  updateDischargeLabel();
+  drawSectionView();
+}
+
 function calculateStreamLeakage(groundwaterElevation, riverElevation) {
   const headDifference = riverElevation - groundwaterElevation;
   return STREAMBED_CONDUCTANCE_M2_DAY * headDifference;
@@ -250,6 +305,12 @@ function readScenarioConfig(region = pendingTopViewRegion) {
       [1, 2, 3].map((levelNumber) => [
         String(levelNumber),
         getSoilTypeForLevel(levelNumber),
+      ]),
+    ),
+    hydraulicByLevel: Object.fromEntries(
+      [1, 2, 3].map((levelNumber) => [
+        String(levelNumber),
+        getHydraulicPropertiesForLevel(levelNumber),
       ]),
     ),
     dischargeM3Day: sectionDischarge,
@@ -479,7 +540,7 @@ function updateDischargeLabel() {
     soilDescriptions[soilProfile.type] || soilDescriptions.loam;
 }
 
-function updateSoilControl() {
+function updateSoilControl({ writeHydraulicValues = true } = {}) {
   const profile = getSoilProfileForLevel(activeSoilLevel);
   soilSelectValueEl.textContent = profile.label;
   soilFigureEl.src = soilImages[profile.type] || soilImages.loam;
@@ -492,6 +553,10 @@ function updateSoilControl() {
     option.setAttribute("aria-selected", String(isCurrent));
   }
   soilTypeSelect.value = profile.type;
+  if (writeHydraulicValues) {
+    writeHydraulicInputs(activeSoilLevel);
+  }
+  updateHydraulicNote(profile.type);
   updateScreenPreview();
 }
 
@@ -878,6 +943,7 @@ sectionDischargeInput.addEventListener("input", () => {
 soilTypeSelect.addEventListener("change", () => {
   selectedSoilType = soilTypeSelect.value;
   soilTypeByLevel.set(activeSoilLevel, selectedSoilType);
+  resetHydraulicPropertiesForLevel(activeSoilLevel, selectedSoilType);
   updateSoilControl();
   updateDischargeLabel();
   drawSectionView();
@@ -885,6 +951,18 @@ soilTypeSelect.addEventListener("change", () => {
     showSensorSpecs();
   }
 });
+soilHorizontalKInput.addEventListener("input", () => {
+  applyHydraulicInputsToActiveLevel({ classify: true });
+});
+soilVerticalKInput.addEventListener("input", () => {
+  applyHydraulicInputsToActiveLevel();
+});
+soilSpecificYieldInput.addEventListener("input", () => {
+  applyHydraulicInputsToActiveLevel();
+});
+soilHorizontalKInput.addEventListener("change", normalizeHydraulicInputs);
+soilVerticalKInput.addEventListener("change", normalizeHydraulicInputs);
+soilSpecificYieldInput.addEventListener("change", normalizeHydraulicInputs);
 soilSelectButtonEl.addEventListener("click", () => {
   setSoilMenuOpen(soilSelectMenuEl.hidden);
 });

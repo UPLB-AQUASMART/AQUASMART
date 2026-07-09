@@ -32,6 +32,10 @@ const soilSelectValueEl = document.querySelector("#soil-select-value");
 const soilSelectMenuEl = document.querySelector("#soil-select-menu");
 const soilFigureEl = document.querySelector("#soil-figure");
 const soilDescriptionEl = document.querySelector("#soil-description");
+const soilHorizontalKInput = document.querySelector("#soil-horizontal-k");
+const soilVerticalKInput = document.querySelector("#soil-vertical-k");
+const soilSpecificYieldInput = document.querySelector("#soil-specific-yield");
+const soilHydraulicNoteEl = document.querySelector("#soil-hydraulic-note");
 const screenOptionsEl = document.querySelector("#screen-options");
 const pipeScreenStackEl = document.querySelector("#pipe-screen-stack");
 const sensorSpecsEl = document.querySelector("#sensor-specs");
@@ -159,6 +163,7 @@ let sectionDischarge = 0;
 let selectedSoilType = "loam";
 let activeSoilLevel = 1;
 let soilTypeByLevel = new Map();
+let soilHydraulicByLevel = new Map();
 let selectedScreenLevels = new Set();
 let isSectionDragging = false;
 let lastSectionPointer = { x: 0, y: 0 };
@@ -246,10 +251,18 @@ const modflowTransitionStages = [
 const soilDrawdownProfiles = {
   sand: { label: "Sand", influence: 0.68, depth: 1.15 },
   loam: { label: "Loam", influence: 1.05, depth: 0.9 },
-  silt: { label: "Silt", influence: 1.22, depth: 0.78 },
   clay: { label: "Clay", influence: 1.38, depth: 0.66 },
-  gravel: { label: "Gravel", influence: 0.82, depth: 1.02 },
 };
+const soilHydraulicDefaults = {
+  sand: { k: 25, k33: 2.5, sy: 0.22 },
+  loam: { k: 5, k33: 0.5, sy: 0.16 },
+  clay: { k: 0.05, k33: 0.005, sy: 0.05 },
+};
+const soilHydraulicRanges = [
+  { type: "clay", min: 0, max: 2.5, label: "Kx below 2.5 m/day maps to Clay." },
+  { type: "loam", min: 2.5, max: 15, label: "Kx 2.5-15 m/day maps to Loam." },
+  { type: "sand", min: 15, max: Infinity, label: "Kx 15 m/day or higher maps to Sand." },
+];
 const soilDescriptions = {
   sand: "Drains water quickly because of large particles, causing faster water drawdown and lower water retention.",
   loam: "Holds a balanced amount of water and allows moderate drainage, so water drawdown is usually steady and controlled.",

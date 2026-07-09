@@ -316,11 +316,40 @@ function getSoilTypeForLevel(level) {
   );
 }
 
+function classifySoilByHydraulicK(horizontalK) {
+  const value = Number(horizontalK);
+  if (!Number.isFinite(value)) return "loam";
+  const range = soilHydraulicRanges.find(
+    (candidate) => value >= candidate.min && value < candidate.max,
+  );
+  return range?.type || "sand";
+}
+
+function getHydraulicRangeForSoil(soilType) {
+  return (
+    soilHydraulicRanges.find((range) => range.type === soilType) ||
+    soilHydraulicRanges.find((range) => range.type === "loam")
+  );
+}
+
+function getHydraulicDefaultsForSoil(soilType) {
+  return soilHydraulicDefaults[soilType] || soilHydraulicDefaults.loam;
+}
+
+function getHydraulicPropertiesForLevel(level) {
+  const soilType = getSoilTypeForLevel(level);
+  return (
+    soilHydraulicByLevel.get(level) ||
+    getHydraulicDefaultsForSoil(soilType)
+  );
+}
+
 function getSoilProfileForLevel(level) {
   const soilType = getSoilTypeForLevel(level);
   return {
     type: soilType,
     ...(soilDrawdownProfiles[soilType] || soilDrawdownProfiles.loam),
+    hydraulic: getHydraulicPropertiesForLevel(level),
   };
 }
 

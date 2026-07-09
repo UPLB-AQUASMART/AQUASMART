@@ -155,6 +155,23 @@ export const simulations = [
     ],
   },
   {
+    title: "Irrigation Schedule",
+    highlight: "Planner",
+    href: "/simulation/irrigation-schedule",
+    states: [
+      {
+        label: "Schedule overview",
+        image: "/assets/field.png",
+        body: "Generate weather-linked irrigation plans from rainfall, ET0 demand, soil moisture estimates, and crop-field settings.",
+      },
+      {
+        label: "Calendar recommendations",
+        image: "/assets/field.png",
+        body: "Review weekly and monthly irrigation recommendations, inspect daily water balance, and export the schedule for field use.",
+      },
+    ],
+  },
+  {
     title: "Spatial Drawdown",
     highlight: "Map",
     href: "/simulation",
