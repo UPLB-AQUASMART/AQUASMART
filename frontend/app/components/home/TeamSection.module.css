@@ -1,213 +1,232 @@
-.team-section {
-  position: relative;
+.section {
+  --bg: #101f3b;
+  --ink: #f6fafc;
+  --muted: #a7b0c2;
+  --accent: #46a4ca;
+  --accent-soft: #e2f6fd;
+  --line: rgba(246, 250, 252, 0.1);
+
   width: 100%;
-  overflow: hidden;
-  background: linear-gradient(155deg, #0a1626 0%, #0b1f3a 55%, #0a1626 100%);
-  padding: clamp(118px, 13vh, 148px) 0 clamp(104px, 12vh, 148px);
+  background: var(--bg);
+  color: var(--ink);
 }
 
-.team-header-group {
-  position: relative;
-  margin-bottom: clamp(40px, 5vh, 48px);
-  padding: 0 clamp(28px, 5.7vw, 82px);
+.header {
+  width: min(100%, 1180px);
+  margin: 0 auto;
+  padding: clamp(56px, 6vw, 96px) clamp(24px, 5.5vw, 80px)
+    clamp(40px, 5vw, 64px);
 }
 
-.team-tag {
-  position: absolute;
-  top: -58px;
-  left: clamp(28px, 5.7vw, 82px);
+.kicker {
   display: inline-block;
+  margin-bottom: 24px;
+  padding: 10px 22px;
+  color: var(--accent);
+  background: var(--accent-soft);
   border-radius: 999px;
-  background: #eaf7fb;
-  padding: 10px 24px;
-  color: #1fa3c9;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
 }
 
-.team-header-group h2 {
-  margin: 0;
-  color: #ffffff;
-  font-family: "Sora", sans-serif;
-  font-size: clamp(40px, 4.05vw, 56px);
-  font-weight: 800;
-  line-height: 1.06;
-}
-
-.team-heading-accent {
-  color: #4fc3e8;
-}
-
-.team-carousel-viewport {
-  width: 100%;
-  max-width: 1800px;
-  margin: 0 auto;
-  overflow-x: hidden;
-  overflow-y: visible;
-  padding: 4px 0 24px clamp(28px, 5.7vw, 82px);
-}
-
-.team-carousel-track {
+.heading {
   display: flex;
-  width: max-content;
-  align-items: stretch;
-  gap: clamp(64px, 7.5vw, 108px);
-  will-change: transform;
+  flex-direction: column;
+  margin: 0;
+  font-family: "Sora", sans-serif;
+  font-size: clamp(34px, 4.2vw, 56px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
 }
 
-.team-carousel-track::after {
-  content: "";
-  flex: 0 0 max(
-    0px,
-    calc(100vw - clamp(28px, 5.7vw, 82px) - clamp(980px, 82.15vw, 1183px))
-  );
+.headingLight {
+  color: var(--ink);
 }
 
-.team-slide {
-  display: grid;
-  flex: 0 0 clamp(980px, 82.15vw, 1183px);
-  grid-template-columns: clamp(236px, 19.65vw, 283px) minmax(0, 1fr);
-  align-items: end;
-  gap: clamp(44px, 4.25vw, 61px);
+.headingAccent {
+  color: var(--accent);
 }
 
-.team-photo-box {
+.list {
+  border-top: 1px solid var(--line);
+}
+
+/* Each row is a tall scroll "track": the visual column plays out at normal
+   scroll speed (the row is much taller than the viewport, so it drifts by
+   slowly), while the description column stays pinned (sticky) and
+   translates internally from the top to the bottom of the frame — it only
+   lets go once the row's extra scroll room runs out and the next row begins. */
+.row {
   position: relative;
-  width: clamp(236px, 19.65vw, 283px);
-  aspect-ratio: 279 / 416;
-  overflow: hidden;
-  border-radius: 0;
-  background: linear-gradient(155deg, #1c3a5e, #0b1f3a);
-  box-shadow: 0 18px 36px rgba(3, 10, 22, 0.45);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(32px, 5vw, 80px);
+  min-height: 170vh;
+  padding: 0 clamp(24px, 5.5vw, 80px);
+  border-bottom: 1px solid var(--line);
 }
 
-.team-photo-box img {
+.visual {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: center;
+  gap: 12px;
+  padding: clamp(48px, 6vw, 88px) 0;
+  background: #ffffff; /*temp bg for testing and debugging*/
+}
+
+.imageFrame {
+  position: relative;
+  overflow: hidden;
   width: 100%;
-  height: 100%;
+  max-width: 320px;
+  margin-bottom: 8px;
+  aspect-ratio: 279 / 416;
+  border-radius: 8px;
+  background: rgba(246, 250, 252, 0.06);
+}
+
+.photo {
   object-fit: cover;
 }
 
-.team-initials-avatar {
-  display: flex;
-  width: 100%;
-  height: 100%;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(155deg, #1fa3c9, #16b98a);
-  color: #ffffff;
-  font-family: "Sora", sans-serif;
-  font-size: 48px;
-  font-weight: 800;
-}
-
-.team-info-area {
-  padding-bottom: 2px;
-}
-
-.team-role-label {
-  display: block;
-  margin-bottom: 8px;
-  color: #4fc3e8;
-  font-size: clamp(16px, 1.42vw, 20px);
-  font-weight: 700;
-  line-height: 1.18;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-}
-
-.team-info-area h3 {
-  margin: 0 0 28px;
-  color: #ffffff;
-  font-family: "Sora", sans-serif;
-  font-size: clamp(30px, 2.5vw, 36px);
-  font-weight: 800;
-  line-height: 1.15;
-}
-
-.team-info-area p {
-  max-width: 830px;
-  margin: 0 0 clamp(32px, 4.4vh, 48px);
-  color: rgba(255, 255, 255, 0.88);
-  font-size: clamp(15px, 1.25vw, 18px);
-  line-height: 1.43;
-}
-
-.team-tags-row {
+.role {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 10px;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  max-width: 26ch;
+  line-height: 1.4;
 }
 
-.team-tag-pill {
+.leadBadge {
+  padding: 3px 10px;
+  color: var(--bg);
+  background: var(--accent);
   border-radius: 999px;
-  background: #eaf7fb;
-  min-width: 140px;
-  padding: 9px 24px;
-  color: #1fa3c9;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+.name {
+  margin: 0;
+  color: var(--ink);
+  font-family: "Sora", sans-serif;
+  font-size: clamp(22px, 2vw, 30px);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.linkedin {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  transition: color 0.25s ease;
+}
+
+.linkedin:hover {
+  color: var(--accent);
+}
+
+/* Sticky stage: pins at the top of the viewport for the row's whole
+   scroll duration. overflow hidden keeps descInner's travel clipped
+   to this frame. Height is set inline once TeamSection.tsx measures the
+   visual column; 100vh here is just the fallback before that measurement
+   lands, so there's no flash of an unstyled/oversized frame. */
+.descStage {
+  position: sticky;
+  /* Keeps a fixed gap below the fixed navbar while pinned, instead of
+     butting up flush against it. */
+  top: clamp(60px, 6vw, 90px);
+  overflow: hidden;
+  align-self: start;
+  height: 100vh;
+}
+
+/* Starts flush at the top of the frame (matching the row's visual column)
+   and gets translated down via ScrollTrigger — see TeamSection.tsx — until
+   it lands flush at the bottom right as the row's scroll room runs out. */
+.descInner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  max-width: 46ch;
+  height: 100%;
+  padding: clamp(48px, 6vw, 88px) 0;
+  will-change: transform;
+}
+
+.descIndex {
+  margin-bottom: 16px;
+  color: var(--accent);
+  font-family: "Sora", sans-serif;
   font-size: 14px;
   font-weight: 700;
-  line-height: 1.15;
-  text-align: center;
+  letter-spacing: 0.08em;
 }
 
-@media (max-width: 1100px) {
-  .team-slide {
-    flex-basis: calc(100vw - 96px);
-    grid-template-columns: 236px minmax(0, 1fr);
-  }
+.bio {
+  margin: 0 0 28px;
+  color: var(--muted);
+  font-size: clamp(15px, 1.2vw, 17px);
+  font-weight: 400;
+  line-height: 1.7;
 }
 
-@media (max-width: 720px) {
-  .team-header-group {
-    padding: 0 24px;
-  }
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
 
-  .team-carousel-viewport {
-    padding-left: 24px;
-  }
+.tags li {
+  padding: 8px 16px;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+}
 
-  .team-carousel-track {
-    gap: 40px;
-  }
-
-  .team-slide {
-    flex-basis: calc(100vw - 48px);
+@media (max-width: 900px) {
+  .row {
     grid-template-columns: 1fr;
-    align-items: start;
-    gap: 24px;
+    min-height: 0;
   }
 
-  .team-photo-box {
-    width: 180px;
-    border-radius: 16px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .team-carousel-viewport {
-    overflow-x: auto;
-    scroll-padding-inline: 5%;
-    scroll-snap-type: x mandatory;
-    scrollbar-color: rgba(31, 163, 201, 0.62) rgba(255, 255, 255, 0.1);
-    scrollbar-width: thin;
+  .visual {
+    align-self: auto;
+    padding-top: clamp(40px, 8vw, 64px);
   }
 
-  .team-carousel-viewport::-webkit-scrollbar {
-    height: 10px;
+  .descStage {
+    position: static;
+    height: auto;
+    overflow: visible;
   }
 
-  .team-carousel-viewport::-webkit-scrollbar-track {
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.08);
-  }
-
-  .team-carousel-viewport::-webkit-scrollbar-thumb {
-    border-radius: 999px;
-    background: rgba(31, 163, 201, 0.62);
-  }
-
-  .team-slide {
-    scroll-snap-align: center;
+  .descInner {
+    height: auto;
+    padding-top: 0;
+    padding-bottom: clamp(40px, 8vw, 64px);
+    transform: none !important;
   }
 }
