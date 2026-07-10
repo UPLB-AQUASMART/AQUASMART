@@ -9,6 +9,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 const viewerScriptBase = new URL("./", import.meta.url);
+const viewerRuntimeVersion = "river-boundary-right-edge-20260709";
 const viewerRuntimeFiles = [
   "groundwater-viewer-shared.js",
   "groundwater-3d-model-view.js",
@@ -24,7 +25,9 @@ async function loadViewerRuntime() {
   for (const fileName of viewerRuntimeFiles) {
     await new Promise((resolve, reject) => {
       const script = document.createElement("script");
-      script.src = new URL(fileName, viewerScriptBase).href;
+      const scriptUrl = new URL(fileName, viewerScriptBase);
+      scriptUrl.searchParams.set("v", viewerRuntimeVersion);
+      script.src = scriptUrl.href;
       script.async = false;
       script.onload = resolve;
       script.onerror = () =>

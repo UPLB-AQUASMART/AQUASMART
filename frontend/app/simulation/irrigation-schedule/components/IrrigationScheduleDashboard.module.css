@@ -1,11 +1,16 @@
 .dashboard {
   display: grid;
-  width: min(100%, 1508px);
+  width: min(1440px, 100vw);
+  min-height: 100vh;
   grid-template-columns: minmax(360px, 0.92fr) minmax(0, 1.58fr);
   gap: clamp(14px, 1.4vw, 18px);
   align-items: start;
   margin: 0 auto;
-  padding: clamp(102px, 7vw, 122px) clamp(10px, 2vw, 28px) 22px;
+  background:
+    linear-gradient(180deg, rgba(240, 249, 255, 0.96), rgba(248, 252, 255, 0.98)),
+    #f6fbff;
+  padding: calc(clamp(82px, 6.2vw, 96px) + clamp(40px, 5.6vw, 80px))
+    clamp(40px, 5.6vw, 80px) 28px;
 }
 
 .analytics {

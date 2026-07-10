@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import type { LearningModule } from "@/app/data/home";
+import { LearningModuleCard } from "./components/LearningModuleCard";
 import styles from "./page.module.css";
 
 const filters = [
@@ -70,29 +70,7 @@ export function ModulesBrowser({ modules }: { modules: LearningModule[] }) {
       <div className={styles.gridSection}>
         <div className={styles.materialsGrid}>
           {filteredModules.map((module) => (
-            <article className={styles.card} key={module.code}>
-              <div className={styles.cardVisual}>
-                <Image
-                  src={module.image}
-                  alt=""
-                  fill
-                  sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 390px"
-                />
-              </div>
-              <div className={styles.cardContent}>
-                <span className={styles.cardTag}>{module.category}</span>
-                <h2 className={styles.cardTitle}>
-                  {module.code}: {module.title}
-                </h2>
-                <p className={styles.cardDesc}>{module.description}</p>
-                <div className={styles.cardFooter}>
-                  <span className={styles.cardDate}>{module.date}</span>
-                  <a className={styles.cardLink} href={module.pdfHref}>
-                    View PDF --&gt;
-                  </a>
-                </div>
-              </div>
-            </article>
+            <LearningModuleCard module={module} key={module.code} />
           ))}
         </div>
 

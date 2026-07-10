@@ -159,8 +159,25 @@
 .mapStage.mapViewOpen::after {
   z-index: 1;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(42, 132, 78, 0.1)),
-    radial-gradient(circle at 50% 46%, rgba(255, 255, 255, 0.18), transparent 46%);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.18)),
+    radial-gradient(circle at 50% 48%, rgba(95, 181, 111, 0.1), transparent 46%);
+}
+
+.mapStage.mapViewOpen::before {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 28;
+  height: 118px;
+  background: linear-gradient(
+    180deg,
+    rgba(216, 240, 255, 0) 0%,
+    rgba(216, 232, 242, 0.78) 62%,
+    #dde7ee 100%
+  );
+  content: "";
+  pointer-events: none;
 }
 
 .leafletMap {
@@ -168,7 +185,7 @@
   z-index: 0;
   inset: 0;
   overflow: hidden;
-  background: #f8fff6;
+  background: #d8f0ff;
   opacity: 0;
   pointer-events: none;
   transition:
@@ -183,19 +200,20 @@
 }
 
 .leafletMap :global(.leaflet-tile-pane) {
-  filter: grayscale(1) sepia(0.28) hue-rotate(62deg) saturate(1.2)
-    brightness(1.18) contrast(0.92);
+  opacity: 1;
+  filter: saturate(1.16) brightness(0.98) contrast(1.04);
 }
 
 .leafletMap::before {
   position: absolute;
   z-index: 450;
   inset: 0;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.1)),
-    radial-gradient(circle at 52% 48%, rgba(255, 255, 255, 0.24), transparent 42%);
+  background: linear-gradient(
+    180deg,
+    rgba(13, 148, 180, 0.06),
+    rgba(255, 255, 255, 0.02)
+  );
   content: "";
-  mix-blend-mode: screen;
   pointer-events: none;
 }
 
@@ -203,38 +221,139 @@
   overflow: hidden;
   margin-top: 104px;
   margin-right: clamp(40px, 5.6vw, 80px);
-  border: 1px solid rgba(53, 122, 70, 0.22);
+  border: 1px solid rgba(8, 145, 178, 0.28);
   border-radius: 8px;
-  box-shadow: 0 12px 24px rgba(20, 73, 46, 0.16);
+  box-shadow: 0 12px 24px rgba(12, 74, 110, 0.18);
 }
 
 .leafletMap :global(.leaflet-control-zoom a) {
   width: 36px;
   height: 36px;
-  border-color: rgba(53, 122, 70, 0.18);
-  background: rgba(245, 255, 244, 0.92);
-  color: #1b6d43;
+  border-color: rgba(8, 145, 178, 0.2);
+  background: rgba(240, 249, 255, 0.96);
+  color: #0369a1;
   font-size: 20px;
   line-height: 36px;
 }
 
 .leafletMap :global(.leaflet-control-attribution) {
   border-radius: 6px;
-  background: rgba(245, 255, 244, 0.8);
-  color: #2d6b45;
+  background: rgba(240, 249, 255, 0.86);
+  color: #0369a1;
   font-size: 10px;
 }
 
 .leafletWellPin span {
+  display: flex;
+  width: 42px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  border: 4px solid #fff;
+  border-radius: 50% 50% 50% 0;
+  background: linear-gradient(135deg, #0369a1, #06b6d4);
+  box-shadow: 0 8px 20px rgba(3, 105, 161, 0.32);
+  transform: rotate(-45deg);
+}
+
+.leafletWellPin i {
   display: block;
-  width: 18px;
-  height: 18px;
-  border: 3px solid #f6fff6;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
-  background: #1fa3c9;
+  background: #fff;
+}
+
+.knownPointMarker span {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: #0284c7;
+  color: #fff;
+  font:
+    800 12px "Sora",
+    sans-serif;
   box-shadow:
-    0 0 0 8px rgba(104, 185, 107, 0.24),
-    0 8px 18px rgba(20, 73, 46, 0.25);
+    0 0 0 6px rgba(14, 165, 233, 0.18),
+    0 10px 18px rgba(12, 74, 110, 0.18);
+}
+
+.knownPointLabel {
+  border: 0;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 8px 18px rgba(12, 74, 110, 0.14);
+  color: #0b1f3a;
+  font-family: "Inter", sans-serif;
+}
+
+.knownPointLabel::before {
+  border-top-color: rgba(255, 255, 255, 0.92);
+}
+
+.knownPointLabel strong,
+.knownPointLabel span {
+  display: block;
+}
+
+.knownPointLabel strong {
+  color: #0b1f3a;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.knownPointLabel span {
+  color: #0284c7;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.idwPopup :global(.leaflet-popup-content-wrapper) {
+  overflow: hidden;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 16px 34px rgba(11, 31, 58, 0.18);
+}
+
+.idwPopup :global(.leaflet-popup-content) {
+  min-width: 220px;
+  margin: 0;
+}
+
+.idwPopup :global(.leaflet-popup-tip) {
+  background: #fff;
+}
+
+.idwPopupBody {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 16px;
+  color: #0b1f3a;
+  font-family: "Inter", sans-serif;
+}
+
+.idwPopupBody strong {
+  color: #0b1f3a;
+  font:
+    800 13px "Sora",
+    sans-serif;
+}
+
+.idwPopupBody span {
+  color: #1fa3c9;
+  font:
+    800 18px "Sora",
+    sans-serif;
+}
+
+.idwPopupBody small {
+  color: #66758f;
+  font-size: 11px;
+  line-height: 1.35;
 }
 
 .heroContent {
@@ -252,10 +371,132 @@
 .mapViewOpen .scenarioCard,
 .mapViewOpen .exitButton,
 .mapViewOpen .mapToggleButton,
+.mapViewOpen .mapBackButton,
+.mapViewOpen .mapRandomizeButton,
+.mapViewOpen .mapModeHeader,
 .mapViewOpen .addButton,
 .mapViewOpen .wellAnchor,
 .mapViewOpen .wellPopover {
   pointer-events: auto;
+}
+
+.mapModeHeader {
+  position: absolute;
+  left: clamp(28px, 4.2vw, 60px);
+  top: clamp(116px, 9vw, 132px);
+  z-index: 900;
+  width: min(438px, calc(100vw - 56px));
+  color: #0b1f3a;
+  animation: fadeUp 360ms ease both;
+}
+
+.mapModeHeader h1 {
+  margin: 0 0 8px;
+  max-width: none;
+  color: #0b1f3a;
+  font-family: "Sora", sans-serif;
+  font-size: clamp(25px, 2.4vw, 32px);
+  font-weight: 800;
+  line-height: 1.2;
+  opacity: 1;
+}
+
+.mapStage.mapViewOpen .mapModeHeader h1 {
+  opacity: 1;
+}
+
+.parameterDropdown {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  padding: 10px;
+}
+
+.parameterDropdown.open {
+  z-index: 950;
+}
+
+.parameterPreview {
+  display: flex;
+  width: 100%;
+  min-height: 48px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 8px;
+  background: #f5fafc;
+  color: #857f7f;
+  cursor: pointer;
+  font:
+    400 17px "Inter",
+    sans-serif;
+  line-height: 1.2;
+  text-align: left;
+  transition:
+    background 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.parameterPreview span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.parameterPreview svg {
+  flex: 0 0 auto;
+  color: #857f7f;
+  transition: transform 180ms ease;
+}
+
+.parameterDropdown.open .parameterPreview {
+  background: #f0f8fb;
+  border-radius: 8px 8px 6px 6px;
+}
+
+.parameterDropdown.open .parameterPreview svg {
+  transform: rotate(180deg);
+}
+
+.parameterMenu {
+  position: absolute;
+  z-index: 960;
+  top: 58px;
+  right: 10px;
+  left: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  padding: 20px 16px 28px;
+  border-radius: 0 0 8px 8px;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 14px 30px rgba(11, 31, 58, 0.08);
+}
+
+.parameterMenu button {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: #857f7f;
+  cursor: pointer;
+  font:
+    400 17px "Inter",
+    sans-serif;
+  line-height: 1.2;
+  text-align: left;
+  transition:
+    color 140ms ease,
+    transform 140ms ease;
+}
+
+.parameterMenu button:hover,
+.parameterMenu button:focus-visible,
+.parameterMenu .selectedParameter {
+  color: #1fa3c9;
+  transform: translateX(2px);
 }
 
 .hero h1 {
@@ -365,21 +606,22 @@
   transform: translateY(-2px);
 }
 
-.mapToggleButton {
+.mapToggleButton,
+.mapBackButton {
   position: absolute;
-  top: clamp(40px, 5.6vw, 80px);
-  right: clamp(40px, 5.6vw, 80px);
-  z-index: 12;
+  top: clamp(116px, 9vw, 132px);
+  right: clamp(96px, 10vw, 140px);
+  z-index: 31;
   display: grid;
   width: 48px;
   height: 48px;
   place-items: center;
   border: 1px solid rgba(255, 255, 255, 0.48);
   border-radius: 50%;
-  background: rgba(232, 252, 232, 0.9);
-  color: #2f8f63;
+  background: rgba(240, 249, 255, 0.94);
+  color: #0369a1;
   cursor: pointer;
-  box-shadow: 0 10px 24px rgba(20, 73, 46, 0.18);
+  box-shadow: 0 10px 24px rgba(12, 74, 110, 0.18);
   transition:
     transform 160ms ease,
     background 160ms ease,
@@ -387,11 +629,59 @@
     color 160ms ease;
 }
 
+.mapBackButton {
+  border: 1px solid rgba(8, 145, 178, 0.22);
+  background: rgba(245, 250, 252, 0.94);
+  box-shadow: 0 10px 24px rgba(12, 74, 110, 0.16);
+}
+
+.mapRandomizeButton {
+  position: absolute;
+  left: clamp(28px, 4.2vw, 60px);
+  bottom: 74px;
+  z-index: 40;
+  display: inline-flex;
+  width: auto;
+  min-width: 148px;
+  height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 16px;
+  border: 1px solid rgba(8, 145, 178, 0.22);
+  border-radius: 999px;
+  background: rgba(245, 250, 252, 0.94);
+  color: #0369a1;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(12, 74, 110, 0.16);
+  transition:
+    transform 160ms ease,
+    background 160ms ease,
+    box-shadow 160ms ease,
+    color 160ms ease;
+}
+
+.mapRandomizeButton span {
+  font:
+    800 12px "Inter",
+    sans-serif;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.mapBackButton:hover,
+.mapRandomizeButton:hover {
+  background: #fff;
+  color: #0284c7;
+  box-shadow: 0 0 22px rgba(14, 165, 233, 0.34);
+  transform: translateY(-2px);
+}
+
 .mapToggleButton:hover,
 .mapToggleButton[aria-pressed="true"] {
-  background: #f6fff6;
-  color: #1f7a4d;
-  box-shadow: 0 0 22px rgba(104, 185, 107, 0.48);
+  background: #f0f9ff;
+  color: #0284c7;
+  box-shadow: 0 0 22px rgba(14, 165, 233, 0.38);
   transform: translateY(-2px);
 }
 
@@ -702,142 +992,6 @@
   cursor: pointer;
 }
 
-.readings {
-  width: min(1440px, 100vw);
-  margin: 0 auto;
-  padding: 42px clamp(24px, 5.6vw, 80px) 56px;
-  background: #dde7ee;
-  color: #0b1f3a;
-}
-
-.readingsHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  margin-bottom: 20px;
-}
-.readingsHeader h2 {
-  margin: 0;
-  color: #1fa3c9;
-  font-size: 16px;
-  text-transform: uppercase;
-}
-.reportActions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.reportActions label,
-.reportActions button {
-  display: inline-flex;
-  min-height: 38px;
-  align-items: center;
-  gap: 8px;
-  padding: 9px 14px;
-  border: 1px solid rgba(31, 163, 201, 0.35);
-  border-radius: 8px;
-  background: #fff;
-  color: #19629c;
-  font:
-    600 13px "Inter",
-    sans-serif;
-  cursor: pointer;
-}
-
-.reportActions input {
-  display: none;
-}
-.importMessage {
-  margin: -8px 0 16px;
-  color: #19629c;
-  font-size: 13px;
-}
-
-.tableWrap {
-  overflow-x: auto;
-  border-radius: 8px;
-  background: #fff;
-}
-.tableWrap table {
-  width: 100%;
-  min-width: 1120px;
-  border-collapse: collapse;
-}
-.tableWrap th,
-.tableWrap td {
-  padding: 12px 13px;
-  border-bottom: 1px solid #dde5ef;
-  text-align: center;
-  white-space: nowrap;
-}
-.tableWrap th {
-  color: #66758f;
-  font-size: 13px;
-}
-.tableWrap td:first-child {
-  text-align: left;
-}
-
-.tableWrap input {
-  width: 76px;
-  padding: 7px 6px;
-  border: 1px solid transparent;
-  border-radius: 5px;
-  background: #f5fafc;
-  color: #0b1f3a;
-  font:
-    500 14px "Inter",
-    sans-serif;
-  text-align: center;
-}
-
-.tableWrap input:focus {
-  border-color: #1fa3c9;
-  outline: none;
-  background: #fff;
-}
-.tableWrap .nameInput {
-  width: 120px;
-  font-weight: 700;
-  text-align: left;
-}
-
-.analytics {
-  display: grid;
-  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.35fr);
-  gap: 24px;
-  margin-top: 24px;
-}
-.chartCard {
-  min-width: 0;
-  min-height: 360px;
-  padding: 20px 24px;
-  border-radius: 8px;
-  background: #fff;
-}
-.chartHeading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.chartHeading h3 {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  margin: 0;
-  font-size: 14px;
-}
-.chartHeading h3 span {
-  color: #2f8f63;
-}
-.donut,
-.line {
-  height: 290px;
-  margin-top: 18px;
-}
-
 .research {
   width: min(1440px, 100vw);
   margin: 0 auto;
@@ -980,9 +1134,6 @@
   .researchGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .analytics {
-    grid-template-columns: 1fr;
-  }
   .scenarioCard {
     right: 120px;
   }
@@ -1049,14 +1200,48 @@
     left: 20px;
     top: 32px;
   }
-  .mapToggleButton {
-    top: 32px;
-    right: 20px;
+  .mapToggleButton,
+  .mapBackButton {
+    top: 116px;
+    right: 76px;
     width: 44px;
     height: 44px;
   }
+  .mapRandomizeButton {
+    left: 20px;
+    bottom: 68px;
+    min-width: 132px;
+    width: auto;
+    height: 44px;
+    padding: 0 14px;
+    border-radius: 999px;
+  }
+  .mapModeHeader {
+    left: 10px;
+    top: 106px;
+    width: min(380px, calc(100vw - 76px));
+  }
+  .mapModeHeader h1 {
+    margin-left: 10px;
+    font-size: 24px;
+  }
+  .parameterDropdown {
+    padding: 8px 10px;
+  }
+  .parameterPreview {
+    min-height: 44px;
+    font-size: 15px;
+  }
+  .parameterMenu {
+    top: 52px;
+    gap: 11px;
+    padding: 16px 16px 22px;
+  }
+  .parameterMenu button {
+    font-size: 15px;
+  }
   .leafletMap :global(.leaflet-control-zoom) {
-    margin-top: 84px;
+    margin-top: 98px;
     margin-right: 20px;
   }
   .scenarioCard {
@@ -1082,16 +1267,6 @@
   }
   .wellPopover::after {
     display: none;
-  }
-  .readings {
-    padding: 32px 18px 42px;
-  }
-  .readingsHeader {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-  .chartCard {
-    padding: 18px 14px;
   }
   .research {
     padding: 42px 18px 54px;
