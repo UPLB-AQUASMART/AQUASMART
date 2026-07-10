@@ -46,8 +46,8 @@
   margin: 0;
   color: #0b1f3a;
   font-family: "Sora", sans-serif;
-  font-size: var(--section-title-size);
-  font-weight: 700;
+  font-size: 80px;
+  font-weight: 800;
   line-height: 1;
   letter-spacing: var(--section-title-letter-spacing);
 }

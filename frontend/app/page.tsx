@@ -17,7 +17,7 @@ export default function Home() {
   return (
     <main className={styles["home-page"]} id="home">
       <ScrollRevealInit />
-      <SiteNav />
+      <SiteNav /> 
       <HeroSection />
       <TaglineSection />
       <GoalsSection />
