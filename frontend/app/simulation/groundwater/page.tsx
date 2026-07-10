@@ -3,7 +3,6 @@ import { SiteFooter } from "@/app/components/home/SiteFooter";
 import {
   ChartNoAxesCombined,
   ChevronDown,
-  Download,
   Droplet,
   Eye,
   Image as ImageIcon,
@@ -12,23 +11,10 @@ import {
   Pencil,
   Plus,
   RefreshCw,
-  SlidersHorizontal,
-  Thermometer,
+  Shuffle,
   Trash2,
-  Upload,
   X,
 } from "lucide-react";
-import {
-  ArcElement,
-  CategoryScale,
-  Chart as ChartJS,
-  Filler,
-  Legend,
-  LinearScale,
-  LineElement,
-  PointElement,
-  Tooltip,
-} from "chart.js";
 import {
   useEffect,
   useMemo,
@@ -37,40 +23,10 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from "react";
 import "leaflet/dist/leaflet.css";
-import { Doughnut, Line } from "react-chartjs-2";
 import { SiteNav } from "@/app/components/home/SiteNav";
+import { GroundwaterDashboard } from "./components/GroundwaterDashboard";
 import styles from "./page.module.css";
-
-type ReadingKey =
-  | "dissolvedOxygen"
-  | "ph"
-  | "temperature"
-  | "salinity"
-  | "tds"
-  | "electricalConductivity"
-  | "groundwaterLevel";
-
-type Readings = Record<ReadingKey, number>;
-
-type Well = {
-  id: number;
-  name: string;
-  discharge: number;
-  x: number;
-  y: number;
-  readings: Readings;
-};
-
-ChartJS.register(
-  ArcElement,
-  CategoryScale,
-  Filler,
-  Legend,
-  LinearScale,
-  LineElement,
-  PointElement,
-  Tooltip,
-);
+import type { ReadingKey, Readings, Well } from "./types";
 
 const safeYield = 1000;
 const maxWells = 7;
@@ -170,6 +126,18 @@ const knownMapPoints: KnownMapPoint[] = [
   },
 ];
 
+const mapCenter: [number, number] = [14.166, 121.243];
+const mapBounds: [[number, number], [number, number]] = [
+  [14.142, 121.214],
+  [14.189, 121.272],
+];
+const randomizedPointQuadrants = [
+  { lat: 1, lng: -1 },
+  { lat: 1, lng: 1 },
+  { lat: -1, lng: 1 },
+  { lat: -1, lng: -1 },
+];
+
 function formatParameterValue(parameter: ParameterOption, value: number) {
   const unit = parameterUnits[parameter];
   const decimals =
@@ -187,6 +155,22 @@ function escapeHtml(value: string) {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
+}
+
+function randomizeKnownPointLocations(points: KnownMapPoint[]): KnownMapPoint[] {
+  return points.map((point, index) => {
+    const quadrant = randomizedPointQuadrants[index % randomizedPointQuadrants.length];
+    const latOffset = (0.0048 + Math.random() * 0.0054) * quadrant.lat;
+    const lngOffset = (0.0048 + Math.random() * 0.0064) * quadrant.lng;
+
+    return {
+      ...point,
+      position: [
+        Number((mapCenter[0] + latOffset).toFixed(6)),
+        Number((mapCenter[1] + lngOffset).toFixed(6)),
+      ],
+    };
+  });
 }
 
 function makeReadings(id: number, discharge: number): Readings {
@@ -244,6 +228,8 @@ export default function GroundwaterSimulationPage() {
   const [parameterMenuOpen, setParameterMenuOpen] = useState(false);
   const [selectedParameter, setSelectedParameter] =
     useState<ParameterOption>("Soil Moisture");
+  const [knownPoints, setKnownPoints] =
+    useState<KnownMapPoint[]>(knownMapPoints);
   const [wells, setWells] = useState<Well[]>([initialWell()]);
   const [selectedWellId, setSelectedWellId] = useState<number | null>(null);
   const [importMessage, setImportMessage] = useState("");
@@ -253,6 +239,7 @@ export default function GroundwaterSimulationPage() {
   const knownPointLayerRef = useRef<import("leaflet").LayerGroup | null>(null);
   const projectedLayerRef = useRef<import("leaflet").LayerGroup | null>(null);
   const selectedParameterRef = useRef<ParameterOption>("Soil Moisture");
+  const knownPointsRef = useRef<KnownMapPoint[]>(knownMapPoints);
   const dragMoved = useRef(false);
   const scenarioCardRef = useRef<HTMLElement | null>(null);
 
@@ -295,103 +282,13 @@ export default function GroundwaterSimulationPage() {
     };
   }, [totalDischarge, wells]);
 
-  const averages = useMemo(() => {
-    const average = (key: ReadingKey) =>
-      wells.reduce((sum, well) => sum + well.readings[key], 0) /
-      Math.max(wells.length, 1);
-    return {
-      dissolvedOxygen: average("dissolvedOxygen"),
-      ph: average("ph"),
-      temperature: average("temperature"),
-      salinity: average("salinity"),
-      tds: average("tds"),
-      electricalConductivity: average("electricalConductivity"),
-      groundwaterLevel: average("groundwaterLevel"),
-    };
-  }, [wells]);
-
-  const donutData = useMemo(
-    () => ({
-      labels: ["DO", "pH", "Temperature", "Salinity", "TDS", "EC", "GW Level"],
-      datasets: [
-        {
-          data: [
-            averages.dissolvedOxygen,
-            averages.ph,
-            averages.temperature,
-            averages.salinity * 10,
-            averages.tds / 100,
-            averages.electricalConductivity / 100,
-            averages.groundwaterLevel,
-          ],
-          backgroundColor: [
-            "#0b1f3a",
-            "#46c5df",
-            "#4dbb5d",
-            "#ee9b22",
-            "#638de3",
-            "#2f8f63",
-            "#09a9d5",
-          ],
-          borderColor: "#fff",
-          borderWidth: 2,
-          hoverOffset: 7,
-        },
-      ],
-    }),
-    [averages],
-  );
-
-  const lineData = useMemo(
-    () => ({
-      labels: [
-        "Nov 24",
-        "Nov 25",
-        "Nov 26",
-        "Nov 27",
-        "Nov 28",
-        "Nov 29",
-        "Nov 30",
-        "Dec 1",
-        "Dec 2",
-        "Dec 3",
-        "Dec 4",
-        "Dec 5",
-        "Dec 6",
-        "Dec 7",
-      ],
-      datasets: [
-        {
-          label: "Max Temperature",
-          data: [
-            5.2, 6.2, 7.2, 4.2, 3.2, 5.2, 2.2, 4.2, 6.2, 1.2, 3.2, 5.2, 7.2,
-            6.2,
-          ].map((offset) => averages.temperature + offset),
-          borderColor: "#0b2545",
-          backgroundColor: "rgba(11,37,69,.12)",
-          pointRadius: 3,
-          tension: 0.38,
-          fill: "+1",
-        },
-        {
-          label: "Min Temperature",
-          data: [
-            -2.8, -1.8, -0.8, -3.8, -4.8, -2.8, -5.8, -3.8, -1.8, -6.8, -4.8,
-            -2.8, -0.8, -1.8,
-          ].map((offset) => averages.temperature + offset),
-          borderColor: "#46c5df",
-          backgroundColor: "rgba(70,197,223,.08)",
-          pointRadius: 3,
-          tension: 0.38,
-        },
-      ],
-    }),
-    [averages.temperature],
-  );
-
   useEffect(() => {
     selectedParameterRef.current = selectedParameter;
   }, [selectedParameter]);
+
+  useEffect(() => {
+    knownPointsRef.current = knownPoints;
+  }, [knownPoints]);
 
   useEffect(() => {
     if (!simulationOpen || !mapOpen || !leafletContainerRef.current) return;
@@ -403,21 +300,32 @@ export default function GroundwaterSimulationPage() {
       if (cancelled || !leafletContainerRef.current || leafletMapRef.current) {
         return;
       }
+      const bounds = L.latLngBounds(mapBounds);
 
       const map = L.map(leafletContainerRef.current, {
-        center: [14.166, 121.243],
+        center: mapCenter,
         zoom: 14,
-        minZoom: 12,
-        maxZoom: 18,
+        minZoom: 13,
+        maxZoom: 19,
+        maxBounds: bounds,
+        maxBoundsViscosity: 1,
         zoomControl: false,
         attributionControl: false,
         scrollWheelZoom: true,
+        zoomAnimation: true,
+        fadeAnimation: true,
+        markerZoomAnimation: true,
       });
+      map.fitBounds(bounds, { animate: false });
 
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 19,
-        attribution: "&copy; OpenStreetMap contributors",
-      }).addTo(map);
+      L.tileLayer(
+        "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+        {
+          maxZoom: 19,
+          attribution:
+            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        },
+      ).addTo(map);
 
       L.control
         .zoom({
@@ -430,27 +338,30 @@ export default function GroundwaterSimulationPage() {
           position: "bottomleft",
           prefix: false,
         })
-        .addAttribution("&copy; OpenStreetMap contributors")
+        .addAttribution(
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        )
         .addTo(map);
 
       const wellIcon = L.divIcon({
         className: styles.leafletWellPin,
-        html: "<span></span>",
-        iconSize: [18, 18],
-        iconAnchor: [9, 9],
+        html: "<span><i></i></span>",
+        iconSize: [42, 42],
+        iconAnchor: [21, 42],
+        popupAnchor: [0, -38],
       });
 
-      L.marker([14.166, 121.243], {
+      L.marker(mapCenter, {
         icon: wellIcon,
         title: "AQUASMART groundwater well",
       }).addTo(map);
 
-      L.circle([14.166, 121.243], {
+      L.circle(mapCenter, {
         radius: 420,
-        color: "#1f9d67",
-        weight: 1.5,
-        fillColor: "#68b96b",
-        fillOpacity: 0.18,
+        color: "#0891b2",
+        weight: 2,
+        fillColor: "#67e8f9",
+        fillOpacity: 0.14,
       }).addTo(map);
 
       const projectionGroup = L.layerGroup().addTo(map);
@@ -458,12 +369,13 @@ export default function GroundwaterSimulationPage() {
 
       map.on("click", (event) => {
         const parameter = selectedParameterRef.current;
-        const exactPoint = knownMapPoints.find(
+        const points = knownPointsRef.current;
+        const exactPoint = points.find(
           (point) => map.distance(event.latlng, point.position) < 22,
         );
         if (exactPoint) return;
 
-        const weighted = knownMapPoints.map((point) => {
+        const weighted = points.map((point) => {
           const distance = Math.max(map.distance(event.latlng, point.position), 1);
           const weight = 1 / distance ** 2;
           return {
@@ -532,7 +444,7 @@ export default function GroundwaterSimulationPage() {
       knownPointLayerRef.current?.remove();
       const group = L.layerGroup();
 
-      knownMapPoints.forEach((point) => {
+      knownPoints.forEach((point) => {
         const value = point.values[selectedParameter];
         const marker = L.marker(point.position, {
           icon: L.divIcon({
@@ -580,7 +492,7 @@ export default function GroundwaterSimulationPage() {
     return () => {
       cancelled = true;
     };
-  }, [mapOpen, selectedParameter]);
+  }, [knownPoints, mapOpen, selectedParameter]);
 
   useEffect(() => {
     if (!mapOpen) return;
@@ -657,6 +569,10 @@ export default function GroundwaterSimulationPage() {
     if (next) setSelectedWellId(null);
     else setParameterMenuOpen(false);
     setMapOpen(next);
+  }
+
+  function randomizeKnownPoints() {
+    setKnownPoints((current) => randomizeKnownPointLocations(current));
   }
 
   function cancelWellDrag(event: ReactPointerEvent<HTMLDivElement>) {
@@ -892,6 +808,18 @@ export default function GroundwaterSimulationPage() {
           />
         )}
         <SiteNav activeLabel="Simulation" />
+        {simulationOpen && !mapOpen && (
+          <button
+            className={styles.mapToggleButton}
+            type="button"
+            onClick={toggleMapView}
+            title="Show map view"
+            aria-label="Show map view"
+            aria-pressed={mapOpen}
+          >
+            <MapIcon size={22} strokeWidth={2.4} />
+          </button>
+        )}
         {simulationOpen && mapOpen && (
           <>
             <div className={styles.mapModeHeader}>
@@ -946,6 +874,16 @@ export default function GroundwaterSimulationPage() {
               aria-label="Show field view"
             >
               <ImageIcon size={22} strokeWidth={2.4} />
+            </button>
+            <button
+              className={styles.mapRandomizeButton}
+              type="button"
+              onClick={randomizeKnownPoints}
+              title="Randomize monitoring points"
+              aria-label="Randomize monitoring point locations"
+            >
+              <Shuffle size={20} strokeWidth={2.4} />
+              <span>Shuffle Points</span>
             </button>
           </>
         )}
@@ -1052,18 +990,6 @@ export default function GroundwaterSimulationPage() {
                       <LogOut size={20} />
                     </button>
                   </>
-                )}
-                {!mapOpen && (
-                  <button
-                    className={styles.mapToggleButton}
-                    type="button"
-                    onClick={toggleMapView}
-                    title="Show map view"
-                    aria-label="Show map view"
-                    aria-pressed={mapOpen}
-                  >
-                    <MapIcon size={22} strokeWidth={2.4} />
-                  </button>
                 )}
                 {!mapOpen && (
                   <button
@@ -1179,221 +1105,15 @@ export default function GroundwaterSimulationPage() {
         </section>
       </div>
 
-      <section className={styles.readings} aria-labelledby="readings-title">
-        <div className={styles.readingsHeader}>
-          <h2 id="readings-title">
-            All Parameters — Current Readings (All Zones)
-          </h2>
-          <div className={styles.reportActions}>
-            <label>
-              <Upload size={16} /> Upload PDF
-              <input
-                type="file"
-                accept="application/pdf"
-                onChange={(event) => {
-                  void uploadPdfReport(event.target.files?.[0]);
-                  event.currentTarget.value = "";
-                }}
-              />
-            </label>
-            <button onClick={downloadPdfReport}>
-              <Download size={16} /> Download PDF
-            </button>
-          </div>
-        </div>
-        {importMessage && (
-          <p className={styles.importMessage}>{importMessage}</p>
-        )}
-        <div className={styles.tableWrap}>
-          <table>
-            <thead>
-              <tr>
-                {[
-                  "Well ID",
-                  "Discharge",
-                  "DO (mg/L)",
-                  "pH",
-                  "Temp (°C)",
-                  "Salinity (ppt)",
-                  "TDS (mg/L)",
-                  "EC (µS/cm)",
-                  "GW Level (m)",
-                ].map((label) => (
-                  <th key={label}>{label}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {wells.map((well) => (
-                <tr key={well.id}>
-                  <td>
-                    <input
-                      className={styles.nameInput}
-                      value={well.name}
-                      onChange={(event) =>
-                        updateWell(well.id, { name: event.target.value })
-                      }
-                      aria-label={`${well.name} name`}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      min="0"
-                      max="500"
-                      value={well.discharge}
-                      onChange={(event) =>
-                        updateDischarge(well.id, Number(event.target.value))
-                      }
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      step="0.1"
-                      value={well.readings.dissolvedOxygen}
-                      onChange={(event) =>
-                        updateReading(
-                          well.id,
-                          "dissolvedOxygen",
-                          Number(event.target.value),
-                        )
-                      }
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      step="0.1"
-                      value={well.readings.ph}
-                      onChange={(event) =>
-                        updateReading(well.id, "ph", Number(event.target.value))
-                      }
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      step="0.1"
-                      value={well.readings.temperature}
-                      onChange={(event) =>
-                        updateReading(
-                          well.id,
-                          "temperature",
-                          Number(event.target.value),
-                        )
-                      }
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      step="0.1"
-                      value={well.readings.salinity}
-                      onChange={(event) =>
-                        updateReading(
-                          well.id,
-                          "salinity",
-                          Number(event.target.value),
-                        )
-                      }
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      value={well.readings.tds}
-                      onChange={(event) =>
-                        updateReading(
-                          well.id,
-                          "tds",
-                          Number(event.target.value),
-                        )
-                      }
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      value={well.readings.electricalConductivity}
-                      onChange={(event) =>
-                        updateReading(
-                          well.id,
-                          "electricalConductivity",
-                          Number(event.target.value),
-                        )
-                      }
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      step="0.1"
-                      value={well.readings.groundwaterLevel}
-                      onChange={(event) =>
-                        updateReading(
-                          well.id,
-                          "groundwaterLevel",
-                          Number(event.target.value),
-                        )
-                      }
-                    />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <div className={styles.analytics}>
-          <article className={styles.chartCard}>
-            <div className={styles.chartHeading}>
-              <h3>
-                Average <span>Water Parameters</span>
-              </h3>
-              <SlidersHorizontal size={16} />
-            </div>
-            <div className={styles.donut}>
-              <Doughnut
-                data={donutData}
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  cutout: "62%",
-                  plugins: {
-                    legend: {
-                      position: "bottom",
-                      labels: { boxWidth: 11, color: "#0b2545", padding: 14 },
-                    },
-                  },
-                }}
-              />
-            </div>
-          </article>
-          <article className={styles.chartCard}>
-            <div className={styles.chartHeading}>
-              <h3>
-                <Thermometer size={19} /> Temperature Trends
-              </h3>
-              <SlidersHorizontal size={16} />
-            </div>
-            <div className={styles.line}>
-              <Line
-                data={lineData}
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  interaction: { mode: "index", intersect: false },
-                  plugins: { legend: { position: "top" } },
-                  scales: {
-                    y: { title: { display: true, text: "Temperature (°C)" } },
-                  },
-                }}
-              />
-            </div>
-          </article>
-        </div>
-      </section>
+      <GroundwaterDashboard
+        wells={wells}
+        importMessage={importMessage}
+        onDownloadPdf={downloadPdfReport}
+        onUploadPdf={(file) => void uploadPdfReport(file)}
+        onUpdateWell={updateWell}
+        onUpdateDischarge={updateDischarge}
+        onUpdateReading={updateReading}
+      />
 
       <SiteFooter reveal />
     </main>

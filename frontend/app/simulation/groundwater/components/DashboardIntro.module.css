@@ -1,0 +1,107 @@
+.dashboardIntro {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.dashboardMark {
+  display: grid;
+  position: relative;
+  width: 76px;
+  height: 76px;
+  place-items: center;
+  border-radius: 50%;
+  background: #e9f5ff;
+  color: #147ad6;
+}
+
+.dashboardMark span {
+  position: absolute;
+  right: 19px;
+  bottom: 16px;
+  width: 38px;
+  height: 9px;
+  border-top: 3px solid #15bdd6;
+  border-bottom: 3px solid #15bdd6;
+  border-radius: 999px;
+}
+
+.dashboardIntro p {
+  margin: 0 0 4px;
+  color: #15aee0;
+  font:
+    800 15px "Sora",
+    sans-serif;
+}
+
+.dashboardIntro h2 {
+  margin: 0;
+  color: #0b1f5e;
+  font:
+    800 clamp(30px, 3vw, 42px) "Sora",
+    sans-serif;
+  line-height: 1.1;
+}
+
+.dashboardIntro div > span {
+  display: block;
+  margin-top: 6px;
+  color: #3f5f8d;
+  font-size: 14px;
+}
+
+.dashboardIntro > em {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 18px;
+  border: 1px solid rgba(20, 122, 214, 0.3);
+  border-radius: 999px;
+  background: rgba(235, 247, 255, 0.8);
+  color: #0b3b7a;
+  font:
+    800 12px "Inter",
+    sans-serif;
+  font-style: normal;
+}
+
+@media (max-width: 1050px) {
+  .dashboardIntro {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .dashboardIntro > em {
+    grid-column: 2;
+    justify-self: start;
+  }
+}
+
+@media (max-width: 760px) {
+  .dashboardIntro {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+
+  .dashboardMark {
+    width: 62px;
+    height: 62px;
+  }
+
+  .dashboardMark span {
+    right: 14px;
+    bottom: 13px;
+    width: 32px;
+  }
+
+  .dashboardIntro h2 {
+    font-size: 28px;
+  }
+
+  .dashboardIntro > em {
+    grid-column: auto;
+  }
+}

@@ -1,0 +1,189 @@
+.section {
+  margin-top: 24px;
+  padding: 28px 36px;
+  border: 1px solid rgba(33, 106, 177, 0.14);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 18px 40px rgba(12, 74, 110, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.sectionTitle h3 {
+  margin: 0 0 6px;
+  color: #0b1f5e;
+  font:
+    800 22px "Sora",
+    sans-serif;
+}
+
+.sectionTitle p {
+  margin: 0;
+  color: #3f5f8d;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 360px);
+  gap: 24px;
+  align-items: end;
+}
+
+.wellSelector {
+  position: relative;
+  z-index: 5;
+}
+
+.historyGrid {
+  display: grid;
+  grid-template-columns: 340px minmax(0, 1fr);
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.scoreCard,
+.historyChart {
+  min-width: 0;
+  border: 1px solid #d6e3ef;
+  border-radius: 12px;
+  background: #fff;
+  padding: 24px;
+}
+
+.scoreRing {
+  position: relative;
+  width: 190px;
+  height: 190px;
+  margin: 0 auto 26px;
+  border-radius: 50%;
+  color: #0b1f5e;
+}
+
+.scoreRing strong {
+  position: absolute;
+  top: 50px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-size: 34px;
+  line-height: 1;
+}
+
+.scoreRing span {
+  position: absolute;
+  top: 86px;
+  left: 0;
+  width: 100%;
+  font-size: 24px;
+  line-height: 1;
+  text-align: center;
+}
+
+.scoreRing em {
+  position: absolute;
+  right: 0;
+  bottom: 52px;
+  left: 0;
+  color: #0ea5e9;
+  font-style: normal;
+  font-weight: 800;
+  text-align: center;
+}
+
+.scoreMetric {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px 12px;
+  margin-top: 16px;
+  color: #0b1f5e;
+  font:
+    700 13px "Inter",
+    sans-serif;
+}
+
+.scoreMetric i {
+  grid-column: 1 / -1;
+  height: 8px;
+  border-radius: 999px;
+  background: #e4eef7;
+}
+
+.scoreMetric em {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+}
+
+.historyChart {
+  display: flex;
+  min-height: 420px;
+  flex-direction: column;
+}
+
+.yearTabs {
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+  margin-bottom: 18px;
+}
+
+.yearTabs button {
+  border: 0;
+  background: transparent;
+  color: #0b1f5e;
+  cursor: pointer;
+  font:
+    700 14px "Inter",
+    sans-serif;
+  padding: 8px 10px;
+}
+
+.yearTabs button:hover {
+  color: #147ad6;
+}
+
+.yearTabs .activeYear {
+  border-radius: 8px;
+  background: #eff6ff;
+  color: #147ad6;
+  box-shadow: inset 0 -2px 0 #147ad6;
+}
+
+.chartCanvas {
+  min-height: 0;
+  flex: 1;
+}
+
+@media (max-width: 1050px) {
+  .header {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .historyGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .section {
+    padding: 18px 14px;
+  }
+
+  .historyChart {
+    min-height: 360px;
+    padding: 18px 12px;
+  }
+
+  .yearTabs {
+    gap: 8px;
+    justify-content: flex-start;
+    overflow-x: auto;
+  }
+
+  .scoreCard {
+    padding: 18px 14px;
+  }
+}

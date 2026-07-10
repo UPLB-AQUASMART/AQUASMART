@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { SiteFooter } from "@/app/components/home/SiteFooter";
 import { SiteNav } from "@/app/components/home/SiteNav";
-import { learningModules } from "@/app/data/home";
+import { getLearningModules } from "./moduleData";
 import { ModulesBrowser } from "./ModulesBrowser";
 import styles from "./page.module.css";
 
@@ -12,7 +12,11 @@ export const metadata: Metadata = {
     "Access AQUASMART learning modules on groundwater, sensors, weather forecasting, irrigation, and water quality.",
 };
 
-export default function ModulesPage() {
+export const dynamic = "force-dynamic";
+
+export default async function ModulesPage() {
+  const modules = await getLearningModules();
+
   return (
     <main className={styles.page}>
       <SiteNav activeLabel="Modules" />
@@ -30,7 +34,7 @@ export default function ModulesPage() {
             sustainable irrigation.
           </p>
 
-          <ModulesBrowser modules={learningModules} />
+          <ModulesBrowser modules={modules} />
         </div>
       </section>
 

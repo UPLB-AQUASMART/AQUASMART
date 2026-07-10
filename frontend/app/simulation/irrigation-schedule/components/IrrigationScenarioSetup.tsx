@@ -13,7 +13,6 @@ import {
   RefreshCw,
   Settings2,
   ShieldCheck,
-  SlidersHorizontal,
   Sprout,
   Waves,
 } from "lucide-react";
@@ -152,7 +151,34 @@ export function IrrigationScenarioSetup({ onGenerate }: IrrigationScenarioSetupP
 
   return (
     <section className={styles.setup} aria-labelledby="irrigation-setup-title">
+      <div className={styles.hero}>
+        <img
+          className={styles.heroImage}
+          src="/figma/groundwater-map-expanded.png"
+          alt=""
+        />
+        <div className={styles.heroContent}>
+          <h1 id="irrigation-setup-title">
+            Irrigation Schedule
+            <span>Configuration</span>
+          </h1>
+          <div className={styles.heroBottom}>
+            <p>
+              Set up crop, field, soil, and forecast conditions before generating
+              an irrigation schedule for AQUASMART Mini.
+            </p>
+            <a
+              className={styles.heroAction}
+              href="#irrigation-config-panel"
+              aria-label="View irrigation schedule configuration"
+            >
+              <Eye aria-hidden="true" size={31} strokeWidth={2.4} />
+            </a>
+          </div>
+        </div>
+      </div>
       <form
+        id="irrigation-config-panel"
         className={styles.panel}
         onSubmit={(event) => {
           event.preventDefault();
@@ -160,11 +186,9 @@ export function IrrigationScenarioSetup({ onGenerate }: IrrigationScenarioSetupP
         }}
       >
         <div className={styles.header}>
-          <span className={styles.headerIcon}>
-            <SlidersHorizontal aria-hidden="true" />
-          </span>
           <div className={styles.headerCopy}>
-            <h1 id="irrigation-setup-title">Irrigation Schedule Configuration</h1>
+            <span className={styles.eyebrow}>Irrigation Planning Setup</span>
+            <h2>Configure the schedule inputs before simulation.</h2>
             <p>Set up your crop, field, and forecast conditions before generating the irrigation schedule.</p>
           </div>
           <div className={styles.headerImage} aria-hidden="true" />
