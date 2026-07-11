@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useRef, useState, type MouseEvent } from "react";
 
 import { coreTeam, type TeamMember } from "@/app/data/team";
 
@@ -66,8 +67,40 @@ function TeamRow({ member, index }: { member: TeamMember; index: number }) {
 }
 
 export function TeamSection() {
+  const cursorDotRef = useRef<HTMLDivElement | null>(null);
+  const cursorOutlineRef = useRef<HTMLDivElement | null>(null);
+  const [isCursorVisible, setIsCursorVisible] = useState(false);
+
+  const moveCursor = (event: MouseEvent<HTMLElement>) => {
+    const transform = `translate3d(${event.clientX}px, ${event.clientY}px, 0) translate(-50%, -50%)`;
+
+    if (cursorDotRef.current) {
+      cursorDotRef.current.style.transform = transform;
+    }
+
+    if (cursorOutlineRef.current) {
+      cursorOutlineRef.current.style.transform = transform;
+    }
+  };
+
+  const showCursor = (event: MouseEvent<HTMLElement>) => {
+    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+
+    moveCursor(event);
+    setIsCursorVisible(true);
+  };
+
+  const hideCursor = () => {
+    setIsCursorVisible(false);
+  };
+
   return (
-    <section className={styles.section}>
+    <section
+      className={`${styles.section} ${styles["custom-cursor-area"]}`}
+      onMouseEnter={showCursor}
+      onMouseLeave={hideCursor}
+      onMouseMove={moveCursor}
+    >
       <div className={styles.header}>
         <span className={styles.kicker}>Meet the Team</span>
         <h2 className={styles.heading}>
@@ -81,6 +114,18 @@ export function TeamSection() {
           <TeamRow key={i} member={member} index={i} />
         ))}
       </div>
+      <div
+        aria-hidden="true"
+        className={`${styles["cursor-dot"]}${isCursorVisible ? ` ${styles.visible}` : ""}`}
+        ref={cursorDotRef}
+      />
+      <div
+        aria-hidden="true"
+        className={`${styles["cursor-dot-outline"]}${
+          isCursorVisible ? ` ${styles.visible}` : ""
+        }`}
+        ref={cursorOutlineRef}
+      />
     </section>
   );
 }

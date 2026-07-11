@@ -14,8 +14,8 @@ export function HeroSection() {
           </span>
         </h1>
         <p>
-          AQUASMART provides real-time irrigation monitoring, water analytics,
-          and AI-powered smart farming solutions for sustainable agriculture.
+          AQUASMART Mini is an interactive, sensor-based miniature aquifer and farm system
+          designed to improve public understanding of groundwater and its link to sustainable agriculture.
         </p>
       </div>
     </section>

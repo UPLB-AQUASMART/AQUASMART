@@ -204,6 +204,51 @@
   font-weight: 700;
 }
 
+.cursor-dot,
+.cursor-dot-outline {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10000;
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(-100px, -100px, 0) translate(-50%, -50%);
+  will-change: transform, opacity;
+}
+
+.cursor-dot {
+  width: 6px;
+  height: 6px;
+  background: #7bdff6;
+  box-shadow: 0 0 18px rgba(123, 223, 246, 0.72);
+  transition: opacity 160ms ease;
+}
+
+.cursor-dot-outline {
+  width: 34px;
+  height: 34px;
+  background: rgba(123, 223, 246, 0.2);
+  border: 1px solid rgba(123, 223, 246, 0.36);
+  transition:
+    width 260ms ease,
+    height 260ms ease,
+    opacity 180ms ease,
+    transform 260ms ease-out;
+}
+
+.cursor-dot.visible,
+.cursor-dot-outline.visible {
+  opacity: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .custom-cursor-area,
+  .custom-cursor-area a {
+    cursor: none;
+  }
+}
+
 @media (max-width: 900px) {
   .row {
     grid-template-columns: 1fr;
