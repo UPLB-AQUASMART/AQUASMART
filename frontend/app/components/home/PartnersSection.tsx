@@ -29,16 +29,10 @@ export function PartnersSection() {
       <div className={styles.inner}>
         <div className={styles.header}>
           <span className={styles.kicker}>Collaboration</span>
-          <h2>
-            Our <span>Partners</span>
-          </h2>
-          <Link
-            className={styles["weather-heading"]}
-            href="/partners"
-            aria-label="Open real-time weather forecast page"
-          >
-            <span>Our</span>
-            <strong>Sponsors</strong>
+          <Link href="/partners">
+            <h2>
+              Our <span>Sponsors</span>
+            </h2>
           </Link>
           <p>
             AQUASMART Mini works alongside research and water-management

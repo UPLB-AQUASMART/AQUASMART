@@ -51,7 +51,7 @@ export function WeatherPreviewSection() {
             not just the sky above it.
           </p>
           <Link className={styles["forecast-cta"]} href="/forecast">
-            <span>View full forecast</span>
+            <span>View Today's Forecast</span>
             <ArrowRight size={25} strokeWidth={2.8} aria-hidden="true" />
           </Link>
         </div>
