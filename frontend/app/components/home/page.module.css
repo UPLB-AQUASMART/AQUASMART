@@ -1,0 +1,8 @@
+.merged-section {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    rgba(178, 219, 232, 0.82) 13%,
+    rgba(255, 255, 255, 1) 56%
+  );
+}

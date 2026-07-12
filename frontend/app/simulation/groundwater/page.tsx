@@ -1115,7 +1115,7 @@ export default function GroundwaterSimulationPage() {
         onUpdateReading={updateReading}
       />
 
-      <SiteFooter reveal />
+      <SiteFooter />
     </main>
   );
 }
