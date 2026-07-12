@@ -210,7 +210,7 @@
 .weekly-title {
   margin: 0 0 16px 8px;
   color: rgba(72, 89, 101, 0.52);
-  font-family: "Rubik", "Inter", sans-serif;
+  font-family: "Sora", "Inter", sans-serif;
   font-size: 15px;
 }
 
@@ -259,7 +259,7 @@
 
 .day-pill strong {
   color: #494a4b;
-  font-family: "Rubik", "Inter", sans-serif;
+  font-family: "Sora", "Inter", sans-serif;
   font-size: clamp(19px, 1.7vw, 24px);
   font-weight: 800;
   letter-spacing: -0.02em;
@@ -268,7 +268,7 @@
 .day-pill span {
   overflow: hidden;
   color: #8e8e8e;
-  font-family: "Rubik", "Inter", sans-serif;
+  font-family: "Sora", "Inter", sans-serif;
   font-size: clamp(13px, 1.15vw, 17px);
   text-overflow: ellipsis;
   white-space: nowrap;

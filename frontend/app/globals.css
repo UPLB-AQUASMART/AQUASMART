@@ -42,6 +42,10 @@ body {
   font-family: "Inter", Arial, sans-serif;
 }
 
+body :where(h1, h2, h3, h4, h5, h6) {
+  font-family: "Sora", "Inter", Arial, sans-serif;
+}
+
 body > main {
   width: 100%;
   max-width: var(--app-canvas-width);
