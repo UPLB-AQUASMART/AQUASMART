@@ -902,7 +902,7 @@ export default function GroundwaterSimulationPage() {
                 <p>
                   Simulate groundwater response across wells and field zones
                   using MODFLOW/FLOPY outputs, proximity layers, and live
-                  parameter readings from AQUASMART mini.
+                  parameter readings from AQUASMART Mini.
                 </p>
                 <button
                   className={styles.eyeButton}

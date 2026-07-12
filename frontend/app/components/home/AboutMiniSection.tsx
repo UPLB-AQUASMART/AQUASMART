@@ -5,7 +5,7 @@ import styles from "./AboutMiniSection.module.css";
 export function AboutMiniSection() {
   return (
     <section className={`${styles["about-mini-section"]} ${revealStyles["scroll-reveal"]}`}>
-      <SectionPill className={styles["section-pill"]}>About AQUASMART mini</SectionPill>
+      <SectionPill className={styles["section-pill"]}>About AQUASMART Mini</SectionPill>
       <h2>
         <span>Smaller Scale</span>
         for Better Understanding
