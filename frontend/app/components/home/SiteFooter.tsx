@@ -24,9 +24,9 @@ export function SiteFooter({
             alt="AQUASMART Mini"
           />
           <p>
-            AQUASMART empowers farmers and water managers with real-time data,
-            AI insights, and smart irrigation recommendations for a sustainable
-            future.
+            AQUASMART Mini makes groundwater science visible through a
+            sensor-based aquifer model, real-time dashboard, and public learning
+            materials for sustainable farming awareness.
           </p>
           <div className={styles.socials}>
             <img src="/figma/facebook.svg" alt="Facebook" />

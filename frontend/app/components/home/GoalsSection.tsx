@@ -55,12 +55,12 @@ export function GoalsSection() {
           />
         </div>
         <div className={frameStyles["frame-copy"]}>
-          <h2>Water Intelligence</h2>
+          <h2>Groundwater Awareness</h2>
           <p>
-            AQUASMART is an integrated water resources management initiative
-            focused on strengthening the resilience and sustainability of
-            rice-fish farming systems through groundwater monitoring,
-            AI-assisted forecasting, and data-driven irrigation management.
+            AQUASMART Mini turns complex hydrogeology into a hands-on public
+            engagement experience, helping students, teachers, farmers, local
+            officials, and communities understand groundwater systems,
+            sustainable agriculture, and climate adaptation.
           </p>
         </div>
         <div className={styles["goal-grid"]}>

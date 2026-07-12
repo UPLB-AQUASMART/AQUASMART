@@ -44,27 +44,27 @@ export const navItems = [
 export const goals: GoalItem[] = [
   {
     icon: "soil",
-    title: "Soil Moisture Sensor",
-    highlight: "Moisture",
-    body: "3-in-1 sensor capable of measuring capacitance, temperature, and salinity.",
+    title: "Mini Aquifer Model",
+    highlight: "Aquifer",
+    body: "A clear farm-and-aquifer setup demonstrates infiltration, recharge, flow, pumping, and contaminant transport.",
   },
   {
     icon: "weather",
-    title: "AI Weather Forecasting",
-    highlight: "Weather",
-    body: "Automated checks throughout the code to confirm that files and models are loaded correctly.",
+    title: "Real-time Water Quality",
+    highlight: "Water Quality",
+    body: "Low-cost sensors monitor groundwater depth, pH, electrical conductivity, and salinity during demonstrations.",
   },
   {
     icon: "water",
-    title: "Sustainable Water Usage",
-    highlight: "Water",
-    body: "Maximizes water resources by providing a sustainable irrigation plan to farmers.",
+    title: "Sustainable Farming Awareness",
+    highlight: "Farming",
+    body: "Simple visualizations show how farming practices can influence aquifer conditions and water-use decisions.",
   },
   {
     icon: "monitoring",
     title: "Real-time Monitoring",
     highlight: "Real-time",
-    body: "Provides real-time data for efficient use and notifications.",
+    body: "Live readings are transmitted to a web dashboard so audiences can interact with groundwater data as it changes.",
   },
   // {
   //   icon: "notifications",
@@ -218,11 +218,11 @@ export const learningModules: LearningModule[] = [
   },
   {
     code: "AQS 103",
-    title: "Weather Forecasting",
+    title: "Public Engagement Dashboard",
     description:
-      "Explore how rainfall and evapotranspiration forecasts support climate-responsive water management.",
+      "Explore how live groundwater readings and simple visualizations make aquifer behavior understandable during exhibits and workshops.",
     image: "/assets/weather-preview-light-rain.png",
-    category: "Climate Resilience",
+    category: "Public Engagement",
     date: "April 28, 2025",
     pdfHref: "#",
   },
@@ -269,12 +269,8 @@ export const forecast: ForecastItem[] = [
 ];
 
 export const partners = [
-  "UNESCO",
-  "Nestle",
-  "SWP Youth",
-  "EuroGeosciences",
-  "World Food Forum",
-  "FAO",
+  "European Geosciences Union",
+  "Groundwater Youth Network",
 ];
 
 export const footerColumns = [
@@ -282,7 +278,7 @@ export const footerColumns = [
     title: "Quick Links",
     links: [
       { label: "About", href: "/#about" },
-      { label: "Reports & Research", href: "/#simulations" },
+      { label: "Weather", href: "/forecast" },
       { label: "Team", href: "/team" },
       { label: "Contact", href: "/contact" },
     ],

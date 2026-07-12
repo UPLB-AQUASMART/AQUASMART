@@ -11,10 +11,10 @@ export function AboutMiniSection() {
         for Better Understanding
       </h2>
       <p>
-        AQUASMART Mini provides <strong>information</strong>,{" "}
-        <strong>projection</strong>, and <strong>simulation</strong> related to
-        irrigation systems and models while also providing a simplified version
-        and views for all users.
+        AQUASMART Mini combines a <strong>miniature aquifer model</strong>,{" "}
+        <strong>low-cost sensors</strong>, and a <strong>live dashboard</strong>{" "}
+        to show how infiltration, recharge, groundwater flow, pumping, and water
+        quality connect with sustainable farming.
       </p>
     </section>
   );

@@ -8,9 +8,9 @@ export function HeroSection() {
       <div className={styles["hero-fade"]} />
       <div className={styles["hero-copy"]}>
         <h1>
-          Smarter System
+          AQUASMART Mini
           <span>
-            Stronger <em>Harvest</em>
+            Groundwater <em>Awareness</em>
           </span>
         </h1>
         <p>

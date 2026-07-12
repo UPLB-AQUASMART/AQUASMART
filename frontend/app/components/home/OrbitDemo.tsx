@@ -46,7 +46,7 @@ export default function OrbitDemo() {
         </h1>
         <p style={{ margin: 0, color: "rgba(226, 236, 245, 0.72)", fontSize: "16px", lineHeight: 1.7 }}>
           This is a placeholder page just to preview the Orbit component.
-          Delete or adapt this file once you've wired Orbit into your actual
+          Delete or adapt this file once you&apos;ve wired Orbit into your actual
           page.
         </p>
       </div>
