@@ -172,7 +172,7 @@ export function WaterSavingScaleSection() {
             </h2>
             <p>
               Over 600 gallons of water can be wasted every minute by using outdated irrigation
-              methods. AQUASMART mini helps reduce water waste with smarter monitoring,
+              methods. AQUASMART Mini helps reduce water waste with smarter monitoring,
               weather-aware recommendations, and data-guided decisions.
             </p>
           </div>
