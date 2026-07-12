@@ -21,6 +21,7 @@
     ),
     linear-gradient(155deg, #f7fafc 0%, #eef4f8 55%, #f7fafc 100%);
   padding: clamp(64px, 8vw, 100px) clamp(24px, 6vw, 96px);
+  padding-top: clamp(96px, 12vw, 140px);
   scroll-margin-top: 96px;
 }
 
