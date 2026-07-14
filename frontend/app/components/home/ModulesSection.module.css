@@ -111,8 +111,7 @@
   text-align: left;
   transition:
     box-shadow 0.3s ease,
-    filter 0.3s ease,
-    transform 0.3s ease;
+    filter 0.3s ease;
 }
 
 .card:focus-visible {
@@ -137,6 +136,7 @@
   width: 388px;
   min-width: 388px;
   transform: none;
+  transition: transform 0.3s ease;
 }
 
 .carousel-shell {

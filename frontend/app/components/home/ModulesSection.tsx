@@ -60,7 +60,7 @@ export function ModulesSection() {
   
   const getAlignedTrackX = () => {
     const { cardWidth, step, centerIndex } = getCardMetrics();
-    const viewportCenterX = window.innerWidth / 2;
+    const viewportCenterX = document.documentElement.clientWidth / 2;
 
     return viewportCenterX - centerIndex * step - cardWidth / 2;
   };
@@ -330,7 +330,13 @@ function ModuleCard({
       tabIndex={0}
     >
       <div className={styles.photo}>
-        <Image src={module.image} alt="" fill sizes="388px" />
+        <Image
+          src={module.image}
+          alt=""
+          fill
+          sizes="388px"
+          loading={isRevealed ? "eager" : undefined}
+        />
       </div>
       <div className={styles.desc}>
         <div className={styles["module-title-row"]}>
