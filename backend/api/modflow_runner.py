@@ -257,18 +257,30 @@ def _build_simulation(
 
 
 def _layer_elevations(scenario: Any, nlay: int) -> tuple[float, list[float]]:
-    reference_head = max(
-        float(scenario.boundary.groundwaterElevation),
-        float(scenario.boundary.riverElevation),
-        1.0,
-    )
-    total_thickness = max(30.0 * nlay, 0.35 * reference_head, 45.0)
-    top = reference_head + max(5.0, total_thickness * 0.08)
-    layer_weights = np.array([0.4, 0.22, 0.38][:nlay], dtype=float)
-    if len(layer_weights) < nlay:
-        layer_weights = np.ones(nlay, dtype=float)
-    layer_weights = layer_weights / layer_weights.sum()
-    thicknesses = layer_weights * total_thickness
+    groundwater_head = float(scenario.boundary.groundwaterElevation)
+    river_head = float(scenario.boundary.riverElevation)
+    high_head = max(groundwater_head, river_head, 1.0)
+    low_head = min(groundwater_head, river_head)
+    vertical_range = max(0.0, high_head - low_head)
+    top_buffer = max(5.0, abs(high_head) * 0.05)
+    bottom_buffer = max(5.0, vertical_range * 0.05)
+    top = high_head + top_buffer
+    minimum_bottom = low_head - bottom_buffer
+    first_layer_thickness = max(30.0, top - minimum_bottom)
+    if nlay == 1:
+        thicknesses = np.array([max(first_layer_thickness, 45.0)], dtype=float)
+    else:
+        lower_total_thickness = max(30.0 * (nlay - 1), 45.0)
+        lower_weights = np.array([0.36, 0.64][: nlay - 1], dtype=float)
+        if len(lower_weights) < nlay - 1:
+            lower_weights = np.ones(nlay - 1, dtype=float)
+        lower_weights = lower_weights / lower_weights.sum()
+        thicknesses = np.concatenate(
+            [
+                np.array([first_layer_thickness], dtype=float),
+                lower_weights * lower_total_thickness,
+            ]
+        )
     return float(top), [float(top - thicknesses[: index + 1].sum()) for index in range(nlay)]
 
 
@@ -280,14 +292,38 @@ def _starting_heads(scenario: Any, nlay: int, nrow: int, ncol: int) -> np.ndarra
 
 
 def _edge_heads(scenario: Any) -> tuple[float, float]:
+    if scenario.boundary.type == "river":
+        return (
+            float(scenario.boundary.groundwaterElevation),
+            float(scenario.boundary.riverElevation),
+        )
     base = float(scenario.boundary.groundwaterElevation)
     river = float(scenario.boundary.riverElevation)
     gradient = max(0.5, abs(river - base) * 0.25, 2.0)
-    if scenario.boundary.type == "river":
-        base = (base + river) / 2.0
     if scenario.boundary.direction == "right-to-left":
         return base - gradient, base + gradient
     return base + gradient, base - gradient
+
+
+def _boundary_flow_direction(scenario: Any) -> str:
+    groundwater = float(scenario.boundary.groundwaterElevation)
+    river = float(scenario.boundary.riverElevation)
+    if scenario.boundary.type == "river":
+        return "right-to-left" if river > groundwater else "left-to-right"
+    return scenario.boundary.direction
+
+
+def _river_drawdown_factor(scenario: Any) -> float:
+    if scenario.boundary.type != "river":
+        return 1.0
+    groundwater = float(scenario.boundary.groundwaterElevation)
+    river = float(scenario.boundary.riverElevation)
+    normalized_difference = min(1.0, abs(groundwater - river) / 1000.0)
+    if groundwater > river:
+        return 1.0 + normalized_difference * 0.65
+    if river > groundwater:
+        return max(0.35, 1.0 - normalized_difference * 0.55)
+    return 1.0
 
 
 def _hydraulic_conductivity(scenario: Any, nlay: int) -> tuple[np.ndarray, np.ndarray]:
@@ -406,7 +442,11 @@ def _add_wells(model: Any, scenario: Any, nlay: int, nrow: int, ncol: int) -> No
 
 
 def _effective_pumping_discharge(scenario: Any) -> float:
-    return float(scenario.dischargeM3Day) * _recharge_drawdown_factor(scenario)
+    return (
+        float(scenario.dischargeM3Day)
+        * _recharge_drawdown_factor(scenario)
+        * _river_drawdown_factor(scenario)
+    )
 
 
 def _recharge_drawdown_factor(scenario: Any) -> float:
@@ -452,6 +492,13 @@ def _export_frontend_json(
     qx = np.asarray(spdis["qx"], dtype=float).reshape(nlay, nrow, ncol)
     qy = np.asarray(spdis["qy"], dtype=float).reshape(nlay, nrow, ncol)
     qz = np.asarray(spdis["qz"], dtype=float).reshape(nlay, nrow, ncol)
+    baseline_budget = flopy.utils.CellBudgetFile(
+        baseline_workspace / f"{model_name}.cbc",
+        precision="double",
+    )
+    baseline_spdis = baseline_budget.get_data(text="DATA-SPDIS")[-1]
+    baseline_qx = np.asarray(baseline_spdis["qx"], dtype=float).reshape(nlay, nrow, ncol)
+    baseline_qy = np.asarray(baseline_spdis["qy"], dtype=float).reshape(nlay, nrow, ncol)
 
     vertices, cells = _structured_grid_geometry(nrow, ncol, float(grid.delr[0]), float(grid.delc[0]))
     x_centers = np.asarray([cell["center"][0] for cell in cells], dtype=float)
@@ -471,6 +518,8 @@ def _export_frontend_json(
                 "drawdown": _compact(drawdown),
                 "qx": _compact(qx[layer].reshape(-1), 7),
                 "qy": _compact(qy[layer].reshape(-1), 7),
+                "baselineQx": _compact(baseline_qx[layer].reshape(-1), 7),
+                "baselineQy": _compact(baseline_qy[layer].reshape(-1), 7),
                 "qz": _compact(qz[layer].reshape(-1), 7),
                 "contours": _contour_paths(x_centers, y_centers, layer_heads),
             }
@@ -489,6 +538,7 @@ def _export_frontend_json(
             "wellPackage": "WEL",
             "riverPackage": "RIV",
             "rechargeDrawdownFactor": round(_recharge_drawdown_factor(scenario), 4),
+            "riverDrawdownFactor": round(_river_drawdown_factor(scenario), 4),
             "effectivePumpingM3Day": round(_effective_pumping_discharge(scenario), 3),
         },
         "domain": {
@@ -513,6 +563,7 @@ def _export_frontend_json(
             "riverElevation": float(scenario.boundary.riverElevation),
             "streamLeakage": _signed_stream_leakage(scenario),
             "leakageDirection": scenario.boundary.leakageDirection,
+            "flowDirection": _boundary_flow_direction(scenario),
             "mode": "losing" if _signed_stream_leakage(scenario) >= 0 else "gaining",
         },
         "derived": {

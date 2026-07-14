@@ -247,6 +247,9 @@ function getTopViewScenario(
         maxRate: Number(scenarioInputs.rechargeRate?.max || 1000),
       })
     : rechargeDrawdownFactor();
+  const riverFactor =
+    data.source?.riverDrawdownFactor ??
+    riverDrawdownFactor(data.scenario?.boundary || activeScenarioConfig?.boundary);
   const screenLevel = activeTopLayer + 1;
   const soil = getSoilProfileForLevel(screenLevel);
   const screenActive = selectedScreenLevels.has(screenLevel);
@@ -282,19 +285,39 @@ function getTopViewScenario(
     const scaledDrawdown = drawdown.map(
       (value) => (Number(value) || 0) * dischargeScale,
     );
+    const baselineQx = Array.isArray(layer.baselineQx)
+      ? layer.baselineQx
+      : layer.qx;
+    const baselineQy = Array.isArray(layer.baselineQy)
+      ? layer.baselineQy
+      : layer.qy;
+    const scaledQx = layer.qx.map((value, index) => {
+      const baseValue = Number(baselineQx[index]) || 0;
+      return baseValue + ((Number(value) || 0) - baseValue) * dischargeScale;
+    });
+    const scaledQy = layer.qy.map((value, index) => {
+      const baseValue = Number(baselineQy[index]) || 0;
+      return baseValue + ((Number(value) || 0) - baseValue) * dischargeScale;
+    });
     const solvedMaximumDrawdown =
       scaledDrawdown.length > 0 ? Math.max(...scaledDrawdown) : 0;
     const shouldUseFallbackDrawdown =
       solvedMaximumDrawdown <= 0.001 && screenActive && dischargeValue > 0;
     const maximumDrawdown = shouldUseFallbackDrawdown
-      ? dischargeRatio * 9.5 * soil.depth * rechargeFactor
+      ? dischargeRatio * 9.5 * soil.depth * rechargeFactor * riverFactor
       : solvedMaximumDrawdown;
     const baselineFlowScale = Math.max(
-      ...layer.qx.map((qx, index) => Math.hypot(qx, layer.qy[index])),
+      ...baselineQx.map((qx, index) => Math.hypot(qx, baselineQy[index])),
       1e-9,
     );
-    const flowBoost = shouldUseFallbackDrawdown
-      ? dischargeRatio * baselineFlowScale * 1.15 * soil.depth * rechargeFactor
+    const shouldUseInteractiveFlow = screenActive && dischargeValue > 0;
+    const flowBoost = shouldUseInteractiveFlow
+      ? dischargeRatio *
+        baselineFlowScale *
+        3.2 *
+        soil.depth *
+        rechargeFactor *
+        Math.max(0.65, riverFactor)
       : 0;
     const adjustedHead = [];
     const adjustedQx = [];
@@ -303,8 +326,18 @@ function getTopViewScenario(
     for (let index = 0; index < data.grid.cells.length; index += 1) {
       if (!shouldUseFallbackDrawdown) {
         adjustedHead.push(Number(baselineHead[index]) - (scaledDrawdown[index] || 0));
-        adjustedQx.push(layer.qx[index]);
-        adjustedQy.push(layer.qy[index]);
+        const [cellX, cellY] = data.grid.cells[index].center;
+        const dx = scenarioWellX - cellX;
+        const dy = scenarioWellY - cellY;
+        const distance = Math.hypot(dx, dy);
+        const influence =
+          soil.type === "sand"
+            ? Math.pow(Math.max(0, 1 - distance / radius), 0.9)
+            : Math.exp(-(distance * distance) / (2 * radius * radius));
+        const directionX = distance > 1e-6 ? dx / distance : 0;
+        const directionY = distance > 1e-6 ? dy / distance : 0;
+        adjustedQx.push(scaledQx[index] + directionX * flowBoost * influence);
+        adjustedQy.push(scaledQy[index] + directionY * flowBoost * influence);
         continue;
       }
 
@@ -319,8 +352,8 @@ function getTopViewScenario(
       const directionX = distance > 1e-6 ? dx / distance : 0;
       const directionY = distance > 1e-6 ? dy / distance : 0;
       adjustedHead.push(Number(baselineHead[index]) - maximumDrawdown * influence);
-      adjustedQx.push(layer.qx[index] + directionX * flowBoost * influence);
-      adjustedQy.push(layer.qy[index] + directionY * flowBoost * influence);
+      adjustedQx.push(scaledQx[index] + directionX * flowBoost * influence);
+      adjustedQy.push(scaledQy[index] + directionY * flowBoost * influence);
     }
 
     return {
@@ -333,6 +366,7 @@ function getTopViewScenario(
       wellY: scenarioWellY,
       radius,
       rechargeFactor: data.source?.rechargeDrawdownFactor ?? rechargeFactor,
+      riverFactor,
       maximumDrawdown,
       head: adjustedHead,
       qx: adjustedQx,
@@ -342,14 +376,19 @@ function getTopViewScenario(
     };
   }
   const maximumDrawdown = screenActive
-    ? dischargeRatio * 9.5 * soil.depth * rechargeFactor
+    ? dischargeRatio * 9.5 * soil.depth * rechargeFactor * riverFactor
     : 0;
   const baselineFlowScale = Math.max(
     ...layer.qx.map((qx, index) => Math.hypot(qx, layer.qy[index])),
     1e-9,
   );
   const flowBoost = screenActive
-    ? dischargeRatio * baselineFlowScale * 1.15 * soil.depth * rechargeFactor
+    ? dischargeRatio *
+      baselineFlowScale *
+      3.2 *
+      soil.depth *
+      rechargeFactor *
+      Math.max(0.65, riverFactor)
     : 0;
   const adjustedHead = [];
   const adjustedQx = [];
@@ -381,6 +420,7 @@ function getTopViewScenario(
     wellY,
     radius,
     rechargeFactor,
+    riverFactor,
     maximumDrawdown,
     head: adjustedHead,
     qx: adjustedQx,

@@ -101,6 +101,10 @@ function calculateStreamLeakage(groundwaterElevation, riverElevation) {
   return STREAMBED_CONDUCTANCE_M2_DAY * headDifference;
 }
 
+function calculateBoundaryDirection(groundwaterElevation, riverElevation) {
+  return riverElevation > groundwaterElevation ? "right-to-left" : "left-to-right";
+}
+
 function formatStreamLeakage(value) {
   const leakage = Math.abs(value) < 0.00005 ? 0 : value;
   return leakage.toFixed(4);
@@ -223,6 +227,11 @@ function updateAquiferSetupReadouts({ syncStreamLeakageFromElevations = false } 
   const riverElevation = Number(scenarioInputs.riverElevation.value);
   const groundwaterValue = formatElevationMeters(groundwaterElevation);
   const riverValue = formatElevationMeters(riverElevation);
+  scenarioDirection = calculateBoundaryDirection(
+    groundwaterElevation,
+    riverElevation,
+  );
+  updateScenarioDirectionButtons();
   let streamLeakage = signedStreamLeakageFromControls();
   if (syncStreamLeakageFromElevations) {
     streamLeakage = calculateStreamLeakage(
@@ -302,7 +311,10 @@ function readScenarioConfig(region = pendingTopViewRegion) {
     },
     boundary: {
       type: scenarioInputs.boundary.value,
-      direction: scenarioDirection,
+      direction: calculateBoundaryDirection(
+        Number(scenarioInputs.groundwaterElevation.value),
+        Number(scenarioInputs.riverElevation.value),
+      ),
       groundwaterElevation: Number(
         scenarioInputs.groundwaterElevation.value,
       ),
