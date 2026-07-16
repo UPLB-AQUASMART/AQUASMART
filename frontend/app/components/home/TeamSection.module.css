@@ -87,11 +87,14 @@
   margin-bottom: 8px;
   aspect-ratio: 279 / 416;
   border-radius: 8px;
-  background: rgba(246, 250, 252, 0.06);
+  background-image: url("/assets/team/bg.png");
+  background-size: cover;
+  background-position: center;
 }
 
 .photo {
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center bottom;
 }
 
 .role {
