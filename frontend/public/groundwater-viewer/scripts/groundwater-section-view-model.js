@@ -621,6 +621,89 @@ function drawSectionView() {
     };
   });
 
+  if (!topViewSetupMode && aquiferHitRegions.length > 0) {
+    const hintedRegion =
+      aquiferHitRegions.find((region) => region.level === hoveredAquiferLevel) ||
+      aquiferHitRegions[0];
+    const polygon = hintedRegion.polygon;
+    const target = polygon.reduce(
+      (acc, point) => ({
+        x: acc.x + point.x / polygon.length,
+        y: acc.y + point.y / polygon.length,
+      }),
+      { x: 0, y: 0 },
+    );
+    const isHovered = hintedRegion.level === hoveredAquiferLevel;
+    const badgeWidth = isHovered ? 218 : 205;
+    const badgeHeight = 43;
+    const badgeX = Math.min(
+      width - badgeWidth - 24,
+      Math.max(24, target.x + 38),
+    );
+    const badgeY = Math.min(
+      height - badgeHeight - 28,
+      Math.max(72, target.y - 58),
+    );
+    const pointerStart = {
+      x: badgeX + 16,
+      y: badgeY + badgeHeight,
+    };
+
+    sectionContext.save();
+    sectionContext.strokeStyle = isHovered
+      ? "rgba(14, 165, 233, 0.96)"
+      : "rgba(14, 116, 144, 0.68)";
+    sectionContext.fillStyle = sectionContext.strokeStyle;
+    sectionContext.lineWidth = isHovered ? 2.4 : 1.7;
+    sectionContext.setLineDash(isHovered ? [] : [6, 5]);
+    sectionContext.beginPath();
+    sectionContext.moveTo(pointerStart.x, pointerStart.y);
+    sectionContext.quadraticCurveTo(
+      (pointerStart.x + target.x) / 2,
+      pointerStart.y + 30,
+      target.x,
+      target.y,
+    );
+    sectionContext.stroke();
+    sectionContext.setLineDash([]);
+    sectionContext.beginPath();
+    sectionContext.arc(target.x, target.y, isHovered ? 7 : 5, 0, Math.PI * 2);
+    sectionContext.fill();
+
+    sectionContext.shadowColor = "rgba(15, 23, 42, 0.2)";
+    sectionContext.shadowBlur = 10;
+    sectionContext.fillStyle = isHovered
+      ? "rgba(224, 247, 255, 0.96)"
+      : "rgba(248, 253, 255, 0.9)";
+    sectionContext.strokeStyle = isHovered
+      ? "rgba(14, 165, 233, 0.75)"
+      : "rgba(125, 211, 252, 0.55)";
+    sectionContext.lineWidth = 1.2;
+    sectionContext.beginPath();
+    sectionContext.roundRect(badgeX, badgeY, badgeWidth, badgeHeight, 8);
+    sectionContext.fill();
+    sectionContext.stroke();
+    sectionContext.shadowBlur = 0;
+
+    sectionContext.fillStyle = "#0b1f3a";
+    sectionContext.font = "900 11px Inter, system-ui, sans-serif";
+    sectionContext.textAlign = "left";
+    sectionContext.textBaseline = "alphabetic";
+    sectionContext.fillText(
+      isHovered ? "Click to configure aquifer" : "Clickable aquifer layer",
+      badgeX + 13,
+      badgeY + 17,
+    );
+    sectionContext.fillStyle = "#0e7490";
+    sectionContext.font = "800 9px Inter, system-ui, sans-serif";
+    sectionContext.fillText(
+      "Set inputs, then run MODFLOW top view",
+      badgeX + 13,
+      badgeY + 32,
+    );
+    sectionContext.restore();
+  }
+
   if (topViewSetupMode && selectedAquiferRegion?.polygon?.length) {
     const polygon = selectedAquiferRegion.polygon;
     const target = polygon.reduce(
