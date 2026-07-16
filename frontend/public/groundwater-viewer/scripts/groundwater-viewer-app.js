@@ -9,7 +9,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 const viewerScriptBase = new URL("./", import.meta.url);
-const viewerRuntimeVersion = "river-boundary-right-edge-20260709";
+const viewerRuntimeVersion = "river-flow-arrow-response-20260714";
 const viewerRuntimeFiles = [
   "groundwater-viewer-shared.js",
   "groundwater-3d-model-view.js",

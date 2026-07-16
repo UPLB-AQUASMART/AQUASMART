@@ -210,6 +210,21 @@ function rechargeDrawdownFactor({
   return 1 - normalizedRecharge * MAX_RECHARGE_DRAWDOWN_REDUCTION;
 }
 
+function riverDrawdownFactor(boundary = activeScenarioConfig?.boundary) {
+  if (!boundary || boundary.type !== "river") return 1;
+  const groundwater = Number(boundary.groundwaterElevation);
+  const river = Number(boundary.riverElevation);
+  if (!Number.isFinite(groundwater) || !Number.isFinite(river)) return 1;
+  const normalizedDifference = Math.min(1, Math.abs(groundwater - river) / 1000);
+  if (groundwater > river) {
+    return 1 + normalizedDifference * 0.65;
+  }
+  if (river > groundwater) {
+    return Math.max(0.35, 1 - normalizedDifference * 0.55);
+  }
+  return 1;
+}
+
 const aquiferLevelNames = {
   "Upper Aquifer": "Level 1",
   "Middle Aquifer": "Level 2",
