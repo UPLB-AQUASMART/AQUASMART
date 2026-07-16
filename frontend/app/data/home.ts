@@ -155,23 +155,6 @@ export const simulations = [
     ],
   },
   {
-    title: "Irrigation Schedule",
-    highlight: "Planner",
-    href: "/simulation/irrigation-schedule",
-    states: [
-      {
-        label: "Schedule overview",
-        image: "/assets/field.png",
-        body: "Generate weather-linked irrigation plans from rainfall, ET0 demand, soil moisture estimates, and crop-field settings.",
-      },
-      {
-        label: "Calendar recommendations",
-        image: "/assets/field.png",
-        body: "Review weekly and monthly irrigation recommendations, inspect daily water balance, and export the schedule for field use.",
-      },
-    ],
-  },
-  {
     title: "Spatial Drawdown",
     highlight: "Map",
     href: "/simulation",
@@ -190,6 +173,28 @@ export const simulations = [
         label: "Hydraulic head",
         image: "/figma/drawdown-state-head.png",
         body: "Compare hydraulic-head contours and flow gradients around wells to identify drawdown cones, interference, and higher-risk areas.",
+      },
+    ],
+  },
+  {
+    title: "Irrigation Schedule",
+    highlight: "Planner",
+    href: "/simulation/irrigation-schedule",
+    states: [
+      {
+        label: "Irrigation Setup ",
+        image: "/assets/irrigation-setup.png",
+        body: "Configure irrigation setup based on several parameters and  weather-linked irrigation plans from rainfall, ET0 demand, soil moisture estimates, and crop-field settings.",
+      },
+      {
+        label: "Irrigation Schedule and Recommendation",
+        image: "/assets/irrigation-sched.png",
+        body: "Review weekly and monthly irrigation recommendations, inspect daily water balance, and export the schedule for field use.",
+      },
+      {
+        label: "Schedule Download",
+        image: "/assets/pdf-output.png",
+        body: "Download a pdf or csv copy for past and future irrigation schedule and recommendation for offline support and easy access for users.",
       },
     ],
   },
