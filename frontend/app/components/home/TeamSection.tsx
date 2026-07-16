@@ -20,7 +20,7 @@ function TeamRow({ member, index }: { member: TeamMember; index: number }) {
         <div className={styles.imageFrame}>
           <Image
             className={styles.photo}
-            src={PLACEHOLDER_PHOTO}
+            src={member.image ?? PLACEHOLDER_PHOTO}
             alt={member.image ? member.name : `Placeholder photo for ${member.name}`}
             fill
             sizes="(max-width: 900px) 100vw, 320px"
