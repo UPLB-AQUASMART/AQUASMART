@@ -50,9 +50,9 @@ export const goals: GoalItem[] = [
   },
   {
     icon: "weather",
-    title: "Real-time Water Quality",
-    highlight: "Water Quality",
-    body: "Low-cost sensors monitor groundwater depth, pH, electrical conductivity, and salinity during demonstrations.",
+    title: "Real-time Weather Forecast",
+    highlight: "Weather Forecast",
+    body: "Provides live rainfall, temperature, and weather outlooks to support smarter water-use planning and field decisions.",
   },
   {
     icon: "water",
@@ -62,9 +62,9 @@ export const goals: GoalItem[] = [
   },
   {
     icon: "monitoring",
-    title: "Real-time Monitoring",
-    highlight: "Real-time",
-    body: "Live readings are transmitted to a web dashboard so audiences can interact with groundwater data as it changes.",
+    title: "Learning Modules",
+    highlight: "Modules",
+    body: "Offers public-friendly modules, activity materials, and dashboard-based lessons that make groundwater concepts easier to explore.",
   },
   // {
   //   icon: "notifications",
