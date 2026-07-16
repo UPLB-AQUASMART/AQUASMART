@@ -143,14 +143,19 @@ export const simulations = [
     href: "/simulation/groundwater",
     states: [
       {
-        label: "Scenario overview",
-        image: "/figma/groundwater-state-overview.png",
-        body: "Review total pumping, safe-yield utilization, average drawdown, recovery time, and the current well footprint before changing the model.",
-      },
-      {
         label: "Well configuration",
         image: "/figma/groundwater-state-configure.png",
         body: "Add another well, position it on the field, and adjust its daily discharge while statistics and water-quality readings recalculate dynamically.",
+      },
+      {
+        label: "Inverse Distance Weighting Interpolation",
+        image: "/assets/Interpolation.png",
+        body: "Create water parameter projections for well locations given a known location of existing wells with known parameter values.",
+      },
+      {
+        label: "Water Paramaters",
+        image: "/assets/well-config.png",
+        body: "Adjust water parameters for simulation purposes and use mock historical data for further analysis",
       },
     ],
   },
