@@ -60,7 +60,8 @@ function SimpleDropdown({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownId = useId();
-  const selectedOption = options.find((option) => option.value === value) ?? options[0];
+  const selectedOption =
+    options.find((option) => option.value === value) ?? options[0];
 
   return (
     <div className={styles.dropdown}>
@@ -71,7 +72,9 @@ function SimpleDropdown({
         aria-haspopup="listbox"
         aria-label={label}
         onBlur={(event) => {
-          if (!event.currentTarget.parentElement?.contains(event.relatedTarget)) {
+          if (
+            !event.currentTarget.parentElement?.contains(event.relatedTarget)
+          ) {
             setIsOpen(false);
           }
         }}
@@ -88,7 +91,9 @@ function SimpleDropdown({
           tabIndex={-1}
           aria-label={label}
           onBlur={(event) => {
-            if (!event.currentTarget.parentElement?.contains(event.relatedTarget)) {
+            if (
+              !event.currentTarget.parentElement?.contains(event.relatedTarget)
+            ) {
               setIsOpen(false);
             }
           }}
@@ -113,7 +118,11 @@ function SimpleDropdown({
   );
 }
 
-function previewDemand(fieldAreaHa: number, efficiency: number, cropType: string) {
+function previewDemand(
+  fieldAreaHa: number,
+  efficiency: number,
+  cropType: string,
+) {
   return (
     Math.round(
       fieldAreaHa *
@@ -131,14 +140,17 @@ function demandLevel(demand: number) {
   return "Moderate";
 }
 
-export function IrrigationScenarioSetup({ onGenerate }: IrrigationScenarioSetupProps) {
+export function IrrigationScenarioSetup({
+  onGenerate,
+}: IrrigationScenarioSetupProps) {
   const [scenario, setScenario] = useState<IrrigationScenario>(defaultScenario);
   const demand = previewDemand(
     scenario.fieldAreaHa,
     scenario.irrigationEfficiency,
     scenario.cropType,
   );
-  const retention = soilRetention[scenario.soilType as keyof typeof soilRetention] ?? "Medium";
+  const retention =
+    soilRetention[scenario.soilType as keyof typeof soilRetention] ?? "Medium";
 
   const updateScenario = <Key extends keyof IrrigationScenario>(
     key: Key,
@@ -154,7 +166,7 @@ export function IrrigationScenarioSetup({ onGenerate }: IrrigationScenarioSetupP
       <div className={styles.hero}>
         <img
           className={styles.heroImage}
-          src="/figma/groundwater-map-expanded.png"
+          src="https://fruitgrowers.com/wp-content/uploads/2019/06/watering-crops.jpg"
           alt=""
         />
         <div className={styles.heroContent}>
@@ -164,8 +176,8 @@ export function IrrigationScenarioSetup({ onGenerate }: IrrigationScenarioSetupP
           </h1>
           <div className={styles.heroBottom}>
             <p>
-              Set up crop, field, soil, and forecast conditions before generating
-              an irrigation schedule for AQUASMART Mini.
+              Set up crop, field, soil, and forecast conditions before
+              generating an irrigation schedule for AQUASMART Mini.
             </p>
             <a
               className={styles.heroAction}
@@ -189,10 +201,17 @@ export function IrrigationScenarioSetup({ onGenerate }: IrrigationScenarioSetupP
           <div className={styles.headerCopy}>
             <span className={styles.eyebrow}>Irrigation Planning Setup</span>
             <h2>Configure the schedule inputs before simulation.</h2>
-            <p>Set up your crop, field, and forecast conditions before generating the irrigation schedule.</p>
+            <p>
+              Set up your crop, field, and forecast conditions before generating
+              the irrigation schedule.
+            </p>
           </div>
           <div className={styles.headerImage} aria-hidden="true" />
-          <button className={styles.iconButton} type="button" aria-label="Configuration settings">
+          <button
+            className={styles.iconButton}
+            type="button"
+            aria-label="Configuration settings"
+          >
             <Settings2 aria-hidden="true" />
           </button>
         </div>
@@ -227,14 +246,18 @@ export function IrrigationScenarioSetup({ onGenerate }: IrrigationScenarioSetupP
               <strong>Field Area (hectares)</strong>
               <small>Sets the total area for irrigation planning.</small>
             </span>
-            <strong className={styles.rangeValue}>{scenario.fieldAreaHa.toFixed(1)}</strong>
+            <strong className={styles.rangeValue}>
+              {scenario.fieldAreaHa.toFixed(1)}
+            </strong>
             <input
               min="0.5"
               max="10"
               step="0.1"
               type="range"
               value={scenario.fieldAreaHa}
-              onChange={(event) => updateScenario("fieldAreaHa", Number(event.target.value))}
+              onChange={(event) =>
+                updateScenario("fieldAreaHa", Number(event.target.value))
+              }
             />
             <span className={styles.rangeLabels}>
               <small>0.5</small>
@@ -254,9 +277,14 @@ export function IrrigationScenarioSetup({ onGenerate }: IrrigationScenarioSetupP
               label="Irrigation method"
               value={scenario.irrigationMethod}
               onChange={(value) => {
-                const method = irrigationMethods.find((item) => item.value === value);
+                const method = irrigationMethods.find(
+                  (item) => item.value === value,
+                );
                 updateScenario("irrigationMethod", value);
-                updateScenario("irrigationEfficiency", method?.efficiency ?? scenario.irrigationEfficiency);
+                updateScenario(
+                  "irrigationEfficiency",
+                  method?.efficiency ?? scenario.irrigationEfficiency,
+                );
               }}
               options={irrigationMethods.map((method) => ({
                 label: method.label,
@@ -306,7 +334,10 @@ export function IrrigationScenarioSetup({ onGenerate }: IrrigationScenarioSetupP
           </div>
         </div>
 
-        <section className={styles.preview} aria-labelledby="configuration-preview-title">
+        <section
+          className={styles.preview}
+          aria-labelledby="configuration-preview-title"
+        >
           <div className={styles.previewHeader}>
             <span>
               <Eye aria-hidden="true" />
@@ -349,7 +380,11 @@ export function IrrigationScenarioSetup({ onGenerate }: IrrigationScenarioSetupP
               <CalendarDays aria-hidden="true" />
               <div>
                 <h3>Schedule Horizon</h3>
-                <strong>{scenario.forecastPeriod.startsWith("14") ? "14 days" : "7 days"}</strong>
+                <strong>
+                  {scenario.forecastPeriod.startsWith("14")
+                    ? "14 days"
+                    : "7 days"}
+                </strong>
                 <small>Open-Meteo window</small>
               </div>
               <Info aria-hidden="true" />
@@ -361,10 +396,15 @@ export function IrrigationScenarioSetup({ onGenerate }: IrrigationScenarioSetupP
           <p>
             <Lightbulb aria-hidden="true" />
             <span>
-              <strong>Tip:</strong> You can adjust these settings anytime before generating your schedule.
+              <strong>Tip:</strong> You can adjust these settings anytime before
+              generating your schedule.
             </span>
           </p>
-          <button className={styles.sampleButton} type="button" onClick={useSampleSetup}>
+          <button
+            className={styles.sampleButton}
+            type="button"
+            onClick={useSampleSetup}
+          >
             <RefreshCw aria-hidden="true" />
             Use Sample Setup
           </button>
