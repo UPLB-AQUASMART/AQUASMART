@@ -4,7 +4,7 @@ export function IdwInfoSection() {
   return (
     <article className={styles.section}>
       <div className={styles.sectionTitle}>
-        <h3>Inverse Weight Distancing</h3>
+        <h3>Inverse Distance Weighting</h3>
         <p>
           IDW estimates unsampled groundwater values from surrounding monitoring
           wells, helping visualize parameter distribution.

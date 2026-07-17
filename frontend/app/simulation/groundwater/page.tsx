@@ -157,9 +157,12 @@ function escapeHtml(value: string) {
     .replace(/"/g, "&quot;");
 }
 
-function randomizeKnownPointLocations(points: KnownMapPoint[]): KnownMapPoint[] {
+function randomizeKnownPointLocations(
+  points: KnownMapPoint[],
+): KnownMapPoint[] {
   return points.map((point, index) => {
-    const quadrant = randomizedPointQuadrants[index % randomizedPointQuadrants.length];
+    const quadrant =
+      randomizedPointQuadrants[index % randomizedPointQuadrants.length];
     const latOffset = (0.0048 + Math.random() * 0.0054) * quadrant.lat;
     const lngOffset = (0.0048 + Math.random() * 0.0064) * quadrant.lng;
 
@@ -376,7 +379,10 @@ export default function GroundwaterSimulationPage() {
         if (exactPoint) return;
 
         const weighted = points.map((point) => {
-          const distance = Math.max(map.distance(event.latlng, point.position), 1);
+          const distance = Math.max(
+            map.distance(event.latlng, point.position),
+            1,
+          );
           const weight = 1 / distance ** 2;
           return {
             point,
@@ -384,13 +390,18 @@ export default function GroundwaterSimulationPage() {
             weight,
           };
         });
-        const weightTotal = weighted.reduce((sum, item) => sum + item.weight, 0);
+        const weightTotal = weighted.reduce(
+          (sum, item) => sum + item.weight,
+          0,
+        );
         const estimate =
           weighted.reduce(
             (sum, item) => sum + item.point.values[parameter] * item.weight,
             0,
           ) / weightTotal;
-        const nearest = [...weighted].sort((a, b) => a.distance - b.distance)[0];
+        const nearest = [...weighted].sort(
+          (a, b) => a.distance - b.distance,
+        )[0];
 
         projectionGroup.clearLayers();
         L.circleMarker(event.latlng, {
@@ -823,7 +834,7 @@ export default function GroundwaterSimulationPage() {
         {simulationOpen && mapOpen && (
           <>
             <div className={styles.mapModeHeader}>
-              <h1>IWD Interpolation</h1>
+              <h1>IDW Interpolation</h1>
               <div
                 className={`${styles.parameterDropdown} ${parameterMenuOpen ? styles.open : ""}`}
               >
@@ -893,16 +904,16 @@ export default function GroundwaterSimulationPage() {
           <div className={styles.heroContent}>
             {!simulationOpen && (
               <h1>
-                MODFLOW/FLOPY<span>Groundwater Simulation</span>
+                IDW Interpolation & <span>Groundwater Simulation</span>
               </h1>
             )}
 
             {!simulationOpen ? (
               <div className={styles.heroBottom}>
                 <p>
-                  Simulate groundwater response across wells and field zones
-                  using MODFLOW/FLOPY outputs, proximity layers, and live
-                  parameter readings from AQUASMART Mini.
+                  Simulate groundwater response across wells and field zones ,
+                  proximity layers, and mock parameter readings from AQUASMART
+                  Mini.
                 </p>
                 <button
                   className={styles.eyeButton}
