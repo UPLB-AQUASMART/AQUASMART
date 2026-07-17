@@ -18,18 +18,18 @@ const narrativeItems = [
     title: "Visible Subsurface Processes",
     body: "The model demonstrates infiltration, recharge, groundwater flow, pumping, and contaminant transport.",
   },
+  // {
+  //   number: "03",
+  //   title: "Real-time Sensor Data",
+  //   body: "Low-cost sensors monitor groundwater depth, pH, electrical conductivity, and salinity.",
+  // },
   {
     number: "03",
-    title: "Real-time Sensor Data",
-    body: "Low-cost sensors monitor groundwater depth, pH, electrical conductivity, and salinity.",
+    title: "Real-time Weather Forecast",
+    body: "Provides live rainfall, temperature, and weather outlooks to support smarter water-use planning and field decisions.",
   },
   {
     number: "04",
-    title: "Web-based Dashboard",
-    body: "Live readings are transmitted to a dashboard with simple visualizations of groundwater conditions.",
-  },
-  {
-    number: "05",
     title: "Community Outreach",
     body: "Demonstrations, workshops, booklets, activity sheets, and posters make the science accessible.",
   },

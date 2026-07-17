@@ -287,7 +287,7 @@ export const footerColumns = [
   {
     title: "Quick Links",
     links: [
-      { label: "About", href: "/#about" },
+      { label: "About", href: "/about" },
       { label: "Weather", href: "/forecast" },
       { label: "Team", href: "/team" },
       { label: "Contact", href: "/contact" },
@@ -305,6 +305,9 @@ export const footerColumns = [
   },
   {
     title: "Partners",
-    links: partners.map((partner) => ({ label: partner, href: "/partners" })),
+    links: partners.map((partner) => ({
+      label: partner,
+      href: "/partners#partner-spotlight",
+    })),
   },
 ];

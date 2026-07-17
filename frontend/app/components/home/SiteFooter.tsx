@@ -1,4 +1,5 @@
 import { footerColumns } from "@/app/data/home";
+import Link from "next/link";
 import revealStyles from "./ScrollReveal.module.css";
 import styles from "./SiteFooter.module.css";
 
@@ -38,11 +39,17 @@ export function SiteFooter({
           {footerColumns.map((column) => (
             <div key={column.title}>
               <h3>{column.title}</h3>
-              {column.links.map((link) => (
-                <a href={link.href} key={link.label}>
-                  {link.label}
-                </a>
-              ))}
+              {column.links.map((link) =>
+                column.title === "Modules" ? (
+                  <a href={link.href} key={link.label}>
+                    {link.label}
+                  </a>
+                ) : (
+                  <Link href={link.href} key={link.label}>
+                    {link.label}
+                  </Link>
+                ),
+              )}
             </div>
           ))}
         </div>
@@ -50,8 +57,8 @@ export function SiteFooter({
       <div className={styles["footer-lower"]}>
         <span>{"\u00a9"} 2026 AQUASMART. All rights reserved.</span>
         <div>
-          <a href="#contact">Privacy Policy</a>
-          <a href="#contact">Terms of Service</a>
+          <Link href="/privacy">Privacy Policy</Link>
+          <Link href="/terms">Terms of Service</Link>
         </div>
       </div>
     </footer>
