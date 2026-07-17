@@ -803,6 +803,7 @@ export default function GroundwaterSimulationPage() {
 
   return (
     <main className={styles.page}>
+      <SiteNav activeLabel="Simulation" />
       <div
         className={`${styles.mapStage} ${simulationOpen ? styles.simulating : ""} ${mapOpen ? styles.mapViewOpen : ""}`}
       >
@@ -818,7 +819,6 @@ export default function GroundwaterSimulationPage() {
             aria-hidden={!mapOpen}
           />
         )}
-        <SiteNav activeLabel="Simulation" />
         {simulationOpen && !mapOpen && (
           <button
             className={styles.mapToggleButton}
