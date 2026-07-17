@@ -1,6 +1,7 @@
 import type { LearningModule } from "@/app/data/home";
 import { learningModules } from "@/app/data/home";
 import { createClient } from "@/app/utils/supabase/server";
+import { getR2PublicUrl } from "@/lib/r2";
 
 export const MODULES_TABLE = "modules";
 
@@ -47,7 +48,7 @@ function dateValue(row: ModuleRecord) {
 }
 
 function publicR2Url(key: string) {
-  const baseUrl = process.env.R2_PUBLIC_URL;
+  const baseUrl = getR2PublicUrl();
 
   if (!baseUrl) {
     return "";

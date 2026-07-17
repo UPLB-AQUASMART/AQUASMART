@@ -1,9 +1,12 @@
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { NextRequest, NextResponse } from "next/server";
 
-import { R2_BUCKET_NAME, r2 } from "@/lib/r2";
+import { createR2Client, getR2BucketName } from "@/lib/r2";
 
 const DEFAULT_CONTENT_TYPE = "application/octet-stream";
+
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 export async function GET(request: NextRequest) {
   const key = request.nextUrl.searchParams.get("key");
@@ -13,9 +16,10 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    const r2 = createR2Client();
     const object = await r2.send(
       new GetObjectCommand({
-        Bucket: R2_BUCKET_NAME,
+        Bucket: getR2BucketName(),
         Key: key,
       }),
     );
