@@ -149,7 +149,7 @@ export const simulations = [
       },
       {
         label: "Inverse Distance Weighting Interpolation",
-        image: "/assets/Interpolation.png",
+        image: "/assets/interpolation.png",
         body: "Create water parameter projections for well locations given a known location of existing wells with known parameter values.",
       },
       {
