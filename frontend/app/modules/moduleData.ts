@@ -1,5 +1,4 @@
 import type { LearningModule } from "@/app/data/home";
-import { learningModules } from "@/app/data/home";
 import { createClient } from "@/app/utils/supabase/server";
 import { getR2PublicUrl } from "@/lib/r2";
 
@@ -124,16 +123,16 @@ export async function getLearningModules(): Promise<LearningModule[]> {
 
     if (error) {
       console.error("Unable to load learning modules:", error.message);
-      return learningModules;
+      return [];
     }
 
     if (!data?.length) {
-      return learningModules;
+      return [];
     }
 
     return Promise.all(data.map((row) => toLearningModule(row)));
   } catch (error) {
     console.error("Unable to load learning modules:", error);
-    return learningModules;
+    return [];
   }
 }

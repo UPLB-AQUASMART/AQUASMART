@@ -11,9 +11,12 @@ import { SiteNav } from "@/app/components/home/SiteNav";
 import { TaglineSection } from "@/app/components/home/TaglineSection";
 import { TeamSection } from "@/app/components/home/TeamSection";
 import { WeatherPreviewSection } from "@/app/components/home/WeatherPreviewSection";
+import { getLearningModules } from "@/app/modules/moduleData";
 import styles from "./Home.module.css";
 
-export default function Home() {
+export default async function Home() {
+  const modules = await getLearningModules();
+
   return (
     <main className={styles["home-page"]} id="home">
       <ScrollRevealInit />
@@ -24,7 +27,7 @@ export default function Home() {
       <AboutMiniSection />
       <ParametersSection />
       <SimulationsSection />
-      <ModulesSection />
+      <ModulesSection modules={modules} />
       <WeatherPreviewSection />
       <TeamSection />
       <PartnersSection />

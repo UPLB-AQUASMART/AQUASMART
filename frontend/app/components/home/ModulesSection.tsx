@@ -1,16 +1,17 @@
 "use client";
 
 import gsap from "gsap";
+import { Construction } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { learningModules } from "@/app/data/home";
+import type { LearningModule } from "@/app/data/home";
 
 import revealStyles from "./ScrollReveal.module.css";
 import styles from "./ModulesSection.module.css";
 
-export function ModulesSection() {
+export function ModulesSection({ modules }: { modules: LearningModule[] }) {
   const [isRevealed, setIsRevealed] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const deckCardRefs = useRef<Array<HTMLElement | null>>([]);
@@ -18,14 +19,14 @@ export function ModulesSection() {
   const carouselTrackRef = useRef<HTMLDivElement | null>(null);
   const marqueeTlRef = useRef<gsap.core.Timeline | null>(null);
   const router = useRouter();
-  const loopModules = useMemo(() => [...learningModules, ...learningModules], []);
+  const loopModules = useMemo(() => [...modules, ...modules], [modules]);
 
   const getCardMetrics = () => {
     const isMobile = window.matchMedia("(max-width: 720px)").matches;
     const cardWidth = isMobile ? 260 : 388;
     const gap = isMobile ? 20 : 48;
     const step = cardWidth + gap;
-    const centerIndex = (learningModules.length - 1) / 2;
+    const centerIndex = (modules.length - 1) / 2;
 
     return { cardWidth, gap, step, centerIndex };
   };
@@ -39,18 +40,20 @@ export function ModulesSection() {
       y: (index) => index * 8,
       rotate: (index) => [-5, 0, 5, -2, 3, -4][index] ?? 0,
       scale: (index) => 1 - index * 0.018,
-      zIndex: (index) => learningModules.length - index,
+      zIndex: (index) => modules.length - index,
     });
   };
 
   useEffect(() => {
+    if (modules.length === 0) return;
+
     setDeckStack();
 
     if (carouselShellRef.current) {
       gsap.set(carouselShellRef.current, { autoAlpha: 0 });
       carouselShellRef.current.style.display = "none";
     }
-  }, []);
+  }, [modules]);
 
   const getSpreadOffset = (index: number) => {
     const { step, centerIndex } = getCardMetrics();
@@ -75,7 +78,7 @@ export function ModulesSection() {
     if (!track) return;
 
     const { step } = getCardMetrics();
-    const loopWidth = step * learningModules.length;
+    const loopWidth = step * modules.length;
     const alignedX = getAlignedTrackX();
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
@@ -200,7 +203,7 @@ export function ModulesSection() {
         from: "center",
       },
       ease: "power3.inOut",
-      zIndex: (index) => learningModules.length - index,
+      zIndex: (index) => modules.length - index,
     });
   };
 
@@ -231,67 +234,80 @@ export function ModulesSection() {
         </p>
       </div>
 
-      <div className={styles.wrapper}>
-        <div
-          aria-label="Open learning modules carousel"
-          className={`${styles.deck}${isRevealed ? ` ${styles["deck-unpacked"]}` : ""}`}
-          onClick={handleCollapsedCardClick}
-          onKeyDown={(event) => {
-            if (event.key === "Enter" || event.key === " ") {
-              event.preventDefault();
-              handleCollapsedCardClick();
-            }
-          }}
-          role="button"
-          tabIndex={isRevealed ? -1 : 0}
-        >
-          {learningModules.map((module, index) => (
-            <ModuleCard
-              cardRef={(node) => {
-                deckCardRefs.current[index] = node;
-              }}
-              key={module.code}
-              module={module}
-              onClick={handleCollapsedCardClick}
-            />
-          ))}
+      {modules.length === 0 ? (
+        <div className={styles["wip-container"]}>
+          <Construction size={48} strokeWidth={1.5} className={styles["wip-icon"]} />
+          <h3 className={styles["wip-title"]}>Modules Coming Soon</h3>
+          <p className={styles["wip-description"]}>
+            Learning modules are currently being prepared and will be available
+            here once published. Check back soon for educational materials on
+            groundwater, sensors, and sustainable irrigation.
+          </p>
+          <span className={styles["wip-badge"]}>Work in Progress</span>
         </div>
-
-        <div
-          className={styles["carousel-shell"]}
-          onMouseEnter={() => marqueeTlRef.current?.pause()}
-          onMouseLeave={() => marqueeTlRef.current?.play()}
-          ref={carouselShellRef}
-        >
-          <div className={styles["carousel-track"]} ref={carouselTrackRef}>
-            {loopModules.map((module, index) => (
+      ) : (
+        <div className={styles.wrapper}>
+          <div
+            aria-label="Open learning modules carousel"
+            className={`${styles.deck}${isRevealed ? ` ${styles["deck-unpacked"]}` : ""}`}
+            onClick={handleCollapsedCardClick}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                handleCollapsedCardClick();
+              }
+            }}
+            role="button"
+            tabIndex={isRevealed ? -1 : 0}
+          >
+            {modules.map((module, index) => (
               <ModuleCard
-                isRevealed
-                key={`${module.code}-${index}`}
+                cardRef={(node) => {
+                  deckCardRefs.current[index] = node;
+                }}
+                key={module.code}
                 module={module}
-                onClick={openModulesPage}
+                onClick={handleCollapsedCardClick}
               />
             ))}
           </div>
-        </div>
 
-        {isRevealed ? (
-          <button
-            className={styles["collapse-button"]}
-            disabled={isAnimating}
-            onClick={collapseDeck}
-            type="button"
+          <div
+            className={styles["carousel-shell"]}
+            onMouseEnter={() => marqueeTlRef.current?.pause()}
+            onMouseLeave={() => marqueeTlRef.current?.play()}
+            ref={carouselShellRef}
           >
-            Collapse deck
-          </button>
-        ) : null}
+            <div className={styles["carousel-track"]} ref={carouselTrackRef}>
+              {loopModules.map((module, index) => (
+                <ModuleCard
+                  isRevealed
+                  key={`${module.code}-${index}`}
+                  module={module}
+                  onClick={openModulesPage}
+                />
+              ))}
+            </div>
+          </div>
 
-        <p className={styles.hint}>
-          {isRevealed
-            ? "Hover on a card to focus"
-            : "Click the deck to browse modules"}
-        </p>
-      </div>
+          {isRevealed ? (
+            <button
+              className={styles["collapse-button"]}
+              disabled={isAnimating}
+              onClick={collapseDeck}
+              type="button"
+            >
+              Collapse deck
+            </button>
+          ) : null}
+
+          <p className={styles.hint}>
+            {isRevealed
+              ? "Hover on a card to focus"
+              : "Click the deck to browse modules"}
+          </p>
+        </div>
+      )}
 
       {/* <a className={styles["see-all"]} href="/modules">
         See All Materials <span aria-hidden="true">→</span>
@@ -308,7 +324,7 @@ function ModuleCard({
 }: {
   cardRef?: (node: HTMLElement | null) => void;
   isRevealed?: boolean;
-  module: (typeof learningModules)[number];
+  module: LearningModule;
   onClick?: () => void;
 }) {
   return (

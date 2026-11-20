@@ -73,3 +73,43 @@
     gap: 14px;
   }
 }
+
+.wipContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 2px dashed rgba(15, 118, 200, 0.2);
+  border-radius: 12px;
+  background: rgba(223, 246, 253, 0.25);
+  padding: 36px 24px;
+  text-align: center;
+}
+
+.wipIcon {
+  margin-bottom: 14px;
+  color: #0f76c8;
+}
+
+.wipText {
+  max-width: 400px;
+  margin: 0 0 16px;
+  color: #516c8c;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.65;
+}
+
+.wipBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(15, 118, 200, 0.1);
+  color: #0f76c8;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  padding: 8px 18px;
+  text-transform: uppercase;
+}

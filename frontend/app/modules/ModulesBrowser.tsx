@@ -1,6 +1,6 @@
 "use client";
 
-import { Search } from "lucide-react";
+import { Construction, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import type { LearningModule } from "@/app/data/home";
@@ -35,6 +35,23 @@ export function ModulesBrowser({ modules }: { modules: LearningModule[] }) {
       return matchesFilter && matchesQuery;
     });
   }, [activeFilter, modules, query]);
+
+  if (modules.length === 0) {
+    return (
+      <div className={styles.gridSection}>
+        <div className={styles.wipContainer}>
+          <Construction size={48} strokeWidth={1.5} className={styles.wipIcon} />
+          <h2 className={styles.wipTitle}>Modules Coming Soon</h2>
+          <p className={styles.wipDescription}>
+            Learning modules are currently being prepared and will be available
+            here once published. Check back soon for groundwater, sensor
+            networks, irrigation planning, and other educational materials.
+          </p>
+          <span className={styles.wipBadge}>Work in Progress</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>

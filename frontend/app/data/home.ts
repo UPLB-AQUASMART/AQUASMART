@@ -205,69 +205,6 @@ export const simulations = [
   },
 ];
 
-export const learningModules: LearningModule[] = [
-  {
-    code: "AQS 101",
-    title: "Groundwater Monitoring",
-    description:
-      "Understand how groundwater levels are measured, interpreted, and translated into practical irrigation insights.",
-    image: "/figma/drawdown-state-head.png",
-    category: "Groundwater",
-    date: "May 15, 2025",
-    pdfHref: "#",
-  },
-  {
-    code: "AQS 102",
-    title: "Smart Sensor Networks",
-    description:
-      "Learn how field sensors collect pH, salinity, temperature, EC, and TDS data for real-time farm decisions.",
-    image: "/figma/drawdown-card.png",
-    category: "AI & Technology",
-    date: "May 10, 2025",
-    pdfHref: "#",
-  },
-  {
-    code: "AQS 103",
-    title: "Public Engagement Dashboard",
-    description:
-      "Explore how live groundwater readings and simple visualizations make aquifer behavior understandable during exhibits and workshops.",
-    image: "/assets/weather-preview-light-rain.png",
-    category: "Public Engagement",
-    date: "April 28, 2025",
-    pdfHref: "#",
-  },
-  {
-    code: "AQS 104",
-    title: "Irrigation Planning",
-    description:
-      "Study how pump-to-crop water movement, soil moisture, and crop needs shape irrigation recommendations.",
-    image: "/assets/field.png",
-    category: "Field Studies",
-    date: "April 12, 2025",
-    pdfHref: "#",
-  },
-  {
-    code: "AQS 105",
-    title: "Water Quality Basics",
-    description:
-      "Review key water-quality indicators and how they affect crop health, salinity risk, and sustainable use.",
-    image: "/assets/weather-clouds.png",
-    category: "Water Quality",
-    date: "March 30, 2025",
-    pdfHref: "#",
-  },
-  {
-    code: "AQS 106",
-    title: "Decision Dashboards",
-    description:
-      "See how monitoring data, model outputs, and alerts come together in clear dashboards for farm action.",
-    image: "/assets/field.png",
-    category: "AI & Technology",
-    date: "March 15, 2025",
-    pdfHref: "#",
-  },
-];
-
 export const forecast: ForecastItem[] = [
   { temp: "22\u00b0", day: "Friday, 1 Nov", icon: "sun" },
   { temp: "19\u00b0", day: "Sunday, 3 Nov", icon: "rain" },

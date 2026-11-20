@@ -1,12 +1,13 @@
-import { Layers } from "lucide-react";
+import { Construction, Layers } from "lucide-react";
 
-import { learningModules } from "@/app/data/home";
+import { getLearningModules } from "@/app/modules/moduleData";
 import { LearningModuleCard } from "@/app/modules/components/LearningModuleCard";
 import styles from "./RelatedModulesSection.module.css";
 
-const placeholderModules = learningModules.slice(0, 4);
+export async function RelatedModulesSection() {
+  const modules = await getLearningModules();
+  const displayModules = modules.slice(0, 4);
 
-export function RelatedModulesSection() {
   return (
     <section className={styles.section} aria-labelledby="related-title">
       <div className={styles.shell}>
@@ -21,11 +22,23 @@ export function RelatedModulesSection() {
             </p>
           </div>
         </header>
-        <div className={styles.grid}>
-          {placeholderModules.map((module) => (
-            <LearningModuleCard module={module} key={module.code} />
-          ))}
-        </div>
+
+        {displayModules.length > 0 ? (
+          <div className={styles.grid}>
+            {displayModules.map((module) => (
+              <LearningModuleCard module={module} key={module.code} />
+            ))}
+          </div>
+        ) : (
+          <div className={styles.wipContainer}>
+            <Construction size={36} strokeWidth={1.5} className={styles.wipIcon} />
+            <p className={styles.wipText}>
+              Related learning modules are being prepared and will appear here
+              once published.
+            </p>
+            <span className={styles.wipBadge}>Work in Progress</span>
+          </div>
+        )}
       </div>
     </section>
   );
