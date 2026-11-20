@@ -36,23 +36,6 @@ export function ModulesBrowser({ modules }: { modules: LearningModule[] }) {
     });
   }, [activeFilter, modules, query]);
 
-  if (modules.length === 0) {
-    return (
-      <div className={styles.gridSection}>
-        <div className={styles.wipContainer}>
-          <Construction size={48} strokeWidth={1.5} className={styles.wipIcon} />
-          <h2 className={styles.wipTitle}>Modules Coming Soon</h2>
-          <p className={styles.wipDescription}>
-            Learning modules are currently being prepared and will be available
-            here once published. Check back soon for groundwater, sensor
-            networks, irrigation planning, and other educational materials.
-          </p>
-          <span className={styles.wipBadge}>Work in Progress</span>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <>
       <div className={styles.searchRow}>
@@ -85,17 +68,32 @@ export function ModulesBrowser({ modules }: { modules: LearningModule[] }) {
       </div>
 
       <div className={styles.gridSection}>
-        <div className={styles.materialsGrid}>
-          {filteredModules.map((module) => (
-            <LearningModuleCard module={module} key={module.code} />
-          ))}
-        </div>
+        {modules.length === 0 ? (
+          <div className={styles.wipContainer}>
+            <Construction size={48} strokeWidth={1.5} className={styles.wipIcon} />
+            <h2 className={styles.wipTitle}>Modules Coming Soon</h2>
+            <p className={styles.wipDescription}>
+              Learning modules are currently being prepared and will be available
+              here once published. Check back soon for groundwater, sensor
+              networks, irrigation planning, and other educational materials.
+            </p>
+            <span className={styles.wipBadge}>Work in Progress</span>
+          </div>
+        ) : (
+          <>
+            <div className={styles.materialsGrid}>
+              {filteredModules.map((module) => (
+                <LearningModuleCard module={module} key={module.code} />
+              ))}
+            </div>
 
-        {filteredModules.length === 0 ? (
-          <p className={styles.emptyState}>
-            No modules match your search yet. Try another topic or keyword.
-          </p>
-        ) : null}
+            {filteredModules.length === 0 ? (
+              <p className={styles.emptyState}>
+                No modules match your search yet. Try another topic or keyword.
+              </p>
+            ) : null}
+          </>
+        )}
       </div>
     </>
   );
