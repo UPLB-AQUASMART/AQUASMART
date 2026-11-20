@@ -23,13 +23,12 @@ const contactDetails = [
   {
     icon: MapPin,
     label: "Location",
-    value: "Luzon, Philippines",
-    caption: "Field operations across Central Luzon",
+    value: "Los Baños, Philippines",
   },
   {
     icon: Globe2,
-    label: "Partners",
-    value: "UNESCO, FAO, Nestle, SWP, EuroGeosciences",
+    label: "Supporters",
+    value: "European Geoscience Union, UNESCO Groundwater Youth Network",
   },
 ];
 
@@ -38,7 +37,10 @@ export default function ContactPage() {
     <main className={styles.page}>
       <SiteNav activeLabel="Contact" />
 
-      <section className={styles.contactSection} aria-labelledby="contact-title">
+      <section
+        className={styles.contactSection}
+        aria-labelledby="contact-title"
+      >
         <div className={styles.backdropRingOne} aria-hidden="true" />
         <div className={styles.backdropRingTwo} aria-hidden="true" />
 
@@ -72,9 +74,6 @@ export default function ContactPage() {
                   <>
                     <span className={styles.detailLabel}>{detail.label}</span>
                     <span className={styles.detailValue}>{detail.value}</span>
-                    {detail.caption ? (
-                      <span className={styles.detailCaption}>{detail.caption}</span>
-                    ) : null}
                   </>
                 );
 
