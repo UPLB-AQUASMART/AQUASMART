@@ -259,7 +259,8 @@
   gap: 8px;
 }
 
-.field span {
+.field > span,
+.fieldLabel {
   color: var(--navy);
   font-size: 13px;
   font-weight: 800;
@@ -307,6 +308,153 @@
   background: #ffffff;
   box-shadow: 0 0 0 4px rgba(31, 163, 201, 0.12);
   transform: translateY(-1px);
+}
+
+.selectContainer {
+  position: relative;
+  width: 100%;
+}
+
+.selectContainerOpen {
+  z-index: 25;
+}
+
+.selectTrigger {
+  display: flex;
+  width: 100%;
+  min-height: 52px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: rgba(245, 250, 252, 0.48);
+  color: var(--navy);
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  outline: none;
+  padding: 15px 17px;
+  text-align: left;
+  user-select: none;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease,
+    transform 180ms ease;
+}
+
+.selectTrigger:hover:not(.selectTriggerOpen) {
+  border-color: #cbd5e1;
+  background: rgba(245, 250, 252, 0.85);
+}
+
+.selectTrigger:focus-visible,
+.selectTriggerOpen {
+  border-color: var(--aqua);
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(31, 163, 201, 0.12);
+  transform: translateY(-1px);
+}
+
+.selectValue {
+  color: var(--navy);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.selectIcon {
+  flex-shrink: 0;
+  color: #8b98aa;
+  transition:
+    transform 220ms ease,
+    color 180ms ease;
+}
+
+.selectIconRotated {
+  color: var(--aqua);
+  transform: rotate(180deg);
+}
+
+.selectMenu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 0;
+  padding: 6px;
+  border: 1px solid rgba(31, 163, 201, 0.2);
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow:
+    0 16px 36px rgba(11, 31, 58, 0.12),
+    0 4px 12px rgba(11, 31, 58, 0.04);
+  list-style: none;
+  animation: dropdownFadeIn 180ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.selectOption {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--navy);
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 11px 14px;
+  text-align: left;
+  user-select: none;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
+}
+
+.selectOption:hover {
+  background: rgba(31, 163, 201, 0.08);
+  color: var(--aqua);
+}
+
+.selectOptionSelected {
+  background: rgba(31, 163, 201, 0.12);
+  color: #0c7694;
+  font-weight: 700;
+}
+
+.selectOptionSelected:hover {
+  background: rgba(31, 163, 201, 0.16);
+  color: #0c7694;
+}
+
+.checkIcon {
+  flex-shrink: 0;
+  color: var(--aqua);
 }
 
 .submitButton {
@@ -383,6 +531,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   .shell {
+    animation: none;
+  }
+
+  .selectMenu {
     animation: none;
   }
 }
