@@ -21,6 +21,10 @@ backend/.venv/
 # Local model/output artifacts
 backend/data/
 backend/outputs/
+backend/bin/linux/
+backend/bin/mac/
+backend/bin/macarm/
+backend/bin/win64/
 
 # Frontend dependencies and build output
 frontend/node_modules/

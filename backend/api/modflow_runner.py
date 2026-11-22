@@ -4,13 +4,14 @@ import math
 import os
 import shutil
 import subprocess
-import sys
 import tempfile
 from pathlib import Path
 from typing import Any
 
 import flopy
 import numpy as np
+
+from .mf6_installer import download_url, install_mf6, platform_bin_dir
 
 
 SOIL_PROPERTIES = {
@@ -40,17 +41,23 @@ def resolve_modflow_executable() -> str:
         candidates.append(configured_path)
         if not configured_path.is_absolute():
             candidates.append(backend_dir / configured_path)
+    platform_dir = platform_bin_dir(backend_dir)
+    candidates.append(platform_dir / "mf6")
     candidates.append(backend_dir / "bin" / "mf6")
 
+    seen: set[Path] = set()
     for candidate in candidates:
+        if candidate in seen:
+            continue
+        seen.add(candidate)
         if candidate.is_file() and _modflow_binary_works(candidate, errors):
             return str(candidate)
 
-    resolved = shutil.which(executable or "mf6")
+    resolved = shutil.which("mf6")
     if resolved and _modflow_binary_works(Path(resolved), errors):
         return resolved
 
-    installed = _install_runtime_modflow(backend_dir / "bin", errors)
+    installed = _install_runtime_modflow(platform_dir, errors)
     if installed and _modflow_binary_works(installed, errors):
         return str(installed)
 
@@ -107,35 +114,12 @@ def _run_modflow_version(path: Path, errors: list[str]) -> str | None:
 
 
 def _install_runtime_modflow(target_dir: Path, errors: list[str]) -> Path | None:
+    # Direct release-asset download (no api.github.com call, so no 403 rate limit).
     try:
-        target_dir.mkdir(parents=True, exist_ok=True)
-        target = target_dir / "mf6"
-        if target.exists():
-            target.unlink()
-        completed = subprocess.run(
-            [
-                sys.executable,
-                "-m",
-                "flopy.utils.get_modflow",
-                str(target_dir),
-                "--subset",
-                "mf6",
-                "--quiet",
-            ],
-            check=False,
-            capture_output=True,
-            text=True,
-            timeout=180,
-        )
-    except (OSError, subprocess.TimeoutExpired) as error:
-        errors.append(f"Runtime MODFLOW install failed: {error}")
+        return install_mf6(target_dir)
+    except Exception as error:  # network, zip, or platform errors
+        errors.append(f"Runtime MODFLOW install from {download_url()} failed: {error}")
         return None
-    if completed.returncode != 0:
-        output = "\n".join(part for part in [completed.stdout, completed.stderr] if part).strip()
-        errors.append(f"Runtime MODFLOW install exited {completed.returncode}: {output[-1000:]}")
-        return None
-    target.chmod(target.stat().st_mode | 0o755)
-    return target if target.exists() else None
 
 
 def run_top_view_model(scenario: Any) -> dict[str, Any]:

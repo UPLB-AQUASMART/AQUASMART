@@ -168,7 +168,7 @@ Keep `SUPABASE_SERVICE_ROLE_KEY` only on the backend. Never expose it through br
 
 The `/simulation/top-view` backend endpoint builds and runs a compact MODFLOW 6 model through FloPy. The repository includes a local macOS arm64 executable at `backend/bin/mf6`.
 
-On another platform, install a compatible MODFLOW 6 executable on `PATH` or set `MODFLOW_EXE` to the correct binary. During Render builds, `render.yaml` removes the local macOS binary and downloads a Linux-compatible MODFLOW 6 executable.
+On another platform, install a compatible MODFLOW 6 executable on `PATH` or set `MODFLOW_EXE` to the correct binary. On Render, the build runs `python -m api.mf6_installer bin/linux`, which downloads the Linux MODFLOW 6 release asset directly (bypassing the rate-limited GitHub API) into `backend/bin/linux/mf6`. If no working binary is found at request time, the API downloads it automatically.
 
 To keep the prototype responsive and free-tier friendly, the API validates grid size and defaults to a small in-memory simulation cache.
 
