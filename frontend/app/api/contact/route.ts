@@ -1,10 +1,43 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { Resend } from "resend";
 
-const CONTACT_FROM =
-  process.env.CONTACT_FROM_EMAIL || "AQUASMART Mini support@aquasmartmini.com";
-const CONTACT_TO =
-  process.env.CONTACT_TO_EMAIL || "aquasmart.philippines@gmail.com";
+function formatFromEmail(raw: string): string {
+  const clean = raw
+    .trim()
+    .replace(/^["']|["']$/g, "")
+    .trim();
+
+  // If already in "Name <email@example.com>" or "email@example.com" format
+  if (
+    /^[^<]+<[^\s@]+@[^\s@]+\.[^\s@]+>$/.test(clean) ||
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clean)
+  ) {
+    return clean;
+  }
+
+  // If provided as "Name email@example.com" (missing angle brackets)
+  const match = clean.match(
+    /^(.*?)\s*([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/,
+  );
+  if (match) {
+    const name = match[1].trim();
+    const email = match[2].trim();
+    return name ? `${name} <${email}>` : email;
+  }
+
+  return clean;
+}
+
+const rawContactFrom =
+  process.env.CONTACT_FROM_EMAIL ||
+  "AQUASMART Mini <support@aquasmartmini.com>";
+const CONTACT_FROM = formatFromEmail(rawContactFrom);
+const CONTACT_TO = (
+  process.env.CONTACT_TO_EMAIL || "aquasmart.philippines@gmail.com"
+)
+  .trim()
+  .replace(/^["']|["']$/g, "")
+  .trim();
 
 type ContactPayload = {
   firstName?: unknown;
