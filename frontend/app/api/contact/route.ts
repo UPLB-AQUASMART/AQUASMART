@@ -1,8 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { Resend } from "resend";
 
-const CONTACT_FROM = "AQUASMART Mini <contact@aquasmartmini.com>";
-const CONTACT_TO = "qacustodio@up.edu.ph";
+const CONTACT_FROM =
+  process.env.CONTACT_FROM_EMAIL || "AQUASMART Mini support@aquasmartmini.com";
+const CONTACT_TO =
+  process.env.CONTACT_TO_EMAIL || "aquasmart.philippines@gmail.com";
 
 type ContactPayload = {
   firstName?: unknown;
