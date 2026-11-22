@@ -30,6 +30,14 @@ html {
   background: #ffffff;
 }
 
+/* Lenis handles smooth scrolling itself. Native smooth scroll-behavior fights
+   with it and makes programmatic jumps (e.g. reset-to-top on page change)
+   animate and stop part-way down the page. */
+html.lenis,
+html.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
 body {
   display: flex;
   min-width: 320px;

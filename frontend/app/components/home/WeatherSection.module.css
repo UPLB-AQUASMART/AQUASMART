@@ -83,7 +83,20 @@
   opacity: 0.16;
 }
 
+/* Full-size layer whose rotation pivot is the centre of the background ring
+   (.weather-section::before: left 330 + 850/2, top -360 + 850/2). Keep these
+   numbers in sync with the ring in each media query. */
+.weather-orbit {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  pointer-events: none;
+  transform-origin: 755px 65px;
+}
+
 .weather-sun {
+  --weather-sun-opacity: 1;
+
   position: absolute;
   top: 112px;
   left: 44.3%;
@@ -101,6 +114,7 @@
   box-shadow:
     0 0 28px rgba(249, 196, 66, 0.48),
     0 0 62px rgba(249, 196, 66, 0.32);
+  opacity: var(--weather-sun-opacity);
   pointer-events: none;
   transition:
     opacity 260ms ease,
@@ -109,14 +123,16 @@
 }
 
 .weather-sun-rain {
-  opacity: 0;
+  --weather-sun-opacity: 0;
+
   filter: grayscale(0.85) blur(2px);
   transform: translateY(20px) scale(0.82);
 }
 
 .weather-sun-cloud {
-  opacity: 0.74;
-  filter: saturate(0.8);
+  --weather-sun-opacity: 0.92;
+
+  filter: saturate(0.95);
   transform: translateY(8px) scale(0.92);
 }
 
@@ -153,13 +169,14 @@
   transform: translate(-50%, 0) scale(1);
 }
 
+/* Cloudy / foggy: soft realistic cloud drifting in front of the (dimmed) CSS
+   sun, instead of the flat badge icon which has its own circular background. */
 .weather-hero-cloud {
-  --weather-hero-opacity: 0.86;
+  --weather-hero-opacity: 0.92;
 
-  background-image: url("/assets/weather/cloudy-sunny-icon.svg");
-  background-size: min(55%, 260px);
-  filter: saturate(0.74) brightness(1.08) contrast(0.92)
-    drop-shadow(0 24px 34px rgba(4, 18, 27, 0.2));
+  background-image: url("/assets/weather-cloud-icon.png");
+  filter: saturate(0.2) brightness(1.32) contrast(0.82)
+    drop-shadow(0 18px 30px rgba(4, 18, 27, 0.16));
   transform: translate(-50%, 0) scale(0.94);
 }
 
@@ -335,8 +352,25 @@
   animation: weatherOrbitSpin 920ms cubic-bezier(0.22, 0.82, 0.18, 1) both;
 }
 
+/* Same keyframes, duration and easing as the ring so the icons travel with it.
+   The icon swap happens at ~260ms (WEATHER_DISSOLVE_MS) while they're faded out. */
+.weather-transition-weather-change .weather-orbit {
+  animation: weatherOrbitSpin 920ms cubic-bezier(0.22, 0.82, 0.18, 1) both;
+}
+
+.weather-transition-weather-change .weather-sun {
+  animation: weatherSunOrbitFade 920ms linear both;
+}
+
 .weather-transition-weather-change .weather-cloud-hero {
-  animation: weatherHeroRotateSwap 980ms cubic-bezier(0.22, 0.82, 0.18, 1) both;
+  animation: weatherHeroOrbitFade 920ms linear both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .weather-transition-weather-change::before,
+  .weather-transition-weather-change .weather-orbit {
+    animation: none;
+  }
 }
 
 .weather-copy .section-pill {
@@ -743,29 +777,33 @@
   }
 }
 
-@keyframes weatherHeroRotateSwap {
+@keyframes weatherSunOrbitFade {
+  0% {
+    opacity: var(--weather-sun-opacity);
+  }
+
+  22%,
+  36% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: var(--weather-sun-opacity);
+  }
+}
+
+@keyframes weatherHeroOrbitFade {
   0% {
     opacity: var(--weather-hero-opacity);
-    rotate: 0deg;
-    scale: 1;
   }
 
-  42% {
+  22%,
+  36% {
     opacity: 0;
-    rotate: -86deg;
-    scale: 0.78;
-  }
-
-  58% {
-    opacity: 0;
-    rotate: 86deg;
-    scale: 0.78;
   }
 
   100% {
     opacity: var(--weather-hero-opacity);
-    rotate: 0deg;
-    scale: 1;
   }
 }
 
@@ -886,6 +924,10 @@
     height: 650px;
   }
 
+  .weather-orbit {
+    transform-origin: 435px 60px;
+  }
+
   .weather-sun {
     top: 130px;
     left: auto;
@@ -975,11 +1017,11 @@
     right: 24px;
     width: 88px;
     height: 88px;
-    opacity: 0.85;
+    --weather-sun-opacity: 0.85;
   }
 
   .weather-sun-rain {
-    opacity: 0;
+    --weather-sun-opacity: 0;
   }
 
   .weather-cloud-hero {
@@ -1001,6 +1043,10 @@
     left: -8px;
     width: 430px;
     height: 430px;
+  }
+
+  .weather-orbit {
+    transform-origin: 207px 45px;
   }
 
   .week-card {
@@ -1166,6 +1212,10 @@
     left: -72px;
     width: 390px;
     height: 390px;
+  }
+
+  .weather-orbit {
+    transform-origin: 123px 53px;
   }
 
   .weather-sun {

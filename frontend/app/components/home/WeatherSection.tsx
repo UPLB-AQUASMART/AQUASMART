@@ -353,19 +353,21 @@ export function WeatherSection({
 
   return (
     <section className={weatherClassName} id="weather" ref={sectionRef}>
-      <div
-        className={`${styles["weather-sun"]}${activeForecast.icon === "sun" ? "" : ` ${styles[`weather-sun-${activeForecast.icon}`]}`}`}
-        aria-hidden="true"
-      />
-      <div
-        className={[
-          styles["weather-cloud-hero"],
-          styles[`weather-hero-${activeForecast.icon}`],
-        ]
-          .filter(Boolean)
-          .join(" ")}
-        aria-hidden="true"
-      />
+      {/* Icons orbit around the same centre as the background ring (::before)
+          so they spin with it when the weather type changes. */}
+      <div className={styles["weather-orbit"]} aria-hidden="true">
+        <div
+          className={`${styles["weather-sun"]}${activeForecast.icon === "sun" ? "" : ` ${styles[`weather-sun-${activeForecast.icon}`]}`}`}
+        />
+        <div
+          className={[
+            styles["weather-cloud-hero"],
+            styles[`weather-hero-${activeForecast.icon}`],
+          ]
+            .filter(Boolean)
+            .join(" ")}
+        />
+      </div>
       <div className={styles["weather-layout"]}>
         {isForecastLoading ? (
           <div className={styles["weather-loading"]} role="status" aria-live="polite">
